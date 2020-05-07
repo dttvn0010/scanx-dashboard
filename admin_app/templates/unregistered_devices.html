@@ -1,0 +1,80 @@
+{% extends "base_admin.html" %}
+
+{% block sidebar %}
+{% with page=2 %}
+{{ block.super }}
+{% endwith %}
+{% endblock %}
+
+{% block content %}
+<div class="content p-3">
+  <div class="row">
+    <div class="col-8">
+      <input placeholder="Search device" class="form-control"/>
+    </div>
+    <div class="col-4">
+      <button class="btn btn-secondary float-right">Add Device</button>
+      <button class="btn btn-secondary float-right mr-2"><i class="fas fa-upload"></i>Import</button>      
+    </div>
+  </div>
+  <table class="table mt-2">
+    <thead>
+      <tr>
+        <th style="width: 8%;">Enabled</th>
+        <th style="width: 24%;">Device Type</th>
+        <th style="width: 15%;">ID #1</th>
+        <th style="width: 15%;">ID #2</th>
+        <th style="width: 28%;">Other</th>
+        <th style="width: 10%;"></th>
+      </tr>      
+    </thead>
+    <tbody>
+      <tr>
+        <td class="text-center"><input type="checkbox" checked></td>
+        <td>QR_Type_1</td>
+        <td>0013</td>
+        <td>2323</td>
+        <td>LoremIpsum00391</td>
+        <td class="text-center">
+          <a title="Edit" href="#"><i class="fas fa-edit"></i></a> &nbsp;
+          <a title="Delete" href="#"><i class="fas fa-trash" style="color:red"></i></a>
+        </td>
+      </tr>
+      <tr>
+        <td class="text-center"><input type="checkbox" checked></td>
+        <td>QR_Type_2</td>
+        <td>0013</td>
+        <td>2323</td>
+        <td>LoremIpsum00391</td>
+        <td class="text-center">
+          <a title="Edit" href="#"><i class="fas fa-edit"></i></a> &nbsp;
+          <a title="Delete" href="#"><i class="fas fa-trash" style="color:red"></i></a>
+        </td>
+      </tr>
+      <tr>
+        <td class="text-center"><input type="checkbox" checked></td>
+        <td>QR_Type_1</td>
+        <td>0013</td>
+        <td>2323</td>
+        <td>LoremIpsum00391</td>
+        <td class="text-center">
+          <a title="Edit" href="#"><i class="fas fa-edit"></i></a> &nbsp;
+          <a title="Delete" href="#"><i class="fas fa-trash" style="color:red"></i></a>
+        </td>
+      </tr>
+      <tr>
+        <td class="text-center"><input type="checkbox" checked></td>
+        <td>QR_Type_2</td>
+        <td>0013</td>
+        <td>2323</td>
+        <td>LoremIpsum00391</td>
+        <td class="text-center">
+          <a title="Edit" href="#"><i class="fas fa-edit"></i></a> &nbsp;
+          <a title="Delete" href="#"><i class="fas fa-trash" style="color:red"></i></a>
+        </td>
+      </tr>
+      
+    </tbody>
+  </table>
+</div>
+{% endblock %}

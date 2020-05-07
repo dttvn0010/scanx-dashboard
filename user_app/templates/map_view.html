@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block sidebar %}
+{% with page=1 %}
+{{ block.super }}
+{% endwith %}
+{% endblock %}
+
+{% block content %}
+<div class="content">
+  <ul class="nav nav-tabs">
+    <li class="nav-item">
+      <a href="/user_app" class="nav-link">Table view</a>
+    </li>
+    <li class="nav-item">
+      <a href="/user_app/map_view" class="nav-link active">Map view</a>
+    </li>
+  </ul>
+  <div>
+    <div id="map" style="width: 100%; height: 500px;"></div>
+  </div>
+</div>
+
+<script>
+  function initMap() {
+    // The location of Uluru
+    var uluru = { lat: 52.479865, lng: -1.911067 };
+    // The map, centered at Uluru
+    var map = new google.maps.Map(
+      document.getElementById('map'), { zoom: 16, center: uluru });
+    // The marker, positioned at Uluru
+    var marker = new google.maps.Marker({ position: uluru, map: map });
+  }
+</script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBR8gU4Te36NCYlc2ZdynsOWQOS03lzWKc&callback=initMap"></script>
+{% endblock %}

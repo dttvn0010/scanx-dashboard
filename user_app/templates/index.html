@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block sidebar %}
+{% with page=1 %}
+{{ block.super }}
+{% endwith %}
+{% endblock %}
+
+{% block content %}
+<div class="content p-3">
+  <ul class="nav nav-tabs">
+    <li class="nav-item">
+      <a href="/user_app" class="nav-link active">Table view</a>
+    </li>
+    <li class="nav-item">
+      <a href="/user_app/map_view" class="nav-link">Map view</a>
+    </li>
+  </ul>
+  <div>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Location</th>
+          <th>Date/Time</th>
+          <th>Name</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>123 Westwood Avenue </td>
+          <td>10 Apr 2020 at 9:12PM (2 hours ago) </td>
+          <td>Abby Adams</td>
+        </tr>
+        <tr>
+          <td>456 Fleetwood Road </td>
+          <td>18 Jan 2020 at 9:41PM (6 hours ago)</td>
+          <td>Barbara Bradley </td>
+        </tr>
+        <tr>
+          <td>21a Townsend Villas </td>
+          <td>23 Mar 2019 at 10:06PM (7 hours ago)</td>
+          <td>Cassie Cohen </td>
+        </tr>
+        <tr>
+          <td>Unit 12 Major Abbot Parkway</td>
+          <td>23 Mar 2019 at 10:06PM (7 hours ago) </td>
+          <td>Dana Donnely </td>
+        </tr>
+        <tr>
+          <td>84 Walford Villas </td>
+          <td>15 July 2018 at 7.34AM (196 hours ago)</td>
+          <td>Edith Eastman</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
