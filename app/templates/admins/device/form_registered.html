@@ -1,0 +1,18 @@
+{% extends "admins/base.html" %}
+
+{% block sidebar %}
+{% with page=3 %}
+{{ block.super }}
+{% endwith %}
+{% endblock %}
+
+{% block content %}
+<div class="content p-3">
+  <form method="POST" novalidate> 
+    {% csrf_token %}
+    <table class="table table-form">{{ form }}</table>
+    <button class="btn btn-primary" type="submit">Save</button>
+    <a class="btn btn-secondary" href='{% url "admin-registered-device" %}'>Back</a>
+  </form>
+</div>
+{% endblock %}

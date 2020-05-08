@@ -13,29 +13,43 @@
   <div id="wrapper">
     {% block sidebar %}
     <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark">
-      <a class="sidebar-brand d-flex align-items-center" href="#">
+      <a class="sidebar-brand d-flex align-items-center" href="/">
         <div class="sidebar-brand-text">ScanX</div>
       </a>
 
       <hr class="sidebar-divider my-0">
 
       <li class="nav-item {% if page == 1 %} active {%endif%}">
-        <a class="nav-link" href="/admin_app">
-          <span>Organizations</span></a>
+        <a class="nav-link" href="#">
+          <span>Dashboard</span></a>
       </li>
 
       <hr class="sidebar-divider my-0">
 
-      <li class="nav-item {% if page == 2 %} active {%endif%}" >
-        <a class="nav-link" href="/admin_app/unregistered_devices">
-          <span>Unregistered Devices</span></a>
+      <li class="nav-item">
+        <a class="nav-link" href="#">
+          <span>Reports</span></a>
       </li>
 
       <hr class="sidebar-divider my-0">
 
-      <li class="nav-item {% if page == 3 %} active {%endif%}">
-        <a class="nav-link" href="/admin_app/registered_devices">
-          <span>Registered Devices</span></a>
+      <li class="nav-item">
+        <a class="nav-link" href="#">
+          <span>Subscription</span></a>
+      </li>
+
+      <hr class="sidebar-divider my-0">
+
+      <li class="nav-item">
+        <a class="nav-link" href="#">
+          <span>Settings</span></a>
+      </li>
+
+      <hr class="sidebar-divider my-0">
+
+      <li class="nav-item">
+        <a class="nav-link" href="#">
+          <span>Logs</span></a>
       </li>
 
       <hr class="sidebar-divider my-0">
