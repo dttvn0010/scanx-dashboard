@@ -8,16 +8,19 @@
 
 {% block content %}
 <div class="content p-3">
-  <div class="row">
-    <div class="col-8">
-      <input placeholder="Search user" class="form-control"/>
-    </div>
+  <div class="row mb-2">
     <div class="col-4">
-      <a href='{% url "organization-add" %}' class="btn btn-secondary float-right">Add Organization</a>
-      <button class="btn btn-secondary float-right mr-2"><i class="fas fa-upload"></i>Import</button>      
+      <a href='{% url "organization-add" %}' class="btn btn-secondary">Add Organization</a>
+      <button class="btn btn-secondary mr-2" data-toggle="modal" data-target="#uploadModal">
+        <i class="fas fa-upload"></i>Import
+      </button>      
+      <a href='/admins/organization/export' class="btn btn-secondary mr-2">
+        <i class="fas fa-download"></i>Export
+      </a>      
     </div>
   </div>
-  <table class="table mt-2">
+
+  <table id="table" class="display mt-2">
     <thead>
       <tr class="text-center">
         <th style="width: 8%;">Active</th>
@@ -27,24 +30,69 @@
         <th style="width: 15%;">Admin Email</th>
         <th style="width: 10%;">Devices</th>
         <th style="width: 8%;"></th>
-      </tr>      
-    </thead>
-    <tbody>
-      {% for org in organizations %}
-      <tr>
-        <td class="text-center"><input type="checkbox" onclick="return false;" {%if org.active %} checked {%endif%}></td>
-        <td>{{org.name}}</td>
-        <td>{{ org.userCount }}</td>
-        <td>{{org.admin.fullname}}</td>
-        <td>{{org.admin.email}}</td>
-        <td>{{ org.deviceCount }}</td>
-        <td class="text-center">
-          <a title="Edit" href='{% url "organization-update" org.id %}'><i class="fas fa-edit"></i></a> &nbsp;
-          <a title="Delete" href="#" onclick="confirmDelete(this)" url='{% url "organization-delete" org.id %}'><i class="fas fa-trash" style="color:red"></i></a>
-        </td>
       </tr>
-      {% endfor %}    
-    </tbody>
+    </thead>
   </table>
+
+  <div class="modal fade" id="uploadModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Import organization</h5>
+          <button type="button" class="close" data-dismiss="modal">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="fmt" method="POST" action="/admins/organization/import" enctype="multipart/form-data">
+            {%csrf_token%}
+            <input type="file" accept=".csv" class="form-control-file" name="csv_file"
+              onchange="document.getElementById('fmt').submit()">
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
+
+<script>
+$(document).ready(function() {
+  $('#table').DataTable({
+    "ordering": false,
+    "processing": true,
+    "serverSide": true,
+    "ajax": "/api/organization/search",
+    "columns": [
+      { "data": "active",
+        render: function (data, type, row){
+          return '<input type="checkbox" onclick="return false;"' + (data? ' checked' : '') + '/>'
+        } 
+      },
+      { "data": "name" },
+      { "data": "userCount" },
+      { "data": "admin.name" },
+      { "data": "admin.email" },
+      { "data": "deviceCount" },      
+      {
+        render: function (data, type, row) {
+          return `
+          <a title="Edit" href="/admins/organization/update/${row['id']}"><i class="fas fa-edit"></i></a> 
+          &nbsp;
+          <a title="Delete" href="#" onclick="deleteItem(${row['id']})" ><i class="fas fa-trash" style="color:red"></i>
+          </a>`;
+        }
+      }
+    ],
+  })
+});
+
+function deleteItem(id) {
+  if (confirm('Do you want to delete?')) {
+    location.href = '/admins/organization/delete/' + id;
+  }
+}
+</script>
 {% endblock %}

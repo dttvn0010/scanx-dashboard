@@ -36,7 +36,7 @@ class LocationGroup(models.Model):
         return self.name
     
 class Location(models.Model):
-    organization = models.ForeignKey(Organization, on_delete=models.PROTECT)
+    organization = models.ForeignKey(Organization, on_delete=models.PROTECT,  blank=True, null=True)
     locationGroup = models.ForeignKey(LocationGroup, on_delete=models.PROTECT)
     addressLine1 = models.CharField(max_length=100)
     addressLine2 = models.CharField(max_length=100)
@@ -48,7 +48,7 @@ class Location(models.Model):
         return f'{self.addressLine1}, {self.addressLine2}'
 
 class DeviceGroup(models.Model):
-    organization = models.ForeignKey(Organization, on_delete=models.PROTECT)
+    organization = models.ForeignKey(Organization, on_delete=models.PROTECT, blank=True, null=True)
     name = models.CharField(max_length=50, unique=True)
     description = models.CharField(max_length=500, blank=True, null=True)
 
@@ -56,7 +56,7 @@ class DeviceGroup(models.Model):
         return self.name
 
 class DeviceType(models.Model):
-    name = models.CharField(max_length=30, unique=True)
+    name = models.CharField(max_length=30, unique=True, blank=True, null=True)
     description = models.CharField(max_length=500, blank=True, null=True)
 
     def __str__(self):
@@ -67,9 +67,9 @@ class Device(models.Model):
         UNREGISTERED = 0
         REGISTERED = 1
 
-    organization = models.ForeignKey(Organization, on_delete=models.PROTECT)    
+    organization = models.ForeignKey(Organization, on_delete=models.PROTECT, blank=True, null=True)    
     deviceGroup = models.ForeignKey(DeviceGroup, on_delete=models.PROTECT)
-    installationLocation = models.ForeignKey(Location, on_delete=models.PROTECT)
+    installationLocation = models.ForeignKey(Location, on_delete=models.PROTECT, blank=True, null=True)
     locationDescription = models.CharField(max_length=500, blank=True, null=True)
     deviceType = models.ForeignKey(DeviceType, blank=True, null=True, on_delete=models.PROTECT)
     id1 = models.CharField(max_length=30)
