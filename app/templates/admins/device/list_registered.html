@@ -8,46 +8,88 @@
 
 {% block content %}
 <div class="content p-3">
-  <div class="row">
-    <div class="col-8">
-      <input placeholder="Search device" class="form-control"/>
-    </div>
+  <div class="row mb-2">
     <div class="col-4">
-      <a href='{% url "registered-device-add" %}' class="btn btn-secondary float-right">Add Device</a>
-      <button class="btn btn-secondary float-right mr-2"><i class="fas fa-upload"></i>Import</button>      
+      <a href='{% url "registered-device-add" %}' class="btn btn-secondary">Add Devices</a>
+      <button class="btn btn-secondary mr-2" data-toggle="modal" data-target="#uploadModal">
+        <i class="fas fa-upload"></i>Import
+      </button>      
+      <a href='/admins/registered_device/export' class="btn btn-secondary mr-2">
+        <i class="fas fa-download"></i>Export
+      </a>    
     </div>
   </div>
-  <table class="table mt-2">
+
+  <table id="table" class="table mt-2">
     <thead>
       <tr>
         <th style="width: 7%;">Enabled</th>
         <th style="width: 17%;">Device Type</th>
-        <th style="width: 10%;">ID #1</th>
-        <th style="width: 10%;">ID #2</th>
-        <th style="width: 10%;">Other</th>
+        <th style="width: 15%;">ID #1</th>
+        <th style="width: 15%;">ID #2</th>
         <th style="width: 23%;">Registered By</th>
         <th style="width: 15%;">Registered Date</th>
         <th style="width: 8%;"></th>
       </tr>      
     </thead>
-    <tbody>
-      {% for device in devices %}
-      <tr>
-        <td class="text-center"><input type="checkbox" onclick="return false;" {%if device.enabled %} checked {%endif%}></td>
-        <td>{{device.deviceType.name}}</td>
-        <td>{{device.id1}}</td>
-        <td>{{device.id2}}</td>
-        <td></td>
-        <td>{{device.organization.name}}</td>
-        <td>{{device.registeredDate |date:"M d, Y" }}</td>
-        <td class="text-center">
-          <a title="Edit" href='{% url "registered-device-update" device.id %}'><i class="fas fa-edit"></i></a> &nbsp;
-          <a title="Delete" href="#" onclick="confirmDelete(this)" url='{% url "registered-device-delete" device.id %}'><i class="fas fa-trash" style="color:red"></i></a>
-        </td>
-      </tr>
-      {% endfor %}      
-      
-    </tbody>
   </table>
+  <div class="modal fade" id="uploadModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Import Devices</h5>
+          <button type="button" class="close" data-dismiss="modal">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="fmt" method="POST" action="/admins/registered_device/import" enctype="multipart/form-data">
+            {%csrf_token%}
+            <input type="file" accept=".csv" class="form-control-file" name="csv_file"
+              onchange="document.getElementById('fmt').submit()">
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
 </div>
-{% endblock %}
+<script>
+  $(document).ready(function() {
+    $('#table').DataTable({
+      "ordering": false,
+      "processing": true,
+      "serverSide": true,
+      "ajax": "/api/registered_device/search",
+      "columns": [
+        { "data": "enabled",
+          render: function (data, type, row){
+            return '<input type="checkbox"' + (data? ' checked' : '') + '/>'
+          } 
+        },
+        { "data": "deviceTypeName" },
+        { "data": "id1" },
+        { "data": "id2" },
+        { "data": "organizationName"},
+        { "data": "registeredDate"},
+        {
+          render: function (data, type, row) {
+            return `
+            <a title="Edit" href="/admins/registered_device/update/${row['id']}"><i class="fas fa-edit"></i></a> 
+            &nbsp;
+            <a title="Delete" href="#" onclick="deleteItem(${row['id']})" ><i class="fas fa-trash" style="color:red"></i>
+            </a>`;
+          }
+        }
+      ],
+    })
+  });
+  
+  function deleteItem(id) {
+    if (confirm('Do you want to delete?')) {
+      location.href = '/admins/registered_device/delete/' + id;
+    }
+  }
+  </script>
+  {% endblock %}
