@@ -292,7 +292,9 @@ def exportUnregisteredDevice(request):
         writer.writerow(UNREGISTERED_DEVICE_HEADER)
         for item in lst:
             postCode = item.installationLocation.postCode if item.installationLocation else ''
-            writer.writerow([item.id1, item.id2, item.deviceType.name, item.deviceGroup.name,
+            deviceType = item.deviceType.name if item.deviceType else ''
+            deviceGroup = item.deviceGroup.name if item.deviceGroup else ''
+            writer.writerow([item.id1, item.id2, deviceType, deviceGroup,
                             postCode, item.locationDescription, item.enabled])
 
     csv_file = open('unreg_devices.csv', 'rb')
@@ -387,7 +389,10 @@ def exportRegisteredDevice(request):
         writer.writerow(REGISTERED_DEVICE_HEADER)
         for item in lst:
             postCode = item.installationLocation.postCode if item.installationLocation else ''
-            writer.writerow([item.id1, item.id2, item.deviceType.name, item.deviceGroup.name,
+            deviceType = item.deviceType.name if item.deviceType else ''
+            deviceGroup = item.deviceGroup.name if item.deviceGroup else ''
+
+            writer.writerow([item.id1, item.id2, deviceType, deviceGroup,
                         postCode, item.locationDescription, 
                         item.registeredDate.strftime('%d %b,%Y'),
                         '' if not item.organization else item.organization.name,

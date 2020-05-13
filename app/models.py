@@ -74,7 +74,7 @@ class Device(models.Model):
         REGISTERED = 1
 
     organization = models.ForeignKey(Organization, on_delete=models.PROTECT, blank=True, null=True)    
-    deviceGroup = models.ForeignKey(DeviceGroup, on_delete=models.PROTECT)
+    deviceGroup = models.ForeignKey(DeviceGroup, on_delete=models.PROTECT, blank=True, null=True)
     installationLocation = models.ForeignKey(Location, on_delete=models.PROTECT, blank=True, null=True)
     locationDescription = models.CharField(max_length=500, blank=True, null=True)
     deviceType = models.ForeignKey(DeviceType, blank=True, null=True, on_delete=models.PROTECT)
