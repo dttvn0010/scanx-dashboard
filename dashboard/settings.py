@@ -25,7 +25,7 @@ SECRET_KEY = 'ckixciqlf4w5qj_3tb$z8z00sp$6kyx$^ox@lvt#y8@t(dx36c'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['35.226.138.244']
+ALLOWED_HOSTS = ['localhost', '35.226.138.244']
 
 
 # Application definition
@@ -76,10 +76,19 @@ WSGI_APPLICATION = 'dashboard.wsgi.application'
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
+    #'default': {
+    #    'ENGINE': 'django.db.backends.sqlite3',
+    #    'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    #}
+
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
+       'ENGINE': 'django.db.backends.mysql',
+       'NAME': 'dashboard',
+       'USER': 'dashboard',
+       'PASSWORD': 'abc@123',
+       'HOST': 'localhost',
+       'PORT': '',
+   }
 }
 
 
