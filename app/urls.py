@@ -15,6 +15,7 @@ urlpatterns = [
     path('admins/organization/update/<int:pk>', updateOrganization, name="organization-update"),
     path('admins/organization/delete/<int:pk>', deleteOrganization, name="organization-delete"),
     path('admins/organization/export', exportOrganization),
+    path('admins/organization/import_preview', importOrganizationPreview),
     path('admins/organization/import', importOrganization),
     
     path('admins/unregistered_device', adminViewUnregisteredDevice, name='admin-unregistered-device'),
@@ -22,6 +23,7 @@ urlpatterns = [
     path('admins/unregistered_device/update/<int:pk>', updateUnregisteredDevice, name="unregistered-device-update"),
     path('admins/unregistered_device/delete/<int:pk>', deleteUnregisteredDevice, name="unregistered-device-delete"),
     path('admins/unregistered_device/export', exportUnregisteredDevice),
+    path('admins/unregistered_device/import_preview', importUnregisteredDevicePreview),
     path('admins/unregistered_device/import', importUnregisteredDevice),
 
     path('admins/registered_device', adminViewRegisteredDevice, name='admin-registered-device'),
@@ -29,6 +31,7 @@ urlpatterns = [
     path('admins/registered_device/update/<int:pk>', updateRegisteredDevice, name="registered-device-update"),
     path('admins/registered_device/delete/<int:pk>', deleteRegisteredDevice, name="registered-device-delete"),
     path('admins/registered_device/export', exportRegisteredDevice),
+    path('admins/registered_device/import_preview', importRegisteredDevicePreview),
     path('admins/registered_device/import', importRegisteredDevice),
 
     path('api/organization/search', searchOrganization),

@@ -11,7 +11,7 @@
   <div class="row mb-2">
     <div class="col-8">
       <a href='{% url "registered-device-add" %}' class="btn btn-secondary">Add Devices</a>
-      <button class="btn btn-secondary mr-2" data-toggle="modal" data-target="#uploadModal">
+      <button class="btn btn-secondary mr-2" onclick="showImportModal()">
         <i class="fas fa-upload"></i>Import
       </button>      
       <a href='/admins/registered_device/export' class="btn btn-secondary mr-2">
@@ -33,8 +33,9 @@
       </tr>      
     </thead>
   </table>
+
   <div class="modal fade" id="uploadModal">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Import Devices</h5>
@@ -42,18 +43,33 @@
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
+
         <div class="modal-body">
-          <form id="fmt" method="POST" action="/admins/registered_device/import" enctype="multipart/form-data">
+          <form id="fmt" method="POST" enctype="multipart/form-data">
             {%csrf_token%}
-            <input type="file" accept=".csv" class="form-control-file" name="csv_file"
-              onchange="document.getElementById('fmt').submit()">
+            <div class="row">
+              <div class="col-3">
+                <label>CSV file:</label>
+              </div>
+              <div class="col-5">
+                <input type="file" accept=".csv" class="form-control-file" 
+                  id="csv_file" name="csv_file" onchange="previewImport()">
+              </div>
+            </div>            
           </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        </div>
+
+          <form id="fmt2" style="display: none;" method="POST" action="/admins/registered_device/import">
+            {%csrf_token%}
+            <label>Select the CSV column you want to use the data from for each field.</label>
+            <div id="fmt2Body"></div>
+            <button type="submit" class="mt-3 btn btn-secondary">
+              Import
+            </button>
+          </form>
+        </div>       
       </div>
     </div>
+  </div>
 </div>
 <script>
   $(document).ready(function() {
@@ -86,10 +102,52 @@
     })
   });
   
-  function deleteItem(id) {
+function deleteItem(id) {
     if (confirm('Do you want to delete?')) {
       location.href = '/admins/registered_device/delete/' + id;
     }
   }
+
+function showImportModal() {
+  $("#csv_file").val("");
+  $("#fmt").show();
+  $("#fmt2").hide();
+  $("#uploadModal").modal();
+}
+
+function createOptionsPanel(header, csvHeader) {
+  return header.map((column, i) => 
+    (
+      `<div class="row mt-3">
+        <div class="col-3">
+          <label>${header[i]}</label>
+        </div>
+        <div class="col-5">
+          <select name="col_${i}" class="form-control">` +
+              csvHeader.map((col, j) => 
+                (
+                  `<option value="${j}" ${i==j?'selected':''}>
+                    ${csvHeader[j]}
+                  </option>`
+                )
+              ).join('') +
+          `</select>
+        </div>
+      </div>`  
+    )
+  ).join('');  
+}
+
+async function previewImport() {
+  var formData = new FormData(document.getElementById("fmt"));
+  var response = await fetch("/admins/registered_device/import_preview", {
+    body: formData,
+    method: "POST"
+  });
+  var result = await response.json();
+  $("#fmt2Body").html(createOptionsPanel(result.header, result.csvHeader));
+  $("#fmt").hide();
+  $("#fmt2").show();
+}
   </script>
   {% endblock %}

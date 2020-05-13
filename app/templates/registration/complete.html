@@ -12,13 +12,63 @@
 </style>
 
 <div class="signup-form">
-  <h3>Completing Registration</h3>
+  <h4>Completing Registration</h4>
   <br>
   <form method="POST" enctype="multipart/form-data">{% csrf_token %}
-    <table class="table table-form">{{ form }}</table>
-    {{form.non_field_errors}}
     <div class="form-group">
-      <button type="submit" class="btn btn-primary btn-block">Complete</button>
+      <label>Your name:</label>
+      <input name="fullname" type="text" class="form-control" value="{{form.fullname.value}}" />
+      {{ form.fullname.errors }}
+    </div>
+
+    <div class="form-group">
+      <label>Your Organization name:</label>
+      <input name="organization" type="text" class="form-control" value="{{form.organization.value}}" />
+      {{ form.organization.errors }}
+    </div>
+
+    <div class="form-group">
+      <label>Enter a new Password:</label>
+      <input name="password" type="password" class="form-control" />
+      {{ form.password.errors }}
+    </div>
+
+    <div class="form-group">
+      <label>Confirmed Password:</label>
+      <input name="password2" type="password" class="form-control" />
+      {{ form.password2.errors }}
+    </div>
+
+    <div class="form-group">
+      <label>Choose a profile picture:</label>
+      <input type="file" id="profilePicture" name="profilePicture" accept="image/*" class="form-control-file" />
+      <img style="display: none;" class="mt-2" width="128" height="128" id="profilePicturePreview" alt="" />
+      {{ form.profilePicture.errors }}
+    </div>
+    
+    <div>{{form.non_field_errors}}</div>
+
+    <div class="form-group">
+      <button type="submit" class="mt-4 btn btn-primary btn-block">Complete</button>
     </div>
   </form>
 </div>
+
+<script>
+function readURL(input) {
+  if (input.files && input.files[0]) {
+    var reader = new FileReader();
+    
+    reader.onload = function(e) {
+      $('#profilePicturePreview').attr('src', e.target.result);
+      $('#profilePicturePreview').show();
+    }
+    
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+$("#profilePicture").change(function() {
+  readURL(this);
+});
+</script>

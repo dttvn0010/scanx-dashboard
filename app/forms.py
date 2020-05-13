@@ -48,6 +48,13 @@ class OrganizationCreationForm(forms.ModelForm):
     adminName = forms.CharField(max_length=30, label="Admin name")
     adminEmail = forms.EmailField(max_length=50, label="Admin email")
 
+    def clean_adminName(self):
+        adminName = self.cleaned_data.get('adminName')
+        if User.objects.filter(fullname=adminName):
+            raise forms.ValidationError('User with name "%s" already existed' % (adminName))
+
+        return adminName
+
     def clean_adminEmail(self):
         email = self.cleaned_data.get('adminEmail')
         if User.objects.filter(email=email):
@@ -78,3 +85,7 @@ class RegisteredDeviceForm(forms.ModelForm):
     class Meta:
         model = Device
         exclude = ('status',)
+
+    registeredDate = forms.DateTimeField(input_formats=['%d %b,%Y'], 
+                        widget=forms.widgets.DateTimeInput(format="%d %b,%Y"), 
+                        label='Registered date', required=False)

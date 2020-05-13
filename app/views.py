@@ -17,6 +17,7 @@ from datetime import datetime
 import string
 import random
 import csv
+import json
 from multiprocessing import Process
 
 TMP_PATH = 'tmp'
@@ -34,7 +35,10 @@ def home(request):
 
 @login_required
 def completeRegistration(request):
-    form = MyUserRegistrationForm()
+    form = MyUserRegistrationForm(initial={
+            'fullname': request.user.fullname, 
+            'organization': request.user.organization.name
+        })
 
     if request.method == 'POST':
         form = MyUserRegistrationForm(request.POST, request.FILES)
@@ -116,7 +120,7 @@ def createTenantAdmin(request, organization, adminName, adminEmail):
     user.save()
 
     hostURL = request.build_absolute_uri('/')
-    print('Sending email:' , hostURL, adminName, adminEmail, password)
+    #print('Sending email:' , hostURL, adminName, adminEmail, password)
     proc = Process(target=sendInvitationMail, args=(hostURL, organization.name, adminName, adminEmail, password))
     proc.start() 
 
@@ -130,8 +134,6 @@ def addOrganization(request):
             org = form.save(commit=False)
             org.createdDate = datetime.now()
             org.save()
-
-            print(org.id)
 
             adminEmail = form.cleaned_data['adminEmail']
             adminName = form.cleaned_data['adminName']
@@ -180,8 +182,11 @@ def exportOrganization(request):
     response['Content-Disposition'] = 'attachment; filename="organizations.csv"'
     return response
 
-@login_required
-def importOrganization(request):
+
+def getPermutation(row, indexes):
+    return [row[i] for i in indexes]
+
+def importPreview(request, header):
     if request.method == 'POST':
         csvFile = request.FILES.get('csv_file')
         if csvFile and csvFile.name:
@@ -190,27 +195,51 @@ def importOrganization(request):
 
             with open(savedPath) as fi:
                 reader = csv.reader(fi)
-                header = next(reader)
-                if header == ORG_HEADER:
-                    for row in reader:
-                        name, adminName, adminEmail, nfcEnabled, qrScanEnabled, active = row
-                        if Organization.objects.filter(name=name).count() > 0:
-                            continue
-
-                        org = Organization()
-                        org.name = name
-                        org.nfcEnabled = nfcEnabled == 'True'
-                        org.qrScanEnabled = qrScanEnabled == 'True'
-                        org.active = active == 'True'
-                        org.createdDate = datetime.now()
-                        org.save()
-
-                        createTenantAdmin(request, org, adminName, adminEmail)
+                csvHeader = next(reader)
+                records = list(reader)
+                request.session['records'] = records
                 
             os.remove(savedPath)
-        
-    return redirect('admin-home')
+            
+            return HttpResponse(json.dumps({"header": header, "csvHeader": csvHeader}), 
+                        content_type='application/json')
 
+    else:
+        return HttpResponse(json.dumps({"error": "Method not support"}), 
+                    content_type='application/json')
+
+@login_required
+def importOrganizationPreview(request):
+    return importPreview(request, ORG_HEADER)
+
+@login_required
+def importOrganization(request):
+    if request.method == 'POST':
+        records = request.session.get("records", [])
+        indexes = [0] * len(ORG_HEADER)
+        
+        for i in range(len(indexes)):
+            indexes[i] = int(request.POST.get(f'col_{i}', '0'))
+        
+        for row in records:
+            name, adminName, adminEmail, nfcEnabled, qrScanEnabled, active = getPermutation(row, indexes)
+            if Organization.objects.filter(name=name).count() > 0:
+                continue
+
+            org = Organization()
+            org.name = name
+            org.nfcEnabled = nfcEnabled == 'True'
+            org.qrScanEnabled = qrScanEnabled == 'True'
+            org.active = active == 'True'
+            org.createdDate = datetime.now()
+            org.save()
+
+            createTenantAdmin(request, org, adminName, adminEmail)
+        
+        del request.session['records']
+    
+    return redirect('admin-home')
+                
 @login_required
 def adminViewUnregisteredDevice(request):
     devices = Device.objects.filter(status=Device.Status.UNREGISTERED)
@@ -272,37 +301,39 @@ def exportUnregisteredDevice(request):
     response['Content-Disposition'] = 'attachment; filename="unreg_devices.csv"'
     return response
 
+
+@login_required
+def importUnregisteredDevicePreview(request):
+    return importPreview(request, UNREGISTERED_DEVICE_HEADER)
+
 @login_required
 def importUnregisteredDevice(request):
     if request.method == 'POST':
-        csvFile = request.FILES.get('csv_file')
-        if csvFile and csvFile.name:
-            tmpFilePath = os.path.join(TMP_PATH, csvFile.name)
-            savedPath = fs.save(tmpFilePath, csvFile)
-
-            with open(savedPath) as fi:
-                reader = csv.reader(fi)
-                header = next(reader)
-                if header == UNREGISTERED_DEVICE_HEADER:                        
-                    for row in reader:
-                        id1, id2, deviceTypeName, deviceGroupName, postCode, locationDescription, enabled = row
-
-                        if Device.objects.filter(id1=id1).filter(id2=id2).count() > 0:
-                            continue
-                        
-                        device = Device()
-                        device.id1 = id1
-                        device.id2 = id2
-                        device.deviceType = DeviceType.objects.filter(name=deviceTypeName).first()
-                        device.deviceGroup = DeviceGroup.objects.filter(name=deviceGroupName).first()
-                        device.installationLocation = Location.objects.filter(postCode=postCode).first()
-                        device.locationDescription = locationDescription
-                        device.enabled = enabled == 'True'
-                        device.status = Device.Status.UNREGISTERED
-                        device.save()
-            
-            os.remove(savedPath)
+        records = request.session.get("records", [])
+        indexes = [0] * len(UNREGISTERED_DEVICE_HEADER)
         
+        for i in range(len(indexes)):
+            indexes[i] = int(request.POST.get(f'col_{i}', '0'))
+        
+        for row in records:
+            id1, id2, deviceTypeName, deviceGroupName, postCode, locationDescription, enabled = row
+
+            if Device.objects.filter(id1=id1).filter(id2=id2).count() > 0:
+                continue
+            
+            device = Device()
+            device.id1 = id1
+            device.id2 = id2
+            device.deviceType = DeviceType.objects.filter(name=deviceTypeName).first()
+            device.deviceGroup = DeviceGroup.objects.filter(name=deviceGroupName).first()
+            device.installationLocation = Location.objects.filter(postCode=postCode).first()
+            device.locationDescription = locationDescription
+            device.enabled = enabled == 'True'
+            device.status = Device.Status.UNREGISTERED
+            device.save()
+        
+        del request.session['records']
+    
     return redirect('admin-unregistered-device')
 
 @login_required
@@ -358,7 +389,7 @@ def exportRegisteredDevice(request):
             postCode = item.installationLocation.postCode if item.installationLocation else ''
             writer.writerow([item.id1, item.id2, item.deviceType.name, item.deviceGroup.name,
                         postCode, item.locationDescription, 
-                        item.registeredDate.strftime('%Y-%m-%d'),
+                        item.registeredDate.strftime('%d %b,%Y'),
                         '' if not item.organization else item.organization.name,
                         item.enabled])
 
@@ -369,40 +400,40 @@ def exportRegisteredDevice(request):
     return response
 
 @login_required
+def importRegisteredDevicePreview(request):
+    return importPreview(request, REGISTERED_DEVICE_HEADER)
+
+@login_required
 def importRegisteredDevice(request):
     if request.method == 'POST':
-        csvFile = request.FILES.get('csv_file')
-        if csvFile and csvFile.name:
-            tmpFilePath = os.path.join(TMP_PATH, csvFile.name)
-            savedPath = fs.save(tmpFilePath, csvFile)
-
-            with open(savedPath) as fi:
-                reader = csv.reader(fi)
-                header = next(reader)
-                if header == REGISTERED_DEVICE_HEADER:                        
-                    for row in reader:                        
-                        id1, id2, deviceTypeName, deviceGroupName, postCode, locationDescription, registeredDate, organizationName, enabled = row
-
-                        if Device.objects.filter(id1=id1).filter(id2=id2).count() > 0:
-                            continue
-                        
-                        device = Device()
-                        device.id1 = id1
-                        device.id2 = id2
-                        device.deviceType = DeviceType.objects.filter(name=deviceTypeName).first()
-                        device.deviceGroup = DeviceGroup.objects.filter(name=deviceGroupName).first()
-                        device.installationLocation = Location.objects.filter(postCode=postCode).first()
-                        device.locationDescription = locationDescription
-                        device.organization = Organization.objects.filter(name=organizationName).first()
-                        device.registeredDate = datetime.strptime(registeredDate, '%Y-%m-%d')
-                        device.enabled = enabled == 'True'
-                        device.status = Device.Status.REGISTERED
-                        device.save()
-            
-            os.remove(savedPath)
+        records = request.session.get("records", [])
+        indexes = [0] * len(REGISTERED_DEVICE_HEADER)
         
-    return redirect('admin-registered-device')    
+        for i in range(len(indexes)):
+            indexes[i] = int(request.POST.get(f'col_{i}', '0'))
+        
+        for row in records:                        
+            id1, id2, deviceTypeName, deviceGroupName, postCode, locationDescription, registeredDate, organizationName, enabled = row
 
+            if Device.objects.filter(id1=id1).filter(id2=id2).count() > 0:
+                continue
+            
+            device = Device()
+            device.id1 = id1
+            device.id2 = id2
+            device.deviceType = DeviceType.objects.filter(name=deviceTypeName).first()
+            device.deviceGroup = DeviceGroup.objects.filter(name=deviceGroupName).first()
+            device.installationLocation = Location.objects.filter(postCode=postCode).first()
+            device.locationDescription = locationDescription
+            device.organization = Organization.objects.filter(name=organizationName).first()
+            device.registeredDate = datetime.strptime(registeredDate, "%d %b,%Y")
+            device.enabled = enabled == 'True'
+            device.status = Device.Status.REGISTERED
+            device.save()
+        
+        del request.session['records']
+    
+    return redirect('admin-registered-device')
 
 @login_required
 def editMailTemplate(request):
