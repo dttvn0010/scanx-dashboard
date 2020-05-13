@@ -19,7 +19,7 @@
   <br>
   <form method="POST">{% csrf_token %}
     <div class="form-group">
-      <label>Username:</label>
+      <label>Username (Email address):</label>
       <input name="username" type="text" class="form-control" />
       {{ form.username.errors }}
     </div>
