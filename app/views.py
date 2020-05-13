@@ -121,8 +121,9 @@ def createTenantAdmin(request, organization, adminName, adminEmail):
 
     hostURL = request.build_absolute_uri('/')
     #print('Sending email:' , hostURL, adminName, adminEmail, password)
-    proc = Process(target=sendInvitationMail, args=(hostURL, organization.name, adminName, adminEmail, password))
-    proc.start() 
+    #proc = Process(target=sendInvitationMail, args=(hostURL, organization.name, adminName, adminEmail, password))
+    #proc.start() 
+    sendInvitationMail(hostURL, organization.name, adminName, adminEmail, password)
 
 @login_required
 def addOrganization(request):
