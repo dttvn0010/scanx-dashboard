@@ -19,6 +19,7 @@ import random
 import csv
 import json
 from multiprocessing import Process
+import traceback
 
 TMP_PATH = 'tmp'
 fs = FileSystemStorage()
@@ -123,7 +124,10 @@ def createTenantAdmin(request, organization, adminName, adminEmail):
     #print('Sending email:' , hostURL, adminName, adminEmail, password)
     #proc = Process(target=sendInvitationMail, args=(hostURL, organization.name, adminName, adminEmail, password))
     #proc.start() 
-    sendInvitationMail(hostURL, organization.name, adminName, adminEmail, password)
+    try:
+        sendInvitationMail(hostURL, organization.name, adminName, adminEmail, password)
+    except:
+        traceback.print_exc()
 
 @login_required
 def addOrganization(request):
