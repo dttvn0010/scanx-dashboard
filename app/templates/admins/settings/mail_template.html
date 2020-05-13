@@ -1,0 +1,21 @@
+{% extends "admins/base.html" %}
+
+{% block sidebar %}
+{% with page=4 %}
+{{ block.super }}
+{% endwith %}
+{% endblock %}
+
+{% block content %}
+<div class="content p-3">
+  {%if saved%}
+    <span class="badge badge-success mb-3">Email template successfully saved!</span>
+  {%endif%}
+  <form method="POST"> 
+    {% csrf_token %}
+    <label>Mail template:</label>
+    <textarea name="email_template" rows="10" class="form-control">{{email_template}}</textarea>
+    <button class="mt-3 btn btn-primary" type="submit">Save</button>
+  </form>  
+</div>
+{% endblock %}

@@ -14,7 +14,7 @@ def searchOrganization(request):
     organizations = Organization.objects.all()
     recordsTotal = organizations.count()
 
-    organizations = organizations.filter(name__contains=keyword)
+    organizations = organizations.filter(name__contains=keyword).order_by('-createdDate')
     recordsFiltered = organizations.count()
     organizations = organizations[start:start+length]
     data = OrganizationSerializer(organizations, many=True).data

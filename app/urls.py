@@ -5,6 +5,7 @@ from .views_api import *
 urlpatterns = [
     path('', home, name='home'),
     path('accounts/signup', signup),
+    path('complete_registration', completeRegistration),
 
     path('users', userViewTable, name='user-home'),
     path('users/map_view', userViewMap, name='user-map-view'),
@@ -15,7 +16,7 @@ urlpatterns = [
     path('admins/organization/delete/<int:pk>', deleteOrganization, name="organization-delete"),
     path('admins/organization/export', exportOrganization),
     path('admins/organization/import', importOrganization),
-
+    
     path('admins/unregistered_device', adminViewUnregisteredDevice, name='admin-unregistered-device'),
     path('admins/unregistered_device/add', addUnregisteredDevice, name="unregistered-device-add"),
     path('admins/unregistered_device/update/<int:pk>', updateUnregisteredDevice, name="unregistered-device-update"),
@@ -33,4 +34,6 @@ urlpatterns = [
     path('api/organization/search', searchOrganization),
     path('api/unregistered_device/search', searchUnregisteredDevice),
     path('api/registered_device/search', searchRegisteredDevice),
+
+    path('admins/settings/mail_template', editMailTemplate),
 ]

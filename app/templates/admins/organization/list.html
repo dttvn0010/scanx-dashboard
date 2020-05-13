@@ -56,8 +56,6 @@
       </div>
     </div>
   </div>
-</div>
-
 <script>
 $(document).ready(function() {
   $('#table').DataTable({
@@ -90,7 +88,7 @@ $(document).ready(function() {
 });
 
 function deleteItem(id) {
-  if (confirm('Do you want to delete?')) {
+  if (confirm('All users in this organization will be deleted. Do you want to continue?')) {
     location.href = '/admins/organization/delete/' + id;
   }
 }

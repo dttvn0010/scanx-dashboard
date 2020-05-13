@@ -14,12 +14,52 @@ class MyUserChangeForm(UserChangeForm):
         model = User
         fields = ('username', 'fullname', 'email', 'organization')
 
+class MyUserRegistrationForm(forms.Form):
+    fullname = forms.CharField(max_length=30, label='Your name')
+    organization = forms.CharField(max_length=200, label='Your organization name')
+    password = forms.CharField(max_length=30, widget=forms.PasswordInput, label='Enter a new password')
+    password2 = forms.CharField(max_length=30, widget=forms.PasswordInput, label='Confirmed Password')
+    profilePicture = forms.ImageField(label="Choose a profile picture", required=False)
 
-class OrganizationForm(forms.ModelForm):
+    def clean_password(self):
+        password = self.cleaned_data.get('password', '')
+        if len(password) < 8:
+            raise forms.ValidationError('Password too short')
+
+        if password.isdigit():
+            raise forms.ValidationError('Password cannot be all digits')
+
+        return password
+
+    def clean_password2(self):
+        password = self.cleaned_data.get('password')
+        password2 = self.cleaned_data.get('password2')
+
+        if password != password2:
+            raise forms.ValidationError('Confirmed password does not match')
+
+        return password2
+
+class OrganizationCreationForm(forms.ModelForm):
     class Meta:
         model = Organization
-        fields = '__all__'
+        fields = ('name', 'nfcEnabled', 'qrScanEnabled', 'active')
 
+    adminName = forms.CharField(max_length=30, label="Admin name")
+    adminEmail = forms.EmailField(max_length=50, label="Admin email")
+
+    def clean_adminEmail(self):
+        email = self.cleaned_data.get('adminEmail')
+        if User.objects.filter(email=email):
+            raise forms.ValidationError('User with email "%s" already existed' % (email))
+
+        return email
+
+class OrganizationChangeForm(forms.ModelForm):
+    class Meta:
+        model = Organization
+        fields = ('name', 'nfcEnabled', 'qrScanEnabled', 'active')
+    
 class UnRegisteredDeviceForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):        
         organization = kwargs.pop('organization', None)
