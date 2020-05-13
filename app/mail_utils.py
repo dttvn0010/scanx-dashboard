@@ -14,9 +14,9 @@ SENDER_PASSWORD = "Ab01234567"
 
 def sendInvitationMail(hostURL, organization, fullname, email, password):
     html = INVITE_TEMPLATE.replace('${Link.ACCEPT_INVITATION}', hostURL)
-    html = html.replace('${ORGANIZATION}', organization)
+    html = html.replace('${User.ORGANIZATION}', organization)
     html = html.replace('${User.FULL_NAME}', fullname)
-    html = html.replace('${PASSWORD}', password)
+    html = html.replace('${User.PASSWORD}', password)
 
     msg = MIMEText(html, 'html')
     msg['Subject'] = INVITE_TITLE

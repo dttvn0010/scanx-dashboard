@@ -9,7 +9,7 @@ class OrganizationSerializer(ModelSerializer):
 class DeviceSerializer(ModelSerializer):
     deviceTypeName = CharField(source='deviceType.name')
     organizationName = CharField(source='organization.name', default="")
-    registeredDate = DateTimeField(format="%Y-%m-%d", required=False, read_only=True)
+    registeredDate = DateTimeField(format="%d %b,%Y", required=False, read_only=True)
 
     class Meta:
         model = Device
