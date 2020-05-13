@@ -6,10 +6,18 @@ from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
 from django.core.files.storage import FileSystemStorage
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth import login, authenticate
+
 from .models import *
 from .forms import *
-import csv
+from .consts import MAIL_TEMPLATE_PATH
+from .mail_utils import sendInvitationMail
 from datetime import datetime
+import string
+import random
+import csv
+from multiprocessing import Process
 
 TMP_PATH = 'tmp'
 fs = FileSystemStorage()
@@ -19,7 +27,36 @@ def home(request):
     if request.user.is_superuser:
         return HttpResponseRedirect("/admins")
     else:
-        return HttpResponseRedirect("/users")
+        if(request.user.status == User.Status.INVITED):
+            return HttpResponseRedirect("/complete_registration")
+        else:
+            return HttpResponseRedirect("/users")
+
+@login_required
+def completeRegistration(request):
+    form = MyUserRegistrationForm()
+
+    if request.method == 'POST':
+        form = MyUserRegistrationForm(request.POST, request.FILES)
+        if form.is_valid():
+            user = request.user
+            user.fullname = form.cleaned_data['fullname']
+            user.password = make_password(form.cleaned_data['password'])
+            user.status = User.Status.REGISTERED
+            user.profilePicture = form.cleaned_data['profilePicture']
+            user.save()
+
+            org = user.organization
+            org.name = form.cleaned_data['organization']
+            org.save()
+
+            user = authenticate(username=user.username,
+                                    password=form.cleaned_data['password'])
+            login(request, user)
+
+            return HttpResponseRedirect("/users")
+
+    return render(request, "registration/complete.html", {'form': form})
 
 def signup(request):
    form = MyUserCreationForm()
@@ -54,16 +91,52 @@ def adminViewOrganization(request):
         org.userCount = User.objects.filter(organization=org).count()
         org.deviceCount = Device.objects.filter(organization=org).count()
 
-    return render(request, "admins/organization/list.html", {"organizations" : organizations})
+    with open(MAIL_TEMPLATE_PATH, encoding="utf-8") as fi:
+        email_template = fi.read()
+
+    return render(request, "admins/organization/list.html", 
+                    {"organizations" : organizations, "email_template": email_template})
+
+def genPassword():
+    return ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+
+
+def createTenantAdmin(request, organization, adminName, adminEmail):
+    if adminEmail == "":
+        return 
+
+    password = genPassword()
+    user = User.objects.create_user(username=adminEmail, password=password)
+    user.fullname = adminName
+    user.email = adminEmail
+    user.status = User.Status.INVITED
+    user.createdDate = datetime.now()
+    user.organization = organization
+    user.is_staff = True
+    user.save()
+
+    hostURL = request.build_absolute_uri('/')
+    print('Sending email:' , hostURL, adminName, adminEmail, password)
+    proc = Process(target=sendInvitationMail, args=(hostURL, organization.name, adminName, adminEmail, password))
+    proc.start() 
 
 @login_required
 def addOrganization(request):
-    form = OrganizationForm()
+    form = OrganizationCreationForm()
 
     if request.method == 'POST':
-        form = OrganizationForm(request.POST)
+        form = OrganizationCreationForm(request.POST)
         if form.is_valid():
-            form.save()
+            org = form.save(commit=False)
+            org.createdDate = datetime.now()
+            org.save()
+
+            print(org.id)
+
+            adminEmail = form.cleaned_data['adminEmail']
+            adminName = form.cleaned_data['adminName']
+
+            createTenantAdmin(request, org, adminName, adminEmail)
             return redirect('admin-home')
 
     return render(request, 'admins/organization/form.html', {'form': form})
@@ -71,10 +144,10 @@ def addOrganization(request):
 @login_required
 def updateOrganization(request, pk):
     org = get_object_or_404(Organization, pk=pk)
-    form = OrganizationForm(instance=org)
+    form = OrganizationChangeForm(instance=org)
 
     if request.method == 'POST':
-        form = OrganizationForm(request.POST, instance=org)
+        form = OrganizationChangeForm(request.POST, instance=org)
         if form.is_valid():
             form.save()
             return redirect('admin-home')
@@ -87,7 +160,7 @@ def deleteOrganization(request, pk):
     org.delete()
     return redirect("admin-home")
 
-ORG_HEADER = ['Name', 'Description', 'Date Time Format', 'NFC Enabled', 'QR Scan Enabled', 'Active']
+ORG_HEADER = ['Name', 'Admin Name', 'Admin Email', 'NFC Enabled', 'QR Scan Enabled', 'Active']
 
 @login_required
 def exportOrganization(request):
@@ -96,7 +169,10 @@ def exportOrganization(request):
         writer = csv.writer(fo)
         writer.writerow(ORG_HEADER)
         for item in lst:
-            writer.writerow([item.name, item.description, item.dateTimeFormat, item.nfcEnabled, item.qrScanEnabled, item.active])
+            staff = User.objects.filter(organization=item).filter(is_staff=True).first()
+            adminName = staff.fullname if staff else ''
+            adminEmail = staff.email if staff else ''
+            writer.writerow([item.name, adminName, adminEmail, item.nfcEnabled, item.qrScanEnabled, item.active])
 
     csv_file = open('organizations.csv', 'rb')
     response = HttpResponse(content=csv_file)
@@ -117,18 +193,19 @@ def importOrganization(request):
                 header = next(reader)
                 if header == ORG_HEADER:
                     for row in reader:
-                        name, description, dateTimeFormat, nfcEnabled, qrScanEnabled, active = row
+                        name, adminName, adminEmail, nfcEnabled, qrScanEnabled, active = row
                         if Organization.objects.filter(name=name).count() > 0:
                             continue
 
                         org = Organization()
                         org.name = name
-                        org.description = description
-                        org.dateTimeFormat = dateTimeFormat
                         org.nfcEnabled = nfcEnabled == 'True'
                         org.qrScanEnabled = qrScanEnabled == 'True'
                         org.active = active == 'True'
+                        org.createdDate = datetime.now()
                         org.save()
+
+                        createTenantAdmin(request, org, adminName, adminEmail)
                 
             os.remove(savedPath)
         
@@ -325,3 +402,20 @@ def importRegisteredDevice(request):
             os.remove(savedPath)
         
     return redirect('admin-registered-device')    
+
+
+@login_required
+def editMailTemplate(request):
+    with open(MAIL_TEMPLATE_PATH, encoding="utf-8") as fi:
+        email_template = fi.read()
+
+    saved = False
+
+    if request.method == 'POST':
+        email_template = request.POST["email_template"]
+        with open(MAIL_TEMPLATE_PATH, 'w', encoding="utf-8", newline="") as fo:
+            fo.write(email_template.replace("\n\n", "\n"))
+            saved = True        
+    
+    return render(request, "admins/settings/mail_template.html", 
+            {"email_template": email_template, "saved": saved})

@@ -8,19 +8,25 @@ class Organization(models.Model):
     nfcEnabled = models.BooleanField(verbose_name='NFC Enabled', default=False)
     qrScanEnabled = models.BooleanField(verbose_name='QR Scanning Enabled', default=False)    
     active = models.BooleanField(default=False)
+    createdDate = models.DateTimeField(null=True)
 
     def __str__(self):
         return self.name
 
 class User(AbstractUser):
-    organization = models.ForeignKey(Organization, blank=True, null=True, on_delete=models.PROTECT)
+    class Status:
+        INVITED = 0
+        REGISTERED = 1
+
+    organization = models.ForeignKey(Organization, blank=True, null=True, on_delete=models.CASCADE)
     fullname = models.CharField(max_length=50, blank=True, null=True, unique=True)
     nfcEnabled = models.BooleanField(verbose_name='NFC Enabled', blank=True, null=True)
     qrScanEnabled = models.BooleanField(verbose_name='QR Scanning Enabled', blank=True, null=True)
     sharedLocation = models.BooleanField(verbose_name="Share location after each scan", blank=True, null=True)
-    profilePicture = models.ImageField(upload_to='static/images', blank=True, null=True)    
+    profilePicture = models.ImageField(upload_to='static/images', blank=True, null=True) 
+    status = models.IntegerField(blank=True, null=True)   
+    createdDate = models.DateTimeField(null=True)
     
-
     def __str__(self):
         if self.fullname:
             return self.fullname

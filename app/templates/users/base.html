@@ -69,7 +69,11 @@
             <li class="nav-item dropdown no-arrow">
               <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" aria-haspopup="true"
                 aria-expanded="false">
-                <img class="img-profile rounded-circle" src="/static/img/user.svg">
+                {% if user.profilePicture %}
+                  <img class="img-profile rounded-circle" src="/{{ user.profilePicture.url }}">
+                {%else%}
+                  <img class="img-profile rounded-circle" src="/static/img/user.svg">
+                {%endif%}
               </a>
               <div class="dropdown-menu dropdown-menu-right">
                 <a class="dropdown-item" href="#">

@@ -1,0 +1,1 @@
+MAIL_TEMPLATE_PATH = "static/templates/invitation_mail.tmpl"
