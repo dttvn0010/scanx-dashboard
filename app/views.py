@@ -435,7 +435,7 @@ def updateDeviceType(request, pk):
 
     return render(request, 'admins/device_type/form.html', {'form': form})
 
-DEVICE_TYPE_HEADER = ['Name', 'Description', 'Organization']
+DEVICE_TYPE_HEADER = ['Name', 'Description']
 
 @login_required
 def exportDeviceType(request):
@@ -444,8 +444,7 @@ def exportDeviceType(request):
         writer = csv.writer(fo)
         writer.writerow(DEVICE_TYPE_HEADER)
         for item in lst:
-            organizationName = item.organization.name if item.organization else ''
-            writer.writerow([item.name, item.description, organizationName])
+            writer.writerow([item.name, item.description])
 
     csv_file = open('device_type.csv', 'rb')
     response = HttpResponse(content=csv_file)
@@ -467,7 +466,7 @@ def importDeviceType(request):
             indexes[i] = int(request.POST.get(f'col_{i}', '0'))
         
         for row in records:                        
-            name, description, organizationName = row
+            name, description = row
            
             if DeviceType.objects.filter(name=name).count() > 0:
                 continue
@@ -475,7 +474,6 @@ def importDeviceType(request):
             deviceType = DeviceType()
             deviceType.name = name
             deviceType.description = description
-            deviceType.organization = Organization.objects.filter(name=organizationName).first()
             deviceType.save()
         
         del request.session['records']
