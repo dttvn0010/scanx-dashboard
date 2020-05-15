@@ -79,7 +79,12 @@ class UserForm(forms.ModelForm):
 class PermissionForm(forms.ModelForm):
     class Meta:
         model = Permission
-        exclude = ('accessFunctions', 'viewFunctions', 'editFunctions', 'deleteFunctions', 'createdDate',)
+        exclude = ('createdDate',)
+    
+    accessFunctions = forms.CharField(widget=forms.HiddenInput, required=False)
+    viewFunctions = forms.CharField(widget=forms.HiddenInput, required=False)
+    editFunctions = forms.CharField(widget=forms.HiddenInput, required=False)
+    deleteFunctions = forms.CharField(widget=forms.HiddenInput, required=False)
 
 class DeviceGroupForm(forms.ModelForm):
     class Meta:

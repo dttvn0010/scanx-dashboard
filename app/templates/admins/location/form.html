@@ -1,0 +1,93 @@
+{% extends "../base.html" %}
+
+{% block sidebar %}
+{% with group=3 page=8 %}
+{{ block.super }}
+{% endwith %}
+{% endblock %}
+
+{% block content %}
+<div class="content p-3">
+  <form method="POST" novalidate> 
+    {% csrf_token %}
+    <table class="table table-form">
+      {{ form }}
+    </table>
+
+    <button class="btn btn-primary" type="submit">Save</button>
+    <a class="btn btn-secondary" href='{% url "admin-location" %}'>Back</a>
+  </form>
+
+  <div class="modal fade" id="locationModal">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Choose Location</h5>
+          <button type="button" class="close" data-dismiss="modal">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div id="map" style="width: 100%; height: 500px;"></div>
+        </div>       
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+var map;
+var marker;
+
+function getPosition() {
+  var position = { lat: 52.479865, lng: -1.911067 };
+  var geoLocation = $('#id_geoLocation').val();
+
+  if(geoLocation && geoLocation.indexOf(',') >0) {
+    var arr = geoLocation.split(',');
+    position = { lat: parseFloat(arr[0]), lng: parseFloat(arr[1]) };
+  }
+
+  return position;
+}
+
+function setMarker(position, update) {  
+  if(marker) {
+    marker.setMap(null);
+  }
+  marker = new google.maps.Marker({ position: position, map: map });
+  if(update) map.setCenter(position);
+}
+
+function initMap() {  
+  var position = getPosition();
+  map = new google.maps.Map(document.getElementById('map'), { zoom: 16, center: position });
+  setMarker(position);
+
+  google.maps.event.addListener(map, 'click', function(e) {
+      var position = e.latLng;
+      var lat = position.lat().toFixed(6);
+      var lng = position.lng().toFixed(6);
+      $('#id_geoLocation').val(`${lat},${lng}`);
+      setMarker(position);
+      setTimeout(() => $('#locationModal').modal('hide'), 500);
+  });
+}
+
+function openLocationModal() {
+  $('#locationModal').modal();
+}
+
+$('#locationModal').on('shown.bs.modal', function() {
+  setMarker(getPosition(), true);
+});
+
+$(document).ready(function(){
+  $('#id_geoLocation').click(function(){
+    openLocationModal();
+  });
+})
+</script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBR8gU4Te36NCYlc2ZdynsOWQOS03lzWKc&callback=initMap"></script>
+{% endblock %}

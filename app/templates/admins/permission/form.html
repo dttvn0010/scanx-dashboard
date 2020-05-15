@@ -1,0 +1,63 @@
+{% extends "../base.html" %}
+
+{% block sidebar %}
+{% with group=1 page=2 %}
+{{ block.super }}
+{% endwith %}
+{% endblock %}
+
+{% block content %}
+<div class="content p-3">
+  <form id="fmt" method="POST"> 
+    {% csrf_token %}
+    <table class="table table-form">{{ form }}</table>
+
+    <table class="table">
+      <tr>
+        <th style="width: 40%;">Feature (or module) name</th>
+        <th style="width: 15%;">Access</th>
+        <th style="width: 15%;">View</th>
+        <th style="width: 15%;">Edit</th>
+        <th style="width: 15%;">Delete</th>
+      </tr>
+      {% for detail in details %}
+      <tr>
+        <tr>
+          <td>{{ detail.permission }}</td>
+          <td><input class="access" key='{{forloop.counter}}' type="checkbox" {%if detail.access %}checked{%endif%}></td>
+          <td><input class="view" key='{{forloop.counter}}' type="checkbox" {%if detail.view %}checked{%endif%}></td>
+          <td><input class="edit" key='{{forloop.counter}}' type="checkbox" {%if detail.edit %}checked{%endif%}></td>
+          <td><input class="delete" key='{{forloop.counter}}' type="checkbox" {%if detail.delete %}checked{%endif%}></td>
+        </tr>
+      </tr>
+      {% endfor %}
+    </table>
+
+    <button class="btn btn-primary" type="submit" onclick="submitForm()">Save</button>
+    <a class="btn btn-secondary" href='{% url "admin-permission" %}'>Back</a>
+  </form>
+</div>
+
+<script>
+function getPermissions(type) {
+  var items = $('.' + type);
+  var permissions = [];
+  for(var i = 0; i < items.length; i++) {
+    permissions.push(0);
+  }
+  for(var i = 0; i < items.length; i++) { 
+    var key = $(items[i]).attr('key');
+    var value = $(items[i]).prop('checked') ? 1 : 0;
+    permissions[key] = value;
+  }
+  return permissions.join(',');
+}
+
+function submitForm() {
+  $('#id_accessFunctions').val(getPermissions('access'));
+  $('#id_viewFunctions').val(getPermissions('view'));
+  $('#id_editFunctions').val(getPermissions('edit'));
+  $('#id_deleteFunctions').val(getPermissions('delete'));
+}
+</script>
+{% endblock %}

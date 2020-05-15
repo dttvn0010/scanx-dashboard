@@ -87,7 +87,7 @@ def searchPermission(request):
     permissions = Permission.objects.all()
     recordsTotal = permissions.count()
 
-    permissions = permissions.filter(name__contains=keyword).order_by('-createdDate')    
+    permissions = permissions.filter(Q(name__contains=keyword) | Q(description__contains=keyword)).order_by('-createdDate')    
     recordsFiltered = permissions.count()
     permissions = permissions[start:start+length]
     data = PermissionSerializer(permissions, many=True).data
@@ -120,7 +120,7 @@ def searchDeviceGroup(request):
     deviceGroups = DeviceGroup.objects.all()
     recordsTotal = deviceGroups.count()
 
-    deviceGroups = deviceGroups.filter(name__contains=keyword).order_by('-createdDate')    
+    deviceGroups = deviceGroups.filter(Q(name__contains=keyword) | Q(description__contains=keyword)).order_by('-createdDate')    
     recordsFiltered = deviceGroups.count()
     deviceGroups = deviceGroups[start:start+length]
     data = DeviceGroupSerializer(deviceGroups, many=True).data
@@ -208,7 +208,7 @@ def searchLocationGroup(request):
     locationGroups = LocationGroup.objects.all()
     recordsTotal = locationGroups.count()
 
-    locationGroups = locationGroups.filter(name__contains=keyword).order_by('-createdDate')    
+    locationGroups = locationGroups.filter(Q(name__contains=keyword) | Q(description__contains=keyword)).order_by('-createdDate')    
     recordsFiltered = locationGroups.count()
     locationGroups = locationGroups[start:start+length]
     data = LocationGroupSerializer(locationGroups, many=True).data

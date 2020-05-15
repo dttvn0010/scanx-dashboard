@@ -1,0 +1,15 @@
+PERMISSIONS = [
+    {"name": "Scanner (ability to scan codes or tags) "},
+    {"name": "Dashboard"},
+    {"name": "Permissions Tab"},
+    {"name": "Locations Tab"},
+    {"name": "Devices Tab"},
+    {"name": "Users Tab"},
+    {"name": "Add Permissions"},
+    {"name": "Add Locations"},
+    {"name": "Add Devices "},
+    {"name": "Add Users "},
+    {"name": "Settings"},
+    {"name": "Logs"},
+    {"name": "Reports"},
+]

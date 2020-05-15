@@ -9,10 +9,6 @@ from django.core.files.storage import FileSystemStorage
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth import login, authenticate
 
-from .models import *
-from .forms import *
-from .consts import MAIL_TEMPLATE_PATH
-from .mail_utils import sendAdminInvitationMail, sendInvitationMail
 from datetime import datetime
 import string
 import random
@@ -20,6 +16,13 @@ import csv
 import json
 from multiprocessing import Process
 import traceback
+
+from .models import *
+from .forms import *
+from .consts import MAIL_TEMPLATE_PATH
+from .mail_utils import sendAdminInvitationMail, sendInvitationMail
+from .permissions import PERMISSIONS
+
 
 TMP_PATH = 'tmp'
 fs = FileSystemStorage()
@@ -348,6 +351,37 @@ def importUser(request):
 def adminViewPermission(request):
     return render(request, "admins/permission/list.html")
 
+def splitToIntArr(st):
+    if st:
+        arr = st.split(',')
+        return [int(x) for x in arr]
+
+    return []
+
+def getPermissionDetail(permission):
+    if not permission:
+        return [{'permission': p['name']} for p in PERMISSIONS]
+        
+    details = {}
+    accessFunctions = splitToIntArr(permission.accessFunctions)
+    viewFunctions = splitToIntArr(permission.viewFunctions)
+    editFunctions = splitToIntArr(permission.editFunctions)
+    deleteFunctions = splitToIntArr(permission.deleteFunctions)
+    
+    safe_get = lambda arr, i : arr[i] if i < len(arr) else 0
+
+    return [
+        {
+            'permission': PERMISSIONS[i]['name'],
+            'access': safe_get(accessFunctions,i),
+            'view': safe_get(viewFunctions,i),
+            'edit': safe_get(editFunctions,i),
+            'delete': safe_get(deleteFunctions,i),
+        }
+        for i in range(len(PERMISSIONS))
+    ]
+
+
 @login_required
 def addPermission(request):
     form = PermissionForm()
@@ -360,7 +394,8 @@ def addPermission(request):
             permission.save()
             return redirect('admin-permission')
 
-    return render(request, 'admins/permission/form.html', {'form': form})
+    return render(request, 'admins/permission/form.html', 
+            {'form': form, 'details': getPermissionDetail(None)})
 
 @login_required
 def updatePermission(request, pk):
@@ -371,9 +406,10 @@ def updatePermission(request, pk):
         form = PermissionForm(request.POST, instance=permission)
         if form.is_valid():
             form.save()
-            return redirect('admin-permission-group')
+            return redirect('admin-permission')
 
-    return render(request, 'admins/permission/form.html', {'form': form})
+    return render(request, 'admins/permission/form.html', 
+                {'form': form, 'details': getPermissionDetail(permission)})
 
 #================================= Device Group====================================================================
 @login_required
