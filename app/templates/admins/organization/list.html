@@ -1,7 +1,7 @@
-{% extends "admins/base.html" %}
+{% extends "../base.html" %}
 
 {% block sidebar %}
-{% with page=1 %}
+{% with group=1 page=1 %}
 {{ block.super }}
 {% endwith %}
 {% endblock %}
@@ -22,7 +22,7 @@
 
   <table id="table" class="display mt-2">
     <thead>
-      <tr class="text-center">
+      <tr>
         <th style="width: 8%;">Active</th>
         <th style="width: 24%;">Name</th>
         <th style="width: 10%;">User</th>
@@ -103,9 +103,15 @@ $(document).ready(function() {
   })
 });
 
-function deleteItem(id) {
-  if (confirm('All users in this organization will be deleted. Do you want to continue?')) {
-    location.href = '/admins/organization/delete/' + id;
+async function deleteItem(id) {
+  if (confirm('Do you want to delete?')) {
+    var response = await fetch('/api/organization/delete/' + id);
+    var result = await response.json();
+    if(result.success) {
+      location.href = "/admins";
+    }else{
+      alert("Error: " + result.message);
+    }
   }
 }
 

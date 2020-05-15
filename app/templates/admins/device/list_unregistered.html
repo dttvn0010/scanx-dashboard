@@ -1,7 +1,7 @@
-{% extends "admins/base.html" %}
+{% extends "../base.html" %}
 
 {% block sidebar %}
-{% with page=2 %}
+{% with group=2 page=5 %}
 {{ block.super }}
 {% endwith %}
 {% endblock %}
@@ -99,9 +99,15 @@ $(document).ready(function() {
   })
 });
 
-function deleteItem(id) {
+async function deleteItem(id) {
   if (confirm('Do you want to delete?')) {
-    location.href = '/admins/unregistered_device/delete/' + id;
+    var response = await fetch('/api/device/delete/' + id);
+    var result = await response.json();
+    if(result.success) {
+      location.href = "/admins/unregistered_device";
+    }else{
+      alert("Error: " + result.message);
+    }
   }
 }
 

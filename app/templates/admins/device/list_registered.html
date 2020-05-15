@@ -1,7 +1,7 @@
-{% extends "admins/base.html" %}
+{% extends "../base.html" %}
 
 {% block sidebar %}
-{% with page=3 %}
+{% with group=2 page=6 %}
 {{ block.super }}
 {% endwith %}
 {% endblock %}
@@ -72,41 +72,47 @@
   </div>
 </div>
 <script>
-  $(document).ready(function() {
-    $('#table').DataTable({
-      "ordering": false,
-      "processing": true,
-      "serverSide": true,
-      "ajax": "/api/registered_device/search",
-      "columns": [
-        { "data": "enabled",
-          render: function (data, type, row){
-            return '<input type="checkbox"' + (data? ' checked' : '') + '/>'
-          } 
-        },
-        { "data": "deviceTypeName" },
-        { "data": "id1" },
-        { "data": "id2" },
-        { "data": "organizationName"},
-        { "data": "registeredDate"},
-        {
-          render: function (data, type, row) {
-            return `
-            <a title="Edit" href="/admins/registered_device/update/${row['id']}"><i class="fas fa-edit"></i></a> 
-            &nbsp;
-            <a title="Delete" href="#" onclick="deleteItem(${row['id']})" ><i class="fas fa-trash" style="color:red"></i>
-            </a>`;
-          }
+$(document).ready(function() {
+  $('#table').DataTable({
+    "ordering": false,
+    "processing": true,
+    "serverSide": true,
+    "ajax": "/api/registered_device/search",
+    "columns": [
+      { "data": "enabled",
+        render: function (data, type, row){
+          return '<input type="checkbox"' + (data? ' checked' : '') + '/>'
+        } 
+      },
+      { "data": "deviceTypeName" },
+      { "data": "id1" },
+      { "data": "id2" },
+      { "data": "organizationName"},
+      { "data": "registeredDate"},
+      {
+        render: function (data, type, row) {
+          return `
+          <a title="Edit" href="/admins/registered_device/update/${row['id']}"><i class="fas fa-edit"></i></a> 
+          &nbsp;
+          <a title="Delete" href="#" onclick="deleteItem(${row['id']})" ><i class="fas fa-trash" style="color:red"></i>
+          </a>`;
         }
-      ],
-    })
-  });
-  
-function deleteItem(id) {
-    if (confirm('Do you want to delete?')) {
-      location.href = '/admins/registered_device/delete/' + id;
+      }
+    ],
+  })
+});
+
+async function deleteItem(id) {
+  if (confirm('Do you want to delete?')) {
+    var response = await fetch('/api/device/delete/' + id);
+    var result = await response.json();
+    if(result.success) {
+      location.href = "/admins/registered_device";
+    }else{
+      alert("Error: " + result.message);
     }
   }
+}
 
 function showImportModal() {
   $("#csv_file").val("");

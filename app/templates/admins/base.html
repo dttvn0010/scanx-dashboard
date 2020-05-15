@@ -7,6 +7,7 @@
 
 <link rel="stylesheet" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.css">
 <link href="/static/css/sb-admin-2.css" rel="stylesheet">
+<link href="/static/fonts/webfonts/balsamiqsans.css" rel="stylesheet" type="text/css">
 <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
@@ -15,45 +16,69 @@
 <body id="page-top">
   <div id="wrapper">
     {% block sidebar %}
-    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark">
+    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark" id="accordionSidebar">
       <a class="sidebar-brand d-flex align-items-center" href="#">
         <div class="sidebar-brand-text">ScanX</div>
       </a>
 
-      <hr class="sidebar-divider my-0">
+      <hr class="sidebar-divider">
 
-      <li class="nav-item {% if page == 1 %} active {%endif%}">
-        <a class="nav-link" href="/admins">
-          <span>Organizations</span></a>
-      </li>
-
-      <hr class="sidebar-divider my-0">
-
-      <li class="nav-item {% if page == 2 %} active {%endif%}" >
-        <a class="nav-link" href="/admins/unregistered_device">
-          <span>Unregistered Devices</span></a>
-      </li>
-
-      <hr class="sidebar-divider my-0">
-
-      <li class="nav-item {% if page == 3 %} active {%endif%}">
-        <a class="nav-link" href="/admins/registered_device">
-          <span>Registered Devices</span></a>
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true">
+          <span>Users & Organizations</span>
+        </a>
+        <div id="collapseOne" class="collapse {% if group == 1%}show{%endif%}" data-parent="#accordionSidebar">
+          <div class="bg-white py-2 collapse-inner rounded">
+            <a class="collapse-item {% if page == 1 %} active {%endif%}" href="/admins">Organizations</a>
+            <a class="collapse-item {% if page == 2 %} active {%endif%}" href="/admins/permission">Permissions</a>
+            <a class="collapse-item {% if page == 3 %} active {%endif%}" href="/admins/user">Users</a>            
+          </div>
+        </div>
       </li>
 
       <hr class="sidebar-divider">
 
-      <div class="sidebar-heading">
-        Settings
-      </div>
-
-      <li class="nav-item {% if page == 4 %} active {%endif%}">
-        <a class="nav-link" href="/admins/settings/mail_template">
-          <span>Mail template</span>
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="true">
+          <span>Devices</span>
         </a>
+        <div id="collapseTwo" class="collapse {% if group == 2%}show{%endif%}" data-parent="#accordionSidebar">
+          <div class="bg-white py-2 collapse-inner rounded">
+            <a class="collapse-item {% if page == 4 %} active {%endif%}" href="/admins/device_group">Device Groups</a>
+            <a class="collapse-item {% if page == 5 %} active {%endif%}" href="/admins/unregistered_device">Unregistered Devices</a>
+            <a class="collapse-item {% if page == 6 %} active {%endif%}" href="/admins/registered_device">Registered Devices</a>
+          </div>
+        </div>
       </li>
 
-      <hr class="sidebar-divider my-0">
+      <hr class="sidebar-divider">
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseThree" aria-expanded="true">
+          <span>Locations</span>
+        </a>
+        <div id="collapseThree" class="collapse {% if group == 3%}show{%endif%}" data-parent="#accordionSidebar">
+          <div class="bg-white py-2 collapse-inner rounded">
+            <a class="collapse-item {% if page == 7 %} active {%endif%}" href="/admins/location_group">Location Groups</a>
+            <a class="collapse-item {% if page == 8 %} active {%endif%}" href="/admins/location">Location</a>
+          </div>
+        </div>
+      </li>
+
+      <hr class="sidebar-divider">
+
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseFour" aria-expanded="true">
+          <span>Settings</span>
+        </a>
+        <div id="collapseFour" class="collapse {% if group == 4%}show{%endif%}" data-parent="#accordionSidebar">
+          <div class="bg-white py-2 collapse-inner rounded">
+            <a class="collapse-item {% if page == 9 %} active {%endif%}" href="/admins/settings/mail_template">Mail template</a>
+          </div>
+        </div>
+      </li>
+
+      <hr class="sidebar-divider">
 
       <!-- Sidebar Toggler (Sidebar) -->
       <div class="text-center d-none d-md-inline">

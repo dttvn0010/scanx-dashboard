@@ -66,7 +66,26 @@ class OrganizationChangeForm(forms.ModelForm):
     class Meta:
         model = Organization
         fields = ('name', 'nfcEnabled', 'qrScanEnabled', 'active')
-    
+
+class UserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ('fullname', 'email', 'organization', 'nfcEnabled', 'qrScanEnabled', 'sharedLocation', 'permissions')
+
+    nfcEnabled = forms.BooleanField(label='NFC Enabled', required=False)
+    qrScanEnabled = forms.BooleanField(label='QR Scanning Enabled', required=False)
+    sharedLocation = forms.BooleanField(label='Share location after each scan', required=False)
+
+class PermissionForm(forms.ModelForm):
+    class Meta:
+        model = Permission
+        exclude = ('accessFunctions', 'viewFunctions', 'editFunctions', 'deleteFunctions', 'createdDate',)
+
+class DeviceGroupForm(forms.ModelForm):
+    class Meta:
+        model = DeviceGroup
+        exclude = ('createdDate',)
+
 class UnRegisteredDeviceForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):        
         organization = kwargs.pop('organization', None)
@@ -79,13 +98,25 @@ class UnRegisteredDeviceForm(forms.ModelForm):
         
     class Meta:
         model = Device
-        exclude = ('status', 'registeredDate')
+        exclude = ('status', 'createdDate', 'registeredDate', )
 
 class RegisteredDeviceForm(forms.ModelForm):
     class Meta:
         model = Device
-        exclude = ('status',)
+        exclude = ('status', 'createdDate')
 
     registeredDate = forms.DateTimeField(input_formats=['%d %b,%Y'], 
                         widget=forms.widgets.DateTimeInput(format="%d %b,%Y"), 
                         label='Registered date', required=False)
+
+
+class LocationGroupForm(forms.ModelForm):
+    class Meta:
+        model = LocationGroup
+        exclude = ('createdDate',)
+
+class LocationForm(forms.ModelForm):
+    class Meta:
+        model = Location
+        exclude = ('createdDate',)
+    
