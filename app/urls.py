@@ -30,6 +30,13 @@ urlpatterns = [
     path('admins/permission/add', addPermission, name="permission-add"),
     path('admins/permission/update/<int:pk>', updatePermission, name="permission-update"),    
     
+    path('admins/device_type', adminViewDeviceType, name='admin-device-type'),
+    path('admins/device_type/add', addDeviceType, name="device-type-add"),
+    path('admins/device_type/update/<int:pk>', updateDeviceType, name="device-type-update"),    
+    path('admins/device_type/export', exportDeviceType),
+    path('admins/device_type/import_preview', importDeviceTypePreview),
+    path('admins/device_type/import', importDeviceType),
+
     path('admins/device_group', adminViewDeviceGroup, name='admin-device-group'),
     path('admins/device_group/add', addDeviceGroup, name="device-group-add"),
     path('admins/device_group/update/<int:pk>', updateDeviceGroup, name="device-group-update"),    
@@ -73,6 +80,9 @@ urlpatterns = [
 
     path('api/permission/search', searchPermission),
     path('api/permission/delete/<int:pk>', deletePermission),
+
+    path('api/device_type/search', searchDeviceType),
+    path('api/device_type/delete/<int:pk>', deleteDeviceType),
 
     path('api/device_group/search', searchDeviceGroup),
     path('api/device_group/delete/<int:pk>', deleteDeviceGroup),

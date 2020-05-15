@@ -16,10 +16,10 @@ class Organization(models.Model):
 class Permission(models.Model):
     name = models.CharField(max_length=200, unique=True)
     description = models.CharField(max_length=500, blank=True, null=True)
-    accessFunctions = models.CharField(max_length=10000, blank=True)
-    viewFunctions = models.CharField(max_length=10000, blank=True)
-    editFunctions = models.CharField(max_length=10000, blank=True)
-    deleteFunctions = models.CharField(max_length=10000, blank=True)
+    accessFunctions = models.CharField(max_length=1000, blank=True)
+    viewFunctions = models.CharField(max_length=1000, blank=True)
+    editFunctions = models.CharField(max_length=1000, blank=True)
+    deleteFunctions = models.CharField(max_length=1000, blank=True)
     createdDate = models.DateTimeField(null=True)
 
     def __str__(self):

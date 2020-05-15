@@ -16,13 +16,18 @@ class PermissionSerializer(ModelSerializer):
         model = Permission
         fields = '__all__'
 
+class DeviceTypeSerializer(ModelSerializer):
+    class Meta:
+        model = DeviceType
+        fields = '__all__'
+
 class DeviceGroupSerializer(ModelSerializer):
     class Meta:
         model = DeviceGroup
         fields = '__all__'
 
 class DeviceSerializer(ModelSerializer):
-    deviceTypeName = CharField(source='deviceType.name')
+    deviceTypeName = CharField(source='deviceType.name', default="")
     organizationName = CharField(source='organization.name', default="")
     registeredDate = DateTimeField(format="%d %b,%Y", required=False, read_only=True)
 

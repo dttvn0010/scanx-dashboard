@@ -109,6 +109,39 @@ def deletePermission(request, pk):
         return Response({'success': False, 'message': 'Cannot delete this permission because some records depend on it'})
 
 
+# =================================================== Device Type ======================================================
+@api_view(['GET'])
+def searchDeviceType(request):
+    draw = request.query_params.get('draw', 1)    
+    keyword = request.query_params.get('search[value]', '')
+    start = int(request.query_params.get('start', 0))
+    length = int(request.query_params.get('length', 0))
+    
+    deviceTypes = DeviceType.objects.all()
+    recordsTotal = deviceTypes.count()
+
+    deviceTypes = deviceTypes.filter(Q(name__contains=keyword) | Q(description__contains=keyword)).order_by('-createdDate')    
+    recordsFiltered = deviceTypes.count()
+    deviceTypes = deviceTypes[start:start+length]
+    data = DeviceTypeSerializer(deviceTypes, many=True).data
+    
+    return Response({
+        "draw": draw,
+        "recordsTotal": recordsTotal,
+        "recordsFiltered": recordsFiltered,
+        "data": data
+    })     
+
+@api_view(['GET'])
+def deleteDeviceType(request, pk):
+    try:
+        deviceType = DeviceType.objects.get(pk=pk)
+        deviceType.delete()
+        return Response({'success': True})
+    except:
+        return Response({'success': False, 'message': 'Cannot delete this device type because some records depend on it'})
+
+
 # =================================================== Device Group ======================================================
 @api_view(['GET'])
 def searchDeviceGroup(request):

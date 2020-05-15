@@ -86,6 +86,12 @@ class PermissionForm(forms.ModelForm):
     editFunctions = forms.CharField(widget=forms.HiddenInput, required=False)
     deleteFunctions = forms.CharField(widget=forms.HiddenInput, required=False)
 
+class DeviceTypeForm(forms.ModelForm):
+    class Meta:
+        model = DeviceType
+        exclude = ('createdDate',)
+
+
 class DeviceGroupForm(forms.ModelForm):
     class Meta:
         model = DeviceGroup

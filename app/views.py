@@ -14,8 +14,7 @@ import string
 import random
 import csv
 import json
-from multiprocessing import Process
-import traceback
+from threading import Thread
 
 from .models import *
 from .forms import *
@@ -113,14 +112,9 @@ def createTenantAdmin(request, organization, adminName, adminEmail):
     user.is_staff = True
     user.save()
 
-    hostURL = request.build_absolute_uri('/')
-    #print('Sending email:' , hostURL, adminName, adminEmail, password)
-    #proc = Process(target=sendInvitationMail, args=(hostURL, organization.name, adminName, adminEmail, password))
-    #proc.start() 
-    try:
-        sendAdminInvitationMail(hostURL, organization.name, adminName, adminEmail, password)
-    except:
-        traceback.print_exc()
+    hostURL = request.build_absolute_uri('/')    
+    thr = Thread(target=sendAdminInvitationMail, args=(hostURL, organization.name, adminName, adminEmail, password))
+    thr.start()
 
 def createUser(request, organization, fullname, email):
     if email == "":
@@ -135,11 +129,9 @@ def createUser(request, organization, fullname, email):
     user.organization = organization
     user.save()
     
-    hostURL = request.build_absolute_uri('/')
-    try:
-        sendInvitationMail(hostURL, organization.name, fullname, email, password)
-    except:
-        traceback.print_exc()
+    hostURL = request.build_absolute_uri('/')        
+    thr = Thread(target=sendInvitationMail, args=(hostURL, organization.name, fullname, email, password))
+    thr.start()
 
     return user
 
@@ -410,6 +402,86 @@ def updatePermission(request, pk):
 
     return render(request, 'admins/permission/form.html', 
                 {'form': form, 'details': getPermissionDetail(permission)})
+
+#================================= Device Type ====================================================================
+@login_required
+def adminViewDeviceType(request):
+    return render(request, "admins/device_type/list.html")
+
+@login_required
+def addDeviceType(request):
+    form = DeviceTypeForm()
+
+    if request.method == 'POST':
+        form = DeviceTypeForm(request.POST)
+        if form.is_valid():
+            deviceType = form.save(commit=False)
+            deviceType.createdDate = datetime.now()
+            deviceType.save()
+            return redirect('admin-device-type')
+
+    return render(request, 'admins/device_type/form.html', {'form': form})
+
+@login_required
+def updateDeviceType(request, pk):
+    deviceType = get_object_or_404(DeviceType, pk=pk)
+    form = DeviceTypeForm(instance=deviceType)
+
+    if request.method == 'POST':
+        form = DeviceTypeForm(request.POST, instance=deviceType)
+        if form.is_valid():
+            form.save()
+            return redirect('admin-device-type')
+
+    return render(request, 'admins/device_type/form.html', {'form': form})
+
+DEVICE_TYPE_HEADER = ['Name', 'Description', 'Organization']
+
+@login_required
+def exportDeviceType(request):
+    lst = DeviceType.objects.all()
+    with open('device_type.csv', 'w', newline='') as fo:
+        writer = csv.writer(fo)
+        writer.writerow(DEVICE_TYPE_HEADER)
+        for item in lst:
+            organizationName = item.organization.name if item.organization else ''
+            writer.writerow([item.name, item.description, organizationName])
+
+    csv_file = open('device_type.csv', 'rb')
+    response = HttpResponse(content=csv_file)
+    response['Content-Type'] = 'text/csv'
+    response['Content-Disposition'] = 'attachment; filename="device_type.csv"'
+    return response
+
+@login_required
+def importDeviceTypePreview(request):
+    return importPreview(request, DEVICE_TYPE_HEADER)
+
+@login_required
+def importDeviceType(request):
+    if request.method == 'POST':
+        records = request.session.get("records", [])
+        indexes = [0] * len(DEVICE_TYPE_HEADER)
+        
+        for i in range(len(indexes)):
+            indexes[i] = int(request.POST.get(f'col_{i}', '0'))
+        
+        for row in records:                        
+            name, description, organizationName = row
+           
+            if DeviceType.objects.filter(name=name).count() > 0:
+                continue
+            
+            deviceType = DeviceType()
+            deviceType.name = name
+            deviceType.description = description
+            deviceType.organization = Organization.objects.filter(name=organizationName).first()
+            deviceType.save()
+        
+        del request.session['records']
+    
+    return redirect('admin-device-type')
+
 
 #================================= Device Group====================================================================
 @login_required
