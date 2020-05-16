@@ -60,6 +60,9 @@ def searchUser(request):
     users = users[start:start+length]
     data = UserSerializer(users, many=True).data
 
+    for i, org in enumerate(users):
+        data[i]['is_superuser'] = users[i].is_superuser
+        
     return Response({
         "draw": draw,
         "recordsTotal": recordsTotal,

@@ -89,7 +89,11 @@ $(document).ready(function() {
       { "data": "qrScanEnabled", "render": renderCheckbox },
       { "data": "sharedLocation", "render": renderCheckbox },      
       {
-        render: function (data, type, row) {
+        render: function (data, type, row) {  
+          if(row.is_superuser){
+            return '';
+          }
+          
           return `
           <a title="Edit" href="/admins/user/update/${row['id']}"><i class="fas fa-edit"></i></a> 
           &nbsp;
