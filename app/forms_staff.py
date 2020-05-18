@@ -4,7 +4,7 @@ from .models import *
 class UserForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ('fullname', 'email', 'organization', 'nfcEnabled', 'qrScanEnabled', 'sharedLocation', 'permissions')
+        fields = ('fullname', 'email', 'nfcEnabled', 'qrScanEnabled', 'sharedLocation', 'permissions')
 
     nfcEnabled = forms.BooleanField(label='NFC Enabled', required=False)
     qrScanEnabled = forms.BooleanField(label='QR Scanning Enabled', required=False)

@@ -32,7 +32,7 @@ class User(AbstractUser):
 
     organization = models.ForeignKey(Organization, blank=True, null=True, on_delete=models.PROTECT)
     fullname = models.CharField(max_length=50, blank=True, null=True, unique=True)
-    permissions = models.ManyToManyField(Permission)
+    permissions = models.ManyToManyField(Permission, blank=True)
     nfcEnabled = models.BooleanField(verbose_name='NFC Enabled', blank=True, null=True)
     qrScanEnabled = models.BooleanField(verbose_name='QR Scanning Enabled', blank=True, null=True)
     sharedLocation = models.BooleanField(verbose_name='Share location after each scan', blank=True, null=True)

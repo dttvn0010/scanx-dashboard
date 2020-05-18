@@ -23,9 +23,16 @@
 
       <hr class="sidebar-divider my-0">
 
-      <li class="nav-item {% if page == 1 %} active {%endif%}">
+      <li class="nav-item {% if not page  %} active {%endif%}">
         <a class="nav-link" href="/staff">
           <span>Dashboard</span></a>
+      </li>
+
+      <hr class="sidebar-divider">
+
+      <li class="nav-item {% if page == 1 %} active {%endif%}">
+        <a class="nav-link" href="/staff/user">
+          <span>Users</span></a>
       </li>
 
       <hr class="sidebar-divider">

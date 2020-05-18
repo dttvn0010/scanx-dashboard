@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 
 import csv
 from datetime import datetime
+from threading import Thread
 
 from .models import *
 from .forms_staff import *
@@ -19,7 +20,7 @@ def tableView(request):
 def mapView(request):
     return render(request, "staff/map_view.html")
 
-def createUser(request, organization, fullname, email):
+def createUser(request, fullname, email):
     if email == "":
         return 
 
@@ -29,11 +30,11 @@ def createUser(request, organization, fullname, email):
     user.email = email
     user.status = User.Status.INVITED
     user.createdDate = datetime.now()
-    user.organization = organization
+    user.organization = request.user.organization
     user.save()
     
     hostURL = request.build_absolute_uri('/')        
-    thr = Thread(target=sendInvitationMail, args=(hostURL, organization.name, fullname, email, password))
+    thr = Thread(target=sendInvitationMail, args=(hostURL, user.organization.name, fullname, email, password))
     thr.start()
 
     return user
@@ -52,10 +53,8 @@ def addUser(request):
         form = UserForm(request.POST)
         if form.is_valid():
             email = form.cleaned_data['email']
-            fullname = form.cleaned_data['fullname']
-            org = form.cleaned_data['organization']
-
-            createUser(request, org, fullname, email)
+            fullname = form.cleaned_data['fullname']            
+            createUser(request,  fullname, email)
             return redirect('staff-user')
 
     return render(request, 'staff/user/form.html', {'form': form})
@@ -69,7 +68,7 @@ def updateUser(request, pk):
         form = UserForm(request.POST, instance=user)
         if form.is_valid():
             form.save()
-            return redirect('staff-user-list')
+            return redirect('staff-user')
 
     return render(request, 'staff/user/form.html', {'form': form})
 
@@ -79,7 +78,7 @@ def deleteUser(request, pk):
     user.delete()
     return redirect("staff-user")
 
-USER_HEADER = ['Full name', 'Email', 'Organization', 'NFC Enabled', 'QR Scan Enabled', 'Location Shared']
+USER_HEADER = ['Full name', 'Email', 'NFC Enabled', 'QR Scan Enabled', 'Location Shared']
 
 @login_required
 def exportUser(request):
@@ -88,9 +87,7 @@ def exportUser(request):
         writer = csv.writer(fo)
         writer.writerow(USER_HEADER)
         for item in lst:
-            organizationName = item.organization.name if item.organization else ''
-            writer.writerow([item.fullname, item.email, organizationName,
-                                 item.nfcEnabled, item.qrScanEnabled, item.sharedLocation])
+            writer.writerow([item.fullname, item.email, item.nfcEnabled, item.qrScanEnabled, item.sharedLocation])
 
     csv_file = open('users.csv', 'rb')
     response = HttpResponse(content=csv_file)
@@ -112,12 +109,11 @@ def importUser(request):
             indexes[i] = int(request.POST.get(f'col_{i}', '0'))
         
         for row in records:
-            fullname, email, organizationName, nfcEnabled, qrScanEnabled, sharedLocation  = getPermutation(row, indexes)
+            fullname, email, nfcEnabled, qrScanEnabled, sharedLocation  = getPermutation(row, indexes)
             if User.objects.filter(email=email).count() > 0 or User.objects.filter(fullname=fullname).count() > 0:
                 continue
 
-            organization = Organization.objects.filter(name=organizationName).first()
-            user = createUser(request, organization, fullname, email)
+            user = createUser(request, fullname, email)
             user.nfcEnabled = nfcEnabled == 'True'
             user.qrScanEnabled = qrScanEnabled == 'True'
             user.sharedLocation = sharedLocation == 'True'

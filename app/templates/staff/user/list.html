@@ -1,7 +1,7 @@
 {% extends "../base.html" %}
 
 {% block sidebar %}
-{% with page=2 %}
+{% with page=1 %}
 {{ block.super }}
 {% endwith %}
 {% endblock %}
@@ -90,7 +90,7 @@ $(document).ready(function() {
       { "data": "sharedLocation", "render": renderCheckbox },      
       {
         render: function (data, type, row) {  
-          if(row.is_superuser){
+          if(row.username == '{{ request.user.username }}'){
             return '';
           }
           

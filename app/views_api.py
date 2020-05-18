@@ -129,7 +129,7 @@ def searchUser(request):
     start = int(request.query_params.get('start', 0))
     length = int(request.query_params.get('length', 0))
     
-    users = User.objects.all()
+    users = User.objects.filter(organization=request.user.organization)
     recordsTotal = users.count()
 
     users = users.filter(Q(fullname__contains=keyword) | Q(email__contains=keyword)).order_by('-createdDate')
