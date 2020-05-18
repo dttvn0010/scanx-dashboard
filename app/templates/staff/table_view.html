@@ -17,42 +17,31 @@
     </li>
   </ul>
   <div>
-    <table class="table">
+    <table id="table" class="mt-2 display">
       <thead>
         <tr>
-          <th>Location</th>
-          <th>Date/Time</th>
-          <th>Name</th>
+          <th style="width: 35%;">Location</th>
+          <th style="width: 30%;">Date/Time</th>
+          <th style="width: 35%;">Name</th>
         </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>123 Westwood Avenue </td>
-          <td>10 Apr 2020 at 9:12PM (2 hours ago) </td>
-          <td>Abby Adams</td>
-        </tr>
-        <tr>
-          <td>456 Fleetwood Road </td>
-          <td>18 Jan 2020 at 9:41PM (6 hours ago)</td>
-          <td>Barbara Bradley </td>
-        </tr>
-        <tr>
-          <td>21a Townsend Villas </td>
-          <td>23 Mar 2019 at 10:06PM (7 hours ago)</td>
-          <td>Cassie Cohen </td>
-        </tr>
-        <tr>
-          <td>Unit 12 Major Abbot Parkway</td>
-          <td>23 Mar 2019 at 10:06PM (7 hours ago) </td>
-          <td>Dana Donnely </td>
-        </tr>
-        <tr>
-          <td>84 Walford Villas </td>
-          <td>15 July 2018 at 7.34AM (196 hours ago)</td>
-          <td>Edith Eastman</td>
-        </tr>
-      </tbody>
+      </thead>     
     </table>
   </div>
 </div>
+
+<script>
+$(document).ready(function() {
+  $('#table').DataTable({
+    "ordering": false,
+    "processing": true,
+    "serverSide": true,
+    "ajax": "/api/checkin/search",
+    "columns": [
+      { "data": "location" },
+      { "data": "date" },
+      { "data": "user" }
+    ],
+  })
+});
+</script>
 {% endblock %}

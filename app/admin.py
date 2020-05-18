@@ -21,9 +21,7 @@ class MyUserAdmin(UserAdmin):
     list_display = ['username', 'fullname', 'email', 'organization']
 
 admin.site.register(models.Organization)
-admin.site.register(models.LocationGroup)
 admin.site.register(models.Location)
-admin.site.register(models.DeviceType)
-admin.site.register(models.DeviceGroup)
 admin.site.register(models.Device)
+admin.site.register(models.CheckIn)
 admin.site.register(models.User, MyUserAdmin)

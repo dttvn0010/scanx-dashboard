@@ -1,7 +1,7 @@
 {% extends "../base.html" %}
 
 {% block sidebar %}
-{% with group=2 page=5 %}
+{% with group=1 page=1 %}
 {{ block.super }}
 {% endwith %}
 {% endblock %}
@@ -10,11 +10,11 @@
 <div class="content p-3">
   <div class="row mb-2">
     <div class="col-8">
-      <a href='{% url "device-group-add" %}' class="btn btn-secondary">Add Device Group</a>
+      <a href='/_admin/organization/add' class="btn btn-secondary">Add Organization</a>
       <button class="btn btn-secondary mr-2" onclick="showImportModal()">
         <i class="fas fa-upload"></i>Import
       </button>      
-      <a href='/admins/device_group/export' class="btn btn-secondary mr-2">
+      <a href='/_admin/organization/export' class="btn btn-secondary mr-2">
         <i class="fas fa-download"></i>Export
       </a>      
     </div>
@@ -23,9 +23,13 @@
   <table id="table" class="display mt-2">
     <thead>
       <tr>
-        <th style="width: 40%;">Name</th>
-        <th style="width: 50%;">Description</th>
-        <th style="width: 10%;"></th>
+        <th style="width: 8%;">Active</th>
+        <th style="width: 24%;">Name</th>
+        <th style="width: 10%;">User</th>
+        <th style="width: 15%;">Admin Name</th>
+        <th style="width: 15%;">Admin Email</th>
+        <th style="width: 10%;">Devices</th>
+        <th style="width: 8%;"></th>
       </tr>
     </thead>
   </table>
@@ -34,7 +38,7 @@
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Import Device Groups</h5>
+          <h5 class="modal-title">Import Organizations</h5>
           <button type="button" class="close" data-dismiss="modal">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -54,7 +58,7 @@
             </div>            
           </form>
 
-          <form id="fmt2" style="display: none;" method="POST" action="/admins/device_group/import">
+          <form id="fmt2" style="display: none;" method="POST" action="/_admin/organization/import">
             {%csrf_token%}
             <label>Select the CSV column you want to use the data from for each field.</label>
             <div id="fmt2Body"></div>
@@ -74,15 +78,22 @@ $(document).ready(function() {
     "ordering": false,
     "processing": true,
     "serverSide": true,
-    "ajax": "/api/device_group/search",
+    "ajax": "/api/organization/search",
     "columns": [
+      { "data": "active",
+        render: function (data, type, row){
+          return '<input type="checkbox" onclick="return false;"' + (data? ' checked' : '') + '/>'
+        } 
+      },
       { "data": "name" },
-      { "data": "description" },
-        
+      { "data": "userCount" },
+      { "data": "admin.name" },
+      { "data": "admin.email" },
+      { "data": "deviceCount" },      
       {
         render: function (data, type, row) {
           return `
-          <a title="Edit" href="/admins/device_group/update/${row['id']}"><i class="fas fa-edit"></i></a> 
+          <a title="Edit" href="/_admin/organization/update/${row['id']}"><i class="fas fa-edit"></i></a> 
           &nbsp;
           <a title="Delete" href="#" onclick="deleteItem(${row['id']})" ><i class="fas fa-trash" style="color:red"></i>
           </a>`;
@@ -94,10 +105,10 @@ $(document).ready(function() {
 
 async function deleteItem(id) {
   if (confirm('Do you want to delete?')) {
-    var response = await fetch('/api/device_group/delete/' + id);
+    var response = await fetch('/api/organization/delete/' + id);
     var result = await response.json();
     if(result.success) {
-      location.href = "/admins/device_group";
+      location.href = "/_admin";
     }else{
       alert("Error: " + result.message);
     }
@@ -136,7 +147,7 @@ function createOptionsPanel(header, csvHeader) {
 
 async function previewImport() {
   var formData = new FormData(document.getElementById("fmt"));
-  var response = await fetch("/admins/device_group/import_preview", {
+  var response = await fetch("/_admin/organization/import_preview", {
     body: formData,
     method: "POST"
   });

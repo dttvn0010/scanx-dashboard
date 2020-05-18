@@ -1,7 +1,7 @@
 {% extends "../base.html" %}
 
 {% block sidebar %}
-{% with group=1 page=3 %}
+{% with page=3 %}
 {{ block.super }}
 {% endwith %}
 {% endblock %}
@@ -10,11 +10,11 @@
 <div class="content p-3">
   <div class="row mb-2">
     <div class="col-8">
-      <a href='{% url "user-add" %}' class="btn btn-secondary">Add User</a>
+      <a href='/staff/location/add' class="btn btn-secondary">Add Location</a>
       <button class="btn btn-secondary mr-2" onclick="showImportModal()">
         <i class="fas fa-upload"></i>Import
       </button>      
-      <a href='/admins/user/export' class="btn btn-secondary mr-2">
+      <a href='/staff/location/export' class="btn btn-secondary mr-2">
         <i class="fas fa-download"></i>Export
       </a>      
     </div>
@@ -23,12 +23,11 @@
   <table id="table" class="display mt-2">
     <thead>
       <tr>
-        <th style="width: 20%;">Full name</th>
-        <th style="width: 20%;">Email</th>
-        <th style="width: 15%;">NFC Enabled</th>
-        <th style="width: 15%;">QR Scan Enabled</th>
-        <th style="width: 15%;">Location Shared</th>
-        <th style="width: 15%;"></th>
+        <th style="width: 22%;">Address Line 1</th>
+        <th style="width: 22%;">Address Line 2</th>
+        <th style="width: 22%;">Postcode</th>
+        <th style="width: 22%;">Geo Location</th>
+        <th style="width: 12%;"></th>
       </tr>
     </thead>
   </table>
@@ -37,7 +36,7 @@
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Import Users</h5>
+          <h5 class="modal-title">Import Locations</h5>
           <button type="button" class="close" data-dismiss="modal">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -57,7 +56,7 @@
             </div>            
           </form>
 
-          <form id="fmt2" style="display: none;" method="POST" action="/admins/user/import">
+          <form id="fmt2" style="display: none;" method="POST" action="/staff/location/import">
             {%csrf_token%}
             <label>Select the CSV column you want to use the data from for each field.</label>
             <div id="fmt2Body"></div>
@@ -72,30 +71,21 @@
 </div>
 
 <script>
-function renderCheckbox(data, type, row) {
-  return '<input type="checkbox" onclick="return false;"' + (data? ' checked' : '') + '/>';
-}
-
 $(document).ready(function() {
   $('#table').DataTable({
     "ordering": false,
     "processing": true,
     "serverSide": true,
-    "ajax": "/api/user/search",
+    "ajax": "/api/location/search",
     "columns": [
-      { "data": "fullname" },
-      { "data": "email" },
-      { "data": "nfcEnabled", "render": renderCheckbox},
-      { "data": "qrScanEnabled", "render": renderCheckbox },
-      { "data": "sharedLocation", "render": renderCheckbox },      
+      { "data": "addressLine1" },
+      { "data": "addressLine2" },
+      { "data": "postCode" },
+      { "data": "geoLocation" },      
       {
-        render: function (data, type, row) {  
-          if(row.is_superuser){
-            return '';
-          }
-          
+        render: function (data, type, row) {
           return `
-          <a title="Edit" href="/admins/user/update/${row['id']}"><i class="fas fa-edit"></i></a> 
+          <a title="Edit" href="/staff/location/update/${row['id']}"><i class="fas fa-edit"></i></a> 
           &nbsp;
           <a title="Delete" href="#" onclick="deleteItem(${row['id']})" ><i class="fas fa-trash" style="color:red"></i>
           </a>`;
@@ -107,10 +97,10 @@ $(document).ready(function() {
 
 async function deleteItem(id) {
   if (confirm('Do you want to delete?')) {
-    var response = await fetch('/api/user/delete/' + id);
+    var response = await fetch('/api/location/delete/' + id);
     var result = await response.json();
     if(result.success) {
-      location.href = "/admins/user";
+      location.href = "/staff/location";
     }else{
       alert("Error: " + result.message);
     }
@@ -149,7 +139,7 @@ function createOptionsPanel(header, csvHeader) {
 
 async function previewImport() {
   var formData = new FormData(document.getElementById("fmt"));
-  var response = await fetch("/admins/user/import_preview", {
+  var response = await fetch("/staff/location/import_preview", {
     body: formData,
     method: "POST"
   });

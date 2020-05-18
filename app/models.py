@@ -45,19 +45,10 @@ class User(AbstractUser):
             return self.fullname
         else:
             return self.username
-            
-class LocationGroup(models.Model):
-    organization = models.ForeignKey(Organization, on_delete=models.PROTECT)
-    name = models.CharField(max_length=50, unique=True)
-    description = models.CharField(max_length=500, blank=True, null=True)
-    createdDate = models.DateTimeField(null=True)
-
-    def __str__(self):
-        return self.name
+   
     
 class Location(models.Model):
     organization = models.ForeignKey(Organization, on_delete=models.PROTECT,  blank=True, null=True)
-    locationGroup = models.ForeignKey(LocationGroup, on_delete=models.PROTECT,  blank=True, null=True)
     addressLine1 = models.CharField(max_length=100)
     addressLine2 = models.CharField(max_length=100)
     postCode = models.CharField(max_length=10)
@@ -67,39 +58,20 @@ class Location(models.Model):
     def __str__(self):
         return f'{self.addressLine1}, {self.addressLine2}'
 
-class DeviceGroup(models.Model):
-    organization = models.ForeignKey(Organization, on_delete=models.PROTECT, blank=True, null=True)
-    name = models.CharField(max_length=50, unique=True)
-    description = models.CharField(max_length=500, blank=True, null=True)
-    createdDate = models.DateTimeField(null=True)
-
-    def __str__(self):
-        return self.name
-
-class DeviceType(models.Model):
-    name = models.CharField(max_length=30, unique=True, blank=True, null=True)
-    description = models.CharField(max_length=500, blank=True, null=True)
-    createdDate = models.DateTimeField(null=True)
-
-    def __str__(self):
-        return self.name
-
 class Device(models.Model):
-    class Status:
-        UNREGISTERED = 0
-        REGISTERED = 1
-
     organization = models.ForeignKey(Organization, on_delete=models.PROTECT, blank=True, null=True)    
-    deviceGroup = models.ForeignKey(DeviceGroup, on_delete=models.PROTECT, blank=True, null=True)
     installationLocation = models.ForeignKey(Location, on_delete=models.PROTECT, blank=True, null=True)
-    locationDescription = models.CharField(max_length=500, blank=True, null=True)
-    deviceType = models.ForeignKey(DeviceType, blank=True, null=True, on_delete=models.PROTECT)
     id1 = models.CharField(max_length=30)
     id2 = models.CharField(max_length=30)
-    status = models.IntegerField(blank=True, null=True)
     enabled = models.BooleanField()
     registeredDate = models.DateTimeField(blank=True, null=True)
     createdDate = models.DateTimeField(null=True)
 
     def __str__(self):
         return f'{self.id1}-{self.id2}'
+
+class CheckIn(models.Model):
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
+    location = models.ForeignKey(Location, on_delete=models.PROTECT)
+    device = models.ForeignKey(Device, on_delete=models.PROTECT)
+    date = models.DateTimeField()

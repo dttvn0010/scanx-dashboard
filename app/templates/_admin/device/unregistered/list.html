@@ -1,7 +1,7 @@
-{% extends "../base.html" %}
+{% extends "../../base.html" %}
 
 {% block sidebar %}
-{% with group=3 page=9 %}
+{% with group=2 page=3 %}
 {{ block.super }}
 {% endwith %}
 {% endblock %}
@@ -10,11 +10,11 @@
 <div class="content p-3">
   <div class="row mb-2">
     <div class="col-8">
-      <a href='{% url "location-add" %}' class="btn btn-secondary">Add Location</a>
+      <a href='/_admin/device/unregistered/add' class="btn btn-secondary">Add Devices</a>
       <button class="btn btn-secondary mr-2" onclick="showImportModal()">
         <i class="fas fa-upload"></i>Import
       </button>      
-      <a href='/admins/location/export' class="btn btn-secondary mr-2">
+      <a href='/_admin/device/unregistered/export' class="btn btn-secondary mr-2">
         <i class="fas fa-download"></i>Export
       </a>      
     </div>
@@ -23,11 +23,10 @@
   <table id="table" class="display mt-2">
     <thead>
       <tr>
-        <th style="width: 22%;">Address Line 1</th>
-        <th style="width: 22%;">Address Line 2</th>
-        <th style="width: 22%;">Postcode</th>
-        <th style="width: 22%;">Google Location</th>
-        <th style="width: 12%;"></th>
+        <th style="width: 10%;">Enabled</th>
+        <th style="width: 40%;">ID #1</th>
+        <th style="width: 40%;">ID #2</th>
+        <th style="width: 10%;"></th>
       </tr>
     </thead>
   </table>
@@ -36,7 +35,7 @@
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Import Locations</h5>
+          <h5 class="modal-title">Import Devices</h5>
           <button type="button" class="close" data-dismiss="modal">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -56,7 +55,7 @@
             </div>            
           </form>
 
-          <form id="fmt2" style="display: none;" method="POST" action="/admins/location/import">
+          <form id="fmt2" style="display: none;" method="POST" action="/_admin/device/unregistered/import">
             {%csrf_token%}
             <label>Select the CSV column you want to use the data from for each field.</label>
             <div id="fmt2Body"></div>
@@ -76,16 +75,19 @@ $(document).ready(function() {
     "ordering": false,
     "processing": true,
     "serverSide": true,
-    "ajax": "/api/location/search",
+    "ajax": "/api/device/unregistered/search",
     "columns": [
-      { "data": "addressLine1" },
-      { "data": "addressLine2" },
-      { "data": "postCode" },
-      { "data": "geoLocation" },      
+      { "data": "enabled",
+        render: function (data, type, row){
+          return '<input type="checkbox" onclick="return false;"' + (data? ' checked' : '') + '/>'
+        } 
+      },
+      { "data": "id1" },
+      { "data": "id2" },
       {
         render: function (data, type, row) {
           return `
-          <a title="Edit" href="/admins/location/update/${row['id']}"><i class="fas fa-edit"></i></a> 
+          <a title="Edit" href="/_admin/device/unregistered/update/${row['id']}"><i class="fas fa-edit"></i></a> 
           &nbsp;
           <a title="Delete" href="#" onclick="deleteItem(${row['id']})" ><i class="fas fa-trash" style="color:red"></i>
           </a>`;
@@ -97,10 +99,10 @@ $(document).ready(function() {
 
 async function deleteItem(id) {
   if (confirm('Do you want to delete?')) {
-    var response = await fetch('/api/location/delete/' + id);
+    var response = await fetch('/api/device/delete/' + id);
     var result = await response.json();
     if(result.success) {
-      location.href = "/admins/location";
+      location.href = "/_admin/device/unregistered";
     }else{
       alert("Error: " + result.message);
     }
@@ -139,7 +141,7 @@ function createOptionsPanel(header, csvHeader) {
 
 async function previewImport() {
   var formData = new FormData(document.getElementById("fmt"));
-  var response = await fetch("/admins/location/import_preview", {
+  var response = await fetch("/_admin/device/unregistered/import_preview", {
     body: formData,
     method: "POST"
   });

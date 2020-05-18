@@ -1,8 +1,85 @@
 from django.db.models import Q
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+
+from datetime import datetime
+
 from .models import *
 from .serializers import *
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticated,))
+def test(request):
+    return Response({'success': True})
+
+@api_view(['POST'])
+@permission_classes((IsAuthenticated,))
+def checkIn(request):
+    code = request.data.get("code")
+    print('Code=', code)
+    arr = code.split('-')
+    if len(arr) != 3 or arr[0] != "SCANX":
+        return Response({'error': 'Wrong code'})
+    
+    id1, id2 = arr[1:]
+    device = Device.objects.filter(id1=id1).filter(id2=id2).first()
+    if not device:
+        return Response({'error': 'No device found'})
+
+    print(device.id1, device.id2, device.installationLocation)
+
+    checkIn = CheckIn()
+    checkIn.location = device.installationLocation
+    checkIn.device = device
+    checkIn.user = request.user
+    checkIn.date = datetime.now()
+    checkIn.save()
+
+    return Response({'location': str(device.installationLocation)})
+
+@api_view(['GET'])
+def searchCheckIn(request):
+    draw = request.query_params.get('draw', 1)    
+    keyword = request.query_params.get('search[value]', '')
+    start = int(request.query_params.get('start', 0))
+    length = int(request.query_params.get('length', 0))
+    
+    checkIns = CheckIn.objects.all()
+    recordsTotal = checkIns.count()
+
+    checkIns = checkIns.filter(Q(user__fullname__contains=keyword) 
+                                | Q(location__addressLine1__contains=keyword) 
+                                | Q(location__addressLine1__contains=keyword)) \
+                        .order_by('-date')
+
+    recordsFiltered = checkIns.count()
+    checkIns = checkIns[start:start+length]
+    data = CheckInSerializer(checkIns, many=True).data
+
+    for item in data:
+        item['location'] = f'{item["addressLine1"]}, {item["addressLine2"]}'
+        d = datetime.strptime(item['date'], "%d %b %Y at %I:%M %p")
+        minutes = (datetime.now() - d).seconds // 60
+        hours = (datetime.now() - d).seconds // 3600
+        
+        if hours == 0:
+            item['date'] = item['date'] + f' ({minutes} minute{"" if minutes == 1 else "s"} ago)'
+        else:
+            item['date'] = item['date'] + f' ({hours} hour{"" if hours == 1 else "s"} ago)'
+
+        arr = item['geoLocation'].split(',')
+        if len(arr) == 2:
+            lat = float(arr[0])
+            lng = float(arr[1])
+            item['geoLocation'] = {'lat': lat, 'lng': lng}
+
+    return Response({
+        "draw": draw,
+        "recordsTotal": recordsTotal,
+        "recordsFiltered": recordsFiltered,
+        "data": data
+    })
 
 # =================================================== Organization ======================================================
 
@@ -186,7 +263,7 @@ def searchUnregisteredDevice(request):
     start = int(request.query_params.get('start', 0))
     length = int(request.query_params.get('length', 0))
     
-    devices = Device.objects.filter(status=Device.Status.UNREGISTERED)
+    devices = Device.objects.filter(organization__isnull=True)
     recordsTotal = devices.count()
 
     devices = devices.filter(Q(id1__contains=keyword) | Q(id2__contains=keyword)).order_by('-createdDate')
@@ -218,7 +295,7 @@ def searchRegisteredDevice(request):
     start = int(request.query_params.get('start', 0))
     length = int(request.query_params.get('length', 0))
     
-    devices = Device.objects.filter(status=Device.Status.REGISTERED)
+    devices = Device.objects.filter(organization__isnull=False)
     recordsTotal = devices.count()
 
     devices = devices.filter(Q(id1__contains=keyword) | Q(id2__contains=keyword)).order_by('-createdDate')
@@ -232,6 +309,28 @@ def searchRegisteredDevice(request):
         "recordsFiltered": recordsFiltered,
         "data": data
     })    
+
+@api_view(['GET'])
+def searchByOrganization(request):
+    draw = request.query_params.get('draw', 1)    
+    keyword = request.query_params.get('search[value]', '')
+    start = int(request.query_params.get('start', 0))
+    length = int(request.query_params.get('length', 0))
+    
+    devices = Device.objects.filter(organization=request.user.organization)
+    recordsTotal = devices.count()
+
+    devices = devices.filter(Q(id1__contains=keyword) | Q(id2__contains=keyword)).order_by('-createdDate')
+    recordsFiltered = devices.count()
+    devices = devices[start:start+length]
+    data = DeviceSerializer(devices, many=True).data
+    
+    return Response({
+        "draw": draw,
+        "recordsTotal": recordsTotal,
+        "recordsFiltered": recordsFiltered,
+        "data": data
+    }) 
 
 # =================================================== Location Group ======================================================
 @api_view(['GET'])

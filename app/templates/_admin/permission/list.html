@@ -10,7 +10,7 @@
 <div class="content p-3">
   <div class="row mb-2">
     <div class="col-8">
-      <a href='{% url "permission-add" %}' class="btn btn-secondary">Add Permission</a>
+      <a href='/_admin/permission/add' class="btn btn-secondary">Add Permission</a>
       <button class="btn btn-secondary mr-2" onclick="showImportModal()">
         <i class="fas fa-upload"></i>Import
       </button>      
@@ -46,7 +46,7 @@ $(document).ready(function() {
           }
 
           return `
-          <a title="Edit" href="/admins/permission/update/${row['id']}"><i class="fas fa-edit"></i></a> 
+          <a title="Edit" href="/_admin/permission/update/${row['id']}"><i class="fas fa-edit"></i></a> 
           &nbsp;
           <a title="Delete" href="#" onclick="deleteItem(${row['id']})" ><i class="fas fa-trash" style="color:red"></i>
           </a>`;
@@ -61,7 +61,7 @@ async function deleteItem(id) {
     var response = await fetch('/api/permission/delete/' + id);
     var result = await response.json();
     if(result.success) {
-      location.href = "/admins/permission";
+      location.href = "/_admin/permission";
     }else{
       alert("Error: " + result.message);
     }

@@ -1,7 +1,7 @@
 {% extends "../base.html" %}
 
 {% block sidebar %}
-{% with group=3 page=9 %}
+{% with page=3 %}
 {{ block.super }}
 {% endwith %}
 {% endblock %}
@@ -15,7 +15,7 @@
     </table>
 
     <button class="btn btn-primary" type="submit">Save</button>
-    <a class="btn btn-secondary" href='{% url "admin-location" %}'>Back</a>
+    <a class="btn btn-secondary" href='/staff/location'>Back</a>
   </form>
 
   <div class="modal fade" id="locationModal">
