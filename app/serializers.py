@@ -33,7 +33,7 @@ class LocationSerializer(ModelSerializer):
         fields = '__all__'        
 
 class CheckInSerializer(ModelSerializer):    
-    user = CharField(source='user.username', default="")
+    user = CharField(source='user.fullname', default="")
     addressLine1 = CharField(source='location.addressLine1', default="")
     addressLine2 = CharField(source='location.addressLine2', default="")
     geoLocation = CharField(source='location.geoLocation', default="")
