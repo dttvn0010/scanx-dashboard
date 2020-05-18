@@ -54,7 +54,11 @@ def addUser(request):
         if form.is_valid():
             email = form.cleaned_data['email']
             fullname = form.cleaned_data['fullname']            
-            createUser(request,  fullname, email)
+            user = createUser(request,  fullname, email)
+            user.nfcEnabled = form.cleaned_data['nfcEnabled']
+            user.qrScanEnabled = form.cleaned_data['qrScanEnabled']
+            user.sharedLocation = form.cleaned_data['sharedLocation']
+            user.save()
             return redirect('staff-user')
 
     return render(request, 'staff/user/form.html', {'form': form})
