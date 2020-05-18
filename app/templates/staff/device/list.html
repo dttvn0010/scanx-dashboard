@@ -17,8 +17,9 @@
   <table id="table" class="display mt-2">
     <thead>
       <tr>
-        <th style="width: 45%;">ID #1</th>
-        <th style="width: 45%;">ID #2</th>
+        <th style="width: 25%;">ID #1</th>
+        <th style="width: 25%;">ID #2</th>
+        <th style="width: 40%;">Location</th>
         <th style="width: 10%;"></th>
       </tr>
     </thead>
@@ -35,6 +36,7 @@ $(document).ready(function() {
     "columns": [
       { "data": "id1" },
       { "data": "id2" },
+      { "data": "installationLocation" },
       {
         render: function (data, type, row) {
           return `
