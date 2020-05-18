@@ -142,24 +142,24 @@ LOGOUT_REDIRECT_URL = 'home'
 
 AUTH_USER_MODEL = 'app.User'
 
-#LOGGING = {
-#    'version': 1,
-#    'disable_existing_loggers': False,
-#    'handlers': {
-#        'file': {
-#            'level': 'INFO',
-#            'class': 'logging.FileHandler',
-#            'filename': 'server.log',
-#        },
-#    },
-#    'loggers': {
-#        'django': {
-#            'handlers': ['file'],
-#            'level': 'INFO',
-#            'propagate': True,
-#        },
-#    },
-#}
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': 'server.log',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
+}
 
 
 REST_FRAMEWORK = {
