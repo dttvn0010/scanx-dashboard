@@ -71,7 +71,7 @@ urlpatterns = [
 
     path('api/device/unregistered/search', views_api.searchUnregisteredDevice),    
     path('api/device/registered/search', views_api.searchRegisteredDevice),
-    path('api/device/search_by_org', views_api.searchByOrganization),
+    path('api/device/search_by_org', views_api.searchDeviceByOrganization),
     path('api/device/delete/<int:pk>', views_api.deleteDevice),    
 
     path('api/location/search', views_api.searchLocation),

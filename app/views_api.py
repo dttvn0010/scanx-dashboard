@@ -188,75 +188,6 @@ def deletePermission(request, pk):
     except:
         return Response({'success': False, 'message': 'Cannot delete this permission because some records depend on it'})
 
-
-# =================================================== Device Type ======================================================
-@api_view(['GET'])
-def searchDeviceType(request):
-    draw = request.query_params.get('draw', 1)    
-    keyword = request.query_params.get('search[value]', '')
-    start = int(request.query_params.get('start', 0))
-    length = int(request.query_params.get('length', 0))
-    
-    deviceTypes = DeviceType.objects.all()
-    recordsTotal = deviceTypes.count()
-
-    deviceTypes = deviceTypes.filter(Q(name__contains=keyword) | Q(description__contains=keyword)).order_by('-createdDate')    
-    recordsFiltered = deviceTypes.count()
-    deviceTypes = deviceTypes[start:start+length]
-    data = DeviceTypeSerializer(deviceTypes, many=True).data
-
-    for item in data:
-        item['location'] = f'{item["addressLine1"]}, {item["addressLine2"]}'
-    
-    return Response({
-        "draw": draw,
-        "recordsTotal": recordsTotal,
-        "recordsFiltered": recordsFiltered,
-        "data": data
-    })     
-
-@api_view(['GET'])
-def deleteDeviceType(request, pk):
-    try:
-        deviceType = DeviceType.objects.get(pk=pk)
-        deviceType.delete()
-        return Response({'success': True})
-    except:
-        return Response({'success': False, 'message': 'Cannot delete this device type because some records depend on it'})
-
-
-# =================================================== Device Group ======================================================
-@api_view(['GET'])
-def searchDeviceGroup(request):
-    draw = request.query_params.get('draw', 1)    
-    keyword = request.query_params.get('search[value]', '')
-    start = int(request.query_params.get('start', 0))
-    length = int(request.query_params.get('length', 0))
-    
-    deviceGroups = DeviceGroup.objects.all()
-    recordsTotal = deviceGroups.count()
-
-    deviceGroups = deviceGroups.filter(Q(name__contains=keyword) | Q(description__contains=keyword)).order_by('-createdDate')    
-    recordsFiltered = deviceGroups.count()
-    deviceGroups = deviceGroups[start:start+length]
-    data = DeviceGroupSerializer(deviceGroups, many=True).data
-    
-    return Response({
-        "draw": draw,
-        "recordsTotal": recordsTotal,
-        "recordsFiltered": recordsFiltered,
-        "data": data
-    })     
-
-@api_view(['GET'])
-def deleteDeviceGroup(request, pk):
-    try:
-        deviceGroup = DeviceGroup.objects.get(pk=pk)
-        deviceGroup.delete()
-        return Response({'success': True})
-    except:
-        return Response({'success': False, 'message': 'Cannot delete this device group because some records depend on it'})
-
 # =================================================== Device ======================================================
 
 @api_view(['GET'])
@@ -314,7 +245,7 @@ def searchRegisteredDevice(request):
     })    
 
 @api_view(['GET'])
-def searchByOrganization(request):
+def searchDeviceByOrganization(request):
     draw = request.query_params.get('draw', 1)    
     keyword = request.query_params.get('search[value]', '')
     start = int(request.query_params.get('start', 0))
@@ -327,6 +258,9 @@ def searchByOrganization(request):
     recordsFiltered = devices.count()
     devices = devices[start:start+length]
     data = DeviceSerializer(devices, many=True).data
+
+    for item in data:
+        item['location'] = f'{item["addressLine1"]}, {item["addressLine2"]}'
     
     return Response({
         "draw": draw,
