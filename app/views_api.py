@@ -204,6 +204,9 @@ def searchDeviceType(request):
     recordsFiltered = deviceTypes.count()
     deviceTypes = deviceTypes[start:start+length]
     data = DeviceTypeSerializer(deviceTypes, many=True).data
+
+    for item in data:
+        item['location'] = f'{item["addressLine1"]}, {item["addressLine2"]}'
     
     return Response({
         "draw": draw,

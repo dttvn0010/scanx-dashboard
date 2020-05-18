@@ -18,13 +18,14 @@ class PermissionSerializer(ModelSerializer):
 
 class DeviceSerializer(ModelSerializer):
     organizationName = CharField(source='organization.name', default="")
-    installationLocation = CharField(source='installationLocation.name', default="")
+    addressLine1 = CharField(source='installationLocation.addressLine1', default="")
+    addressLine2 = CharField(source='installationLocation.addressLine2', default="")
     registeredDate = DateTimeField(format="%d %b,%Y", required=False, read_only=True)
 
 
     class Meta:
         model = Device
-        fields = ('id', 'installationLocation', 'organizationName', 'id1', 'id2', 'enabled', 'registeredDate') 
+        fields = ('id', 'addressLine1', 'addressLine2', 'organizationName', 'id1', 'id2', 'enabled', 'registeredDate') 
 
 class LocationSerializer(ModelSerializer):
     class Meta:
