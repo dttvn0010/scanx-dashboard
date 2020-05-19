@@ -74,7 +74,7 @@ def updateUser(request, pk):
             form.save()
             return redirect('staff-user')
 
-    return render(request, 'staff/user/form.html', {'form': form, '_user': user})
+    return render(request, 'staff/user/form.html', {'form': form, 'edit_user': user})
 
 @login_required
 def deleteUser(request, pk):

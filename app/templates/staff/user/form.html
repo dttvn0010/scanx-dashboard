@@ -10,11 +10,11 @@
 <div class="content p-3">
   <form method="POST" novalidate> 
     {% csrf_token %}
-    {% if _user %}
+    {% if edit_user %}
     <h5>
-      User: {{ _user.username }}
-      {% if _user.fullname %}
-        ({{_user.fullname}})
+      User: {{ edit_user.username }}
+      {% if edit_user.fullname %}
+        ({{edit_user.fullname}})
       {%endif%}
     </h5>
     {%endif%}
