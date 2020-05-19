@@ -64,9 +64,9 @@ def searchCheckIn(request):
         hours = (datetime.now() - d).seconds // 3600
         
         if hours == 0:
-            item['date'] = item['date'] + f' ({minutes} minute{"" if minutes == 1 else "s"} ago)'
+            item['datediff'] = f'{minutes} minute{"" if minutes == 1 else "s"}'
         else:
-            item['date'] = item['date'] + f' ({hours} hour{"" if hours == 1 else "s"} ago)'
+            item['datediff'] = f'{hours} hour{"" if hours == 1 else "s"}'
 
         arr = item['geoLocation'].split(',')
         if len(arr) == 2:

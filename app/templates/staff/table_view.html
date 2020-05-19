@@ -32,7 +32,7 @@ $(document).ready(function() {
     "ajax": "/api/checkin/search",
     "columns": [
       { "data": "location" },
-      { "data": "date" },
+      { render: function (data, type, row) { return `${row.date} (${row.datediff} ago)` }},
       { "data": "user" }
     ],
   })
