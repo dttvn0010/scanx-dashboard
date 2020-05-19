@@ -1,10 +1,19 @@
 from django import forms
 from .models import *
 
-class UserForm(forms.ModelForm):
+class UserCreateForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ('fullname', 'email', 'nfcEnabled', 'qrScanEnabled', 'sharedLocation', 'permissions')
+
+    nfcEnabled = forms.BooleanField(label='NFC Enabled', required=False)
+    qrScanEnabled = forms.BooleanField(label='QR Scanning Enabled', required=False)
+    sharedLocation = forms.BooleanField(label='Share location after each scan', required=False)
+
+class UserChangeForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ( 'nfcEnabled', 'qrScanEnabled', 'sharedLocation', 'permissions')
 
     nfcEnabled = forms.BooleanField(label='NFC Enabled', required=False)
     qrScanEnabled = forms.BooleanField(label='QR Scanning Enabled', required=False)

@@ -47,10 +47,10 @@ def listUser(request):
 
 @login_required
 def addUser(request):
-    form = UserForm()
+    form = UserCreateForm()
 
     if request.method == 'POST':
-        form = UserForm(request.POST)
+        form = UserCreateForm(request.POST)
         if form.is_valid():
             email = form.cleaned_data['email']
             fullname = form.cleaned_data['fullname']            
@@ -66,10 +66,10 @@ def addUser(request):
 @login_required
 def updateUser(request, pk):
     user = get_object_or_404(User, pk=pk)
-    form = UserForm(instance=user)
+    form = UserChangeForm(instance=user)
 
     if request.method == 'POST':
-        form = UserForm(request.POST, instance=user)
+        form = UserChangeForm(request.POST, instance=user)
         if form.is_valid():
             form.save()
             return redirect('staff-user')
