@@ -11,12 +11,12 @@
   <form method="POST" novalidate> 
     {% csrf_token %}
     {% if user %}
-    <label>
+    <h5>
       User: {{ user.username }}
       {% if user.fullname %}
         ({{user.fullname}})
       {%endif%}
-    </label>
+    </h5>
     {%endif%}
     <table class="table table-form mt-2">{{ form }}</table>
     <button class="btn btn-primary" type="submit">Save</button>
