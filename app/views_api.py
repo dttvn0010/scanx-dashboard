@@ -36,7 +36,7 @@ def checkIn(request):
     checkIn.date = datetime.now()
     checkIn.save()
 
-    return Response({'device': f'${device.id1}-{device.id2}', 'location': str(device.installationLocation)})
+    return Response({'device': f'{device.id1}-{device.id2}', 'location': str(device.installationLocation)})
 
 @api_view(['GET'])
 def searchCheckIn(request):
