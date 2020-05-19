@@ -10,7 +10,15 @@
 <div class="content p-3">
   <form method="POST" novalidate> 
     {% csrf_token %}
-    <table class="table table-form">{{ form }}</table>
+    {% if user %}
+    <label>
+      User: {{ user.username }}
+      {% if user.fullname %}
+        ({{user.fullname}})
+      {%endif%}
+    </label>
+    {%endif%}
+    <table class="table table-form mt-2">{{ form }}</table>
     <button class="btn btn-primary" type="submit">Save</button>
     <a class="btn btn-secondary" href='/staff/user'>Back</a>
   </form>
