@@ -68,6 +68,6 @@ class DeviceChangeForm(forms.Form):
     def __init__(self, *args, **kwargs):        
         organization = kwargs.pop('organization', None)
         super().__init__(*args, **kwargs)  
-        #self.fields['installationLocation'].queryset = Location.objects.filter(organization=organization)
+        self.fields['installationLocation'].queryset = Location.objects.filter(organization=organization)
 
     installationLocation = forms.ModelChoiceField(queryset=Location.objects.all())
