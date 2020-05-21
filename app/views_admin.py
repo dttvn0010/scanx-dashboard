@@ -53,7 +53,7 @@ def addOrganization(request):
             adminName = form.cleaned_data['adminName']
 
             createTenantAdmin(request, org, adminName, adminEmail)
-            return redirect('admin-organization')
+            return redirect('admin-home')
 
     return render(request, '_admin/organization/form.html', {'form': form})
 

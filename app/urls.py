@@ -9,7 +9,7 @@ urlpatterns = [
     path('users', views_user.home, name='user-home'),
 
     # Admin pages
-    path('_admin', views_admin.listOrganization, name='admin-organization'),
+    path('_admin', views_admin.listOrganization, name='admin-home'),
     path('_admin/organization/add', views_admin.addOrganization),
     path('_admin/organization/update/<int:pk>', views_admin.updateOrganization),    
     path('_admin/organization/export', views_admin.exportOrganization),
