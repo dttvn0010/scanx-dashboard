@@ -90,6 +90,14 @@
     <div id="content-wrapper">
       <div id="content">
         <nav class="navbar navbar-expand navbar-light topbar shadow">
+          <ul class="navbar-nav">
+            <li class="m-2">
+              <h5>Company: {{ user.organization.name }}</h5>              
+            </li>
+            <li class="m-2">
+              <small>Last Login: {{ user.last_login }}</small>
+            </li>
+          </ul>
           <ul class="navbar-nav ml-auto">
             <li class="nav-item dropdown no-arrow">
               <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" aria-haspopup="true"
