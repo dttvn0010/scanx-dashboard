@@ -45,7 +45,7 @@ def searchCheckIn(request):
     start = int(request.query_params.get('start', 0))
     length = int(request.query_params.get('length', 0))
     
-    checkIns = CheckIn.objects.all()
+    checkIns = CheckIn.objects.filter(user__organization=request.user.organization)
     recordsTotal = checkIns.count()
 
     checkIns = checkIns.filter(Q(user__fullname__contains=keyword) 
@@ -272,39 +272,6 @@ def searchDeviceByOrganization(request):
         "data": data
     }) 
 
-# =================================================== Location Group ======================================================
-@api_view(['GET'])
-def searchLocationGroup(request):
-    draw = request.query_params.get('draw', 1)    
-    keyword = request.query_params.get('search[value]', '')
-    start = int(request.query_params.get('start', 0))
-    length = int(request.query_params.get('length', 0))
-    
-    locationGroups = LocationGroup.objects.all()
-    recordsTotal = locationGroups.count()
-
-    locationGroups = locationGroups.filter(Q(name__contains=keyword) | Q(description__contains=keyword)).order_by('-createdDate')    
-    recordsFiltered = locationGroups.count()
-    locationGroups = locationGroups[start:start+length]
-    data = LocationGroupSerializer(locationGroups, many=True).data
-    
-    return Response({
-        "draw": draw,
-        "recordsTotal": recordsTotal,
-        "recordsFiltered": recordsFiltered,
-        "data": data
-    })     
-
-@api_view(['GET'])
-def deleteLocationGroup(request, pk):
-    try:
-        locationGroup = LocationGroup.objects.get(pk=pk)
-        locationGroup.delete()
-        return Response({'success': True})
-    except:
-        return Response({'success': False, 'message': 'Cannot delete this location group because some records depend on it'})
-
-
 # =================================================== Location ======================================================
 @api_view(['GET'])
 def searchLocation(request):
@@ -313,7 +280,7 @@ def searchLocation(request):
     start = int(request.query_params.get('start', 0))
     length = int(request.query_params.get('length', 0))
     
-    locations = Location.objects.all()
+    locations = Location.objects.filter(organization=request.user.organization)
     recordsTotal = locations.count()
 
     locations = locations.filter(Q(addressLine1__contains=keyword) | Q(addressLine2__contains=keyword) | Q(postCode__contains=keyword))

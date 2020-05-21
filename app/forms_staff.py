@@ -45,7 +45,7 @@ class DeviceCreateForm(forms.Form):
     def __init__(self, *args, **kwargs):        
         organization = kwargs.pop('organization', None)
         super().__init__(*args, **kwargs)  
-        #self.fields['installationLocation'].queryset = Location.objects.filter(organization=organization)
+        self.fields['installationLocation'].queryset = Location.objects.filter(organization=organization)
 
     id1 = forms.CharField()
     id2 = forms.CharField()
