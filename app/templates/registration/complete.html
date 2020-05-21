@@ -12,7 +12,7 @@
 </style>
 
 <div class="signup-form">
-  <h4>Completing Registration</h4>
+  <h4>Complete Registration</h4>
   <br>
   <form method="POST" enctype="multipart/form-data">{% csrf_token %}
     <div class="form-group">
@@ -21,11 +21,15 @@
       {{ form.fullname.errors }}
     </div>
 
-    <div class="form-group">
-      <label>Your Organization name:</label>
-      <input name="organization" type="text" class="form-control" value="{{form.organization.value}}" />
-      {{ form.organization.errors }}
-    </div>
+    {%if user.is_staff %}
+      <div class="form-group">
+        <label>Your Organization name:</label>
+        <input name="organization" type="text" class="form-control" value="{{form.organization.value}}" />
+        {{ form.organization.errors }}
+      </div>
+    {%else%}
+      <input name="organization" type="hidden" value="{{form.organization.value}}">
+    {% endif %}
 
     <div class="form-group">
       <label>Enter a new Password:</label>

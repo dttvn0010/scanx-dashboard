@@ -40,7 +40,7 @@ def listOrganization(request):
 
 @login_required
 def addOrganization(request):
-    form = OrganizationCreationForm()
+    form = OrganizationCreationForm(initial={'nfcEnabled': True, 'qrScanEnabled': True, 'active': True})
 
     if request.method == 'POST':
         form = OrganizationCreationForm(request.POST)

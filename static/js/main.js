@@ -1,5 +1,5 @@
 $(document).ready(function(){
-    $('.table-form input,textarea,select').each(function(){
+    $('.table-form input, .table-form textarea, .table-form select').each(function(){
         $(this).addClass('form-control');
     });
 

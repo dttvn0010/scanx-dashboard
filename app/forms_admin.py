@@ -12,14 +12,14 @@ class OrganizationCreationForm(forms.ModelForm):
     def clean_adminName(self):
         adminName = self.cleaned_data.get('adminName')
         if User.objects.filter(fullname=adminName):
-            raise forms.ValidationError('User with name "%s" already existed' % (adminName))
+            raise forms.ValidationError('User with name "%s" already exists' % (adminName))
 
         return adminName
 
     def clean_adminEmail(self):
         email = self.cleaned_data.get('adminEmail')
         if User.objects.filter(email=email):
-            raise forms.ValidationError('User with email "%s" already existed' % (email))
+            raise forms.ValidationError('User with email "%s" already exists' % (email))
 
         return email
 
@@ -49,7 +49,7 @@ class UnRegisteredDeviceForm(forms.ModelForm):
         device = Device.objects.filter(id1=id1).filter(id2=id2).first()
 
         if device:
-            raise forms.ValidationError(f'Device with id1={id1} & id2={id2} already existed')
+            raise forms.ValidationError(f'Device with id1={id1} & id2={id2} already exists')
 
         return self.cleaned_data
 

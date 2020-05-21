@@ -19,7 +19,7 @@
   <br>
   <form method="POST">{% csrf_token %}
     <div class="form-group">
-      <label>Username/Email address:</label>
+      <label>Email Address:</label>
       <input name="username" type="text" class="form-control" />
       {{ form.username.errors }}
     </div>
@@ -35,7 +35,7 @@
       <button type="submit" class="mt-4 btn btn-primary btn-block">Log in</button>
     </div>
     <div class="clearfix">
-      <a href="#" class="float-right">Forget password</a>
+      <a href="#" class="float-right">Forgot Password</a>
     </div>
   </form>
   <!--<p class="text-center"><a href="#">Register</a></p>-->

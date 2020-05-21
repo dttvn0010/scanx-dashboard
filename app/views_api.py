@@ -103,6 +103,7 @@ def searchOrganization(request):
         data[i]['admin'] = {'name': staff.fullname if staff else "", 'email': staff.email if staff else ""}
         data[i]['userCount'] = User.objects.filter(organization=org).count()
         data[i]['deviceCount'] = Device.objects.filter(organization=org).count()
+        data[i]['status'] = staff.status if staff else User.Status.INVITED
     
     return Response({
         "draw": draw,
@@ -137,8 +138,10 @@ def searchUser(request):
     users = users[start:start+length]
     data = UserSerializer(users, many=True).data
 
-    for i, org in enumerate(users):
-        data[i]['is_superuser'] = users[i].is_superuser
+    staff = [item for item in data if item['is_staff']]
+    non_staff = [item for item in data if not item['is_staff']]
+
+    data = staff + non_staff
         
     return Response({
         "draw": draw,

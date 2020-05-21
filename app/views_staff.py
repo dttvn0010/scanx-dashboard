@@ -47,7 +47,7 @@ def listUser(request):
 
 @login_required
 def addUser(request):
-    form = UserCreateForm()
+    form = UserCreateForm(initial={'nfcEnabled': True, 'qrScanEnabled': True, 'sharedLocation': True})
 
     if request.method == 'POST':
         form = UserCreateForm(request.POST)
@@ -82,7 +82,7 @@ def deleteUser(request, pk):
     user.delete()
     return redirect("staff-user")
 
-USER_HEADER = ['Full name', 'Email', 'NFC Enabled', 'QR Scan Enabled', 'Location Shared']
+USER_HEADER = ['Full Name', 'Email', 'NFC Enabled', 'QR Scan Enabled', 'Location Shared']
 
 @login_required
 def exportUser(request):

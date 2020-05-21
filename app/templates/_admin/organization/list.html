@@ -8,7 +8,7 @@
 
 {% block content %}
 <div class="content p-3">
-  <div class="row mb-2">
+  <div class="row mb-4">
     <div class="col-8">
       <a href='/_admin/organization/add' class="btn btn-secondary">Add Organization</a>
       <button class="btn btn-secondary mr-2" onclick="showImportModal()">
@@ -23,12 +23,12 @@
   <table id="table" class="display mt-2">
     <thead>
       <tr>
-        <th style="width: 8%;">Active</th>
-        <th style="width: 24%;">Name</th>
-        <th style="width: 10%;">User</th>
-        <th style="width: 15%;">Admin Name</th>
-        <th style="width: 15%;">Admin Email</th>
-        <th style="width: 10%;">Devices</th>
+        <th style="width: 28%;">Company Name</th>
+        <th style="width: 12%;">User</th>
+        <th style="width: 14%;">Admin Name</th>
+        <th style="width: 14%;">Admin Email</th>
+        <th style="width: 12%;">Devices</th>
+        <th style="width: 12%;">Status</th>
         <th style="width: 8%;"></th>
       </tr>
     </thead>
@@ -80,16 +80,15 @@ $(document).ready(function() {
     "serverSide": true,
     "ajax": "/api/organization/search",
     "columns": [
-      { "data": "active",
-        render: function (data, type, row){
-          return '<input type="checkbox" onclick="return false;"' + (data? ' checked' : '') + '/>'
-        } 
-      },
       { "data": "name" },
       { "data": "userCount" },
       { "data": "admin.name" },
       { "data": "admin.email" },
-      { "data": "deviceCount" },      
+      { "data": "deviceCount" }, 
+      { "data": "status", "render": function(data, type, row) {
+          return data == 1? "Active": "Pending"
+        } 
+      },     
       {
         render: function (data, type, row) {
           return `

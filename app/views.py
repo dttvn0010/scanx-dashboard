@@ -48,9 +48,10 @@ def completeRegistration(request):
             user.profilePicture = form.cleaned_data['profilePicture']
             user.save()
 
-            org = user.organization
-            org.name = form.cleaned_data['organization']
-            org.save()
+            if user.is_staff:
+                org = user.organization
+                org.name = form.cleaned_data['organization']
+                org.save()
 
             user = authenticate(username=user.username,
                                     password=form.cleaned_data['password'])

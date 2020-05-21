@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 class Organization(models.Model):
-    name = models.CharField(max_length=200, unique=True)
+    name = models.CharField(verbose_name='Company Name', max_length=200, unique=True)
     description = models.CharField(max_length=500, blank=True, null=True)
     dateTimeFormat = models.CharField(max_length=30, blank=True, null=True)
     nfcEnabled = models.BooleanField(verbose_name='NFC Enabled', default=False)
@@ -31,11 +31,11 @@ class User(AbstractUser):
         REGISTERED = 1
 
     organization = models.ForeignKey(Organization, blank=True, null=True, on_delete=models.PROTECT)
-    fullname = models.CharField(max_length=50, blank=True, null=True, unique=True)
+    fullname = models.CharField(verbose_name="Full Name", max_length=50, blank=True, null=True, unique=True)
     permissions = models.ManyToManyField(Permission, blank=True)
     nfcEnabled = models.BooleanField(verbose_name='NFC Enabled', blank=True, null=True)
     qrScanEnabled = models.BooleanField(verbose_name='QR Scanning Enabled', blank=True, null=True)
-    sharedLocation = models.BooleanField(verbose_name='Share location after each scan', blank=True, null=True)
+    sharedLocation = models.BooleanField(verbose_name='Geo Location Enabled', blank=True, null=True)
     profilePicture = models.ImageField(upload_to='static/images', blank=True, null=True) 
     status = models.IntegerField(blank=True, null=True)   
     createdDate = models.DateTimeField(null=True)
@@ -49,10 +49,10 @@ class User(AbstractUser):
     
 class Location(models.Model):
     organization = models.ForeignKey(Organization, on_delete=models.PROTECT,  blank=True, null=True)
-    addressLine1 = models.CharField(max_length=100)
-    addressLine2 = models.CharField(max_length=100)
-    postCode = models.CharField(max_length=10)
-    geoLocation = models.CharField(max_length=30, null=True)
+    addressLine1 = models.CharField(verbose_name="Address Line 1", max_length=100)
+    addressLine2 = models.CharField(verbose_name="Address Line 2", max_length=100)
+    postCode = models.CharField(verbose_name="Post Code", max_length=10)
+    geoLocation = models.CharField(verbose_name="Map Coordinates", max_length=30, null=True)
     createdDate = models.DateTimeField(null=True)
 
     def __str__(self):
