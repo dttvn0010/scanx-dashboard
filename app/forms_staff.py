@@ -10,6 +10,21 @@ class UserCreateForm(forms.ModelForm):
     qrScanEnabled = forms.BooleanField(label='QR Scanning Enabled', required=False)
     sharedLocation = forms.BooleanField(label='Share location after each scan', required=False)
 
+    def clean_fullname(self):
+        fullname = self.cleaned_data.get('fullname')
+        if User.objects.filter(fullname=fullname):
+            raise forms.ValidationError('User with name "%s" already existed' % (fullname))
+
+        return fullname
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email):
+            raise forms.ValidationError('User with email "%s" already existed' % (email))
+
+        return email
+
+
 class UserChangeForm(forms.ModelForm):
     class Meta:
         model = User
