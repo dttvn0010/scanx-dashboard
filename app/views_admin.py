@@ -286,17 +286,33 @@ def listRegisteredDevice(request):
 # ========================================== Settings ==========================================
 
 @login_required
-def editMailTemplate(request):
+def editAdminMailTemplate(request):
     with open(ADMIN_MAIL_TEMPLATE_PATH, encoding="utf-8") as fi:
-        email_template = fi.read()
+        admin_mail_template = fi.read()
 
     saved = False
 
     if request.method == 'POST':
-        email_template = request.POST["email_template"]
+        admin_mail_template = request.POST["admin_mail_template"]
         with open(ADMIN_MAIL_TEMPLATE_PATH, 'w', encoding="utf-8", newline="") as fo:
-            fo.write(email_template.replace("\n\n", "\n"))
+            fo.write(admin_mail_template.replace("\n\n", "\n"))
+            saved = True        
+    
+    return render(request, "_admin/settings/admin_mail_template.html", 
+            {"admin_mail_template": admin_mail_template, "saved": saved})   
+
+@login_required
+def editMailTemplate(request):
+    with open(MAIL_TEMPLATE_PATH, encoding="utf-8") as fi:
+        mail_template = fi.read()
+
+    saved = False
+
+    if request.method == 'POST':
+        mail_template = request.POST["mail_template"]
+        with open(MAIL_TEMPLATE_PATH, 'w', encoding="utf-8", newline="") as fo:
+            fo.write(mail_template.replace("\n\n", "\n"))
             saved = True        
     
     return render(request, "_admin/settings/mail_template.html", 
-            {"email_template": email_template, "saved": saved})    
+            {"mail_template": mail_template, "saved": saved})    

@@ -1,7 +1,7 @@
 {% extends "../base.html" %}
 
 {% block sidebar %}
-{% with group=4 page=6 %}
+{% with group=4 page=5 %}
 {{ block.super }}
 {% endwith %}
 {% endblock %}
@@ -9,12 +9,12 @@
 {% block content %}
 <div class="content p-3">
   {%if saved%}
-    <span class="badge badge-success mb-3">Email template successfully saved!</span>
+    <span class="badge badge-success mb-3">Admin Email template successfully saved!</span>
   {%endif%}
   <form method="POST"> 
     {% csrf_token %}
-    <label>Mail template:</label>
-    <textarea name="mail_template" rows="10" class="form-control">{{mail_template}}</textarea>
+    <label>Admin Mail template:</label>
+    <textarea name="admin_mail_template" rows="10" class="form-control">{{admin_mail_template}}</textarea>
     <button class="mt-3 btn btn-primary" type="submit">Save</button>
   </form>  
 </div>

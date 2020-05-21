@@ -29,6 +29,7 @@ urlpatterns = [
 
     path('_admin/device/registered', views_admin.listRegisteredDevice, name='admin-registered-device'),
 
+    path('_admin/settings/admin_mail_template', views_admin.editAdminMailTemplate),
     path('_admin/settings/mail_template', views_admin.editMailTemplate),
 
     # Tenant pages
