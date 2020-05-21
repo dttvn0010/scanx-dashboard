@@ -6,6 +6,8 @@ class UserCreateForm(forms.ModelForm):
         model = User
         fields = ('fullname', 'email', 'nfcEnabled', 'qrScanEnabled', 'sharedLocation', 'permissions')
 
+    fullname = forms.CharField(max_length=30, label="Full name")
+    email = forms.EmailField(max_length=50, label="Email address")
     nfcEnabled = forms.BooleanField(label='NFC Enabled', required=False)
     qrScanEnabled = forms.BooleanField(label='QR Scanning Enabled', required=False)
     sharedLocation = forms.BooleanField(label='Share location after each scan', required=False)
