@@ -1,6 +1,6 @@
 import smtplib, ssl
 import traceback
-from email.mime.text import MIMEText
+from email.mime.text import MIMEText, MIMEMultipart
 from .consts import ADMIN_MAIL_TEMPLATE_PATH, MAIL_TEMPLATE_PATH
 
 HOST_URL = "https://scanx.cloud"
@@ -24,9 +24,11 @@ def sendAdminInvitationMail(hostURL, organization, fullname, email, password):
         html = html.replace('${User.FULL_NAME}', fullname)
         html = html.replace('${User.PASSWORD}', password)
 
-        msg = MIMEText(html, 'html')
+        #msg = MIMEText(html, 'html')
+        msg = MIMEMultipart('alternative')
         msg['Subject'] = INVITE_TITLE
         msg['From'] = 'ScanX'
+        msg.attach(MIMEText(html, 'html'))
 
         context = ssl.create_default_context()
 
@@ -43,9 +45,11 @@ def sendInvitationMail(hostURL, organization, fullname, email, password):
         html = html.replace('${User.FULL_NAME}', fullname)
         html = html.replace('${User.PASSWORD}', password)
 
-        msg = MIMEText(html, 'html')
+        #msg = MIMEText(html, 'html')
+        msg = MIMEMultipart('alternative')
         msg['Subject'] = INVITE_TITLE
         msg['From'] = 'ScanX'
+        msg.attach(MIMEText(html, 'html'))
 
         context = ssl.create_default_context()
 
