@@ -48,7 +48,7 @@ class UnRegisteredDeviceForm(forms.ModelForm):
         id2 = self.cleaned_data.get('id2')
         device = Device.objects.filter(id1=id1).filter(id2=id2).first()
 
-        if device:
+        if device and (self.instance == None or self.instance.id != device.id):
             raise forms.ValidationError(f'Device with id1={id1} & id2={id2} already exists')
 
         return self.cleaned_data
