@@ -3,6 +3,7 @@ import traceback
 from email.mime.text import MIMEText
 from .consts import ADMIN_MAIL_TEMPLATE_PATH, MAIL_TEMPLATE_PATH
 
+HOST_URL = "https://scanx.cloud"
 INVITE_TITLE = 'Invitation to join ScanX'
 
 with open(ADMIN_MAIL_TEMPLATE_PATH, encoding="utf-8") as fi:
@@ -18,7 +19,7 @@ SENDER_PASSWORD = "Ab01234567"
 
 def sendAdminInvitationMail(hostURL, organization, fullname, email, password):
     try:
-        html = ADMIN_INVITE_TEMPLATE.replace('${Link.ACCEPT_INVITATION}', hostURL)
+        html = ADMIN_INVITE_TEMPLATE.replace('${Link.ACCEPT_INVITATION}', HOST_URL)
         html = html.replace('${User.ORGANIZATION}', organization)
         html = html.replace('${User.FULL_NAME}', fullname)
         html = html.replace('${User.PASSWORD}', password)
@@ -37,7 +38,7 @@ def sendAdminInvitationMail(hostURL, organization, fullname, email, password):
 
 def sendInvitationMail(hostURL, organization, fullname, email, password):
     try:
-        html = INVITE_TEMPLATE.replace('${Link.ACCEPT_INVITATION}', hostURL)
+        html = INVITE_TEMPLATE.replace('${Link.ACCEPT_INVITATION}', HOST_URL)
         html = html.replace('${User.ORGANIZATION}', organization)
         html = html.replace('${User.FULL_NAME}', fullname)
         html = html.replace('${User.PASSWORD}', password)
