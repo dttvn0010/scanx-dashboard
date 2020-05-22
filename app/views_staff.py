@@ -1,5 +1,6 @@
 from django.shortcuts import render, HttpResponse, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.hashers import make_password
 
 import csv
 from datetime import datetime
@@ -127,6 +128,18 @@ def importUser(request):
     
     return redirect('staff-user')
 
+@login_required
+def resendMail(request, pk):
+    user = get_object_or_404(User, pk=pk)
+    if user.organization and user.status == User.Status.INVITED:
+        hostURL = request.build_absolute_uri('/')    
+        password = genPassword()
+        user.password = make_password(password)
+        user.save()
+        thr = Thread(target=sendInvitationMail, args=(hostURL, user.organization.name, user.fullname, user.email, password))
+        thr.start()
+    
+    return redirect('staff-user')
 
 #================================= Location  ====================================================================
 @login_required

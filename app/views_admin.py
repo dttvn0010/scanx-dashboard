@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404, HttpResponse, redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.hashers import make_password
 
 import csv
 from datetime import datetime
@@ -29,7 +30,7 @@ def createTenantAdmin(request, organization, adminName, adminEmail):
     user.save()
 
     hostURL = request.build_absolute_uri('/')    
-    thr = Thread(target=sendAdminInvitationMail, args=(hostURL, organization.name, adminName, adminEmail, password))
+    thr = Thread(target=sendAdminInvitationMail, args=(hostURL, organization.name, adminName, adminEmail, genPassword()))
     thr.start()
 
 # ========================================== Organization ======================================================
@@ -69,6 +70,21 @@ def updateOrganization(request, pk):
             return redirect('admin-home')
 
     return render(request, '_admin/organization/form.html', {'form': form})
+
+@login_required
+def resendMail(request, pk):
+    org = get_object_or_404(Organization, pk=pk)
+    staff = User.objects.filter(organization=org).filter(is_staff=True).first()
+    if staff and staff.status == User.Status.INVITED:
+        hostURL = request.build_absolute_uri('/')    
+        password = genPassword()
+        staff.password = make_password(password)
+        staff.save()
+        thr = Thread(target=sendAdminInvitationMail, args=(hostURL, org.name, staff.fullname, staff.email, password))
+        thr.start()
+    
+    return redirect('admin-home')
+    
 
 ORG_HEADER = ['Name', 'Admin Name', 'Admin Email', 'NFC Enabled', 'QR Scan Enabled', 'Active']
 

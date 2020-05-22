@@ -23,13 +23,13 @@
   <table id="table" class="display mt-2">
     <thead>
       <tr>
-        <th style="width: 28%;">Company Name</th>
+        <th style="width: 26%;">Company Name</th>
         <th style="width: 12%;">User</th>
         <th style="width: 14%;">Admin Name</th>
         <th style="width: 14%;">Admin Email</th>
         <th style="width: 12%;">Devices</th>
         <th style="width: 12%;">Status</th>
-        <th style="width: 8%;"></th>
+        <th style="width: 10%;"></th>
       </tr>
     </thead>
   </table>
@@ -86,16 +86,17 @@ $(document).ready(function() {
       { "data": "admin.email" },
       { "data": "deviceCount" }, 
       { "data": "status", "render": function(data, type, row) {
-          return data == 1? "Active": "Pending"
+          return row.status == 1? "Active": "Pending"
         } 
       },     
       {
         render: function (data, type, row) {
-          return `
-          <a title="Edit" href="/_admin/organization/update/${row['id']}"><i class="fas fa-edit"></i></a> 
-          &nbsp;
-          <a title="Delete" href="#" onclick="deleteItem(${row['id']})" ><i class="fas fa-trash" style="color:red"></i>
-          </a>`;
+          var html =  `<a title="Edit" href="/_admin/organization/update/${row['id']}"><i class="fas fa-edit"></i></a>`;
+          if(row.status == 0) {
+            html += `&nbsp;<a title="Resend invitation email" href="#" onclick="resendMail(${row['id']})" ><i class="fas fa-envelope"></i></a>`;
+          }
+          html += `&nbsp;<a title="Delete" href="#" onclick="deleteItem(${row['id']})" ><i class="fas fa-trash" style="color:red"></i></a>`;
+          return html;          
         }
       }
     ],
@@ -111,6 +112,12 @@ async function deleteItem(id) {
     }else{
       alert("Error: " + result.message);
     }
+  }
+}
+
+async function resendMail(id) {
+  if (confirm('Resend an invitation email to this organization?')) {
+    location.href = "/_admin/organization/resend_mail/" + id;
   }
 }
 

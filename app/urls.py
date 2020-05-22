@@ -15,6 +15,7 @@ urlpatterns = [
     path('_admin/organization/export', views_admin.exportOrganization),
     path('_admin/organization/import_preview', views_admin.importOrganizationPreview),
     path('_admin/organization/import', views_admin.importOrganization),
+    path('_admin/organization/resend_mail/<int:pk>', views_admin.resendMail),
 
     path('_admin/permission', views_admin.listPermission, name='admin-permission'),
     path('_admin/permission/add', views_admin.addPermission),
@@ -42,7 +43,7 @@ urlpatterns = [
     path('staff/user/export', views_staff.exportUser),
     path('staff/user/import_preview', views_staff.importUserPreview),
     path('staff/user/import', views_staff.importUser),
-
+    path('staff/user/resend_mail/<int:pk>', views_staff.resendMail),
 
     path('staff/device', views_staff.listDevice, name='staff-device'),
     path('staff/device/add', views_staff.addDevice),
