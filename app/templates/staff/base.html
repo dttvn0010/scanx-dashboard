@@ -97,11 +97,11 @@
           </ul>
           <ul class="navbar-nav ml-auto">
             <li class="nav-item d-flex mr-4">
-              <span style="font-size: 12px;" class="align-self-center">Last Login: {{ user.last_login }}</span>
+              <span class="align-self-center">Last Login: {{ user.last_login }}</span>
             </li>
          
             <li class="nav-item dropdown no-arrow d-flex">
-              <label class="m-0 align-self-center">{{ user.fullname }}</label>              
+              <span class="mr-2 align-self-center">{{ user.fullname }}</span>              
               <a class="p-0 nav-link dropdown-toggle" href="#" data-toggle="dropdown" aria-haspopup="true"
                 aria-expanded="false">
                 {% if user.profilePicture %}
