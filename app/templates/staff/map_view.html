@@ -28,7 +28,7 @@
     items.forEach(item => {
         var marker =  new google.maps.Marker({ 
             position: item.geoLocation, map: map, 
-            label: {text:`${item.user}`, color:'#000080'}
+            title: `${item.user}` 
           });
         
         var infowindow = new google.maps.InfoWindow({
