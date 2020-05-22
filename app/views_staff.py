@@ -45,7 +45,7 @@ def createUser(request, fullname, email):
 # ========================================== User ======================================================
 @login_required
 def listUser(request):
-    return render(request, "staff/user/list.html")
+    return render(request, "staff/users/list.html")
 
 @login_required
 def addUser(request):
@@ -63,7 +63,7 @@ def addUser(request):
             user.save()
             return redirect('staff-user')
 
-    return render(request, 'staff/user/form.html', {'form': form})
+    return render(request, 'staff/users/form.html', {'form': form})
 
 @login_required
 def updateUser(request, pk):
@@ -76,7 +76,7 @@ def updateUser(request, pk):
             form.save()
             return redirect('staff-user')
 
-    return render(request, 'staff/user/form.html', {'form': form, 'edit_user': user})
+    return render(request, 'staff/users/form.html', {'form': form, 'edit_user': user})
 
 @login_required
 def deleteUser(request, pk):
@@ -146,7 +146,7 @@ def resendMail(request, pk):
 #================================= Location  ====================================================================
 @login_required
 def listLocation(request):
-    return render(request, "staff/location/list.html")
+    return render(request, "staff/locations/list.html")
 
 @login_required
 def addLocation(request):
@@ -161,7 +161,7 @@ def addLocation(request):
             location.save()
             return redirect('staff-location')
 
-    return render(request, 'staff/location/form.html', {'form': form})
+    return render(request, 'staff/locations/form.html', {'form': form})
 
 @login_required
 def updateLocation(request, pk):
@@ -174,7 +174,7 @@ def updateLocation(request, pk):
             form.save()
             return redirect('staff-location')
 
-    return render(request, 'staff/location/form.html', {'form': form})
+    return render(request, 'staff/locations/form.html', {'form': form})
 
 LOCATION_HEADER = ['Address Line 1', 'Address Line 2', 'Postcode', 'Geo Location']
 
@@ -237,7 +237,7 @@ def importLocation(request):
 @login_required
 def listDevice(request):
     devices = Device.objects.filter(organization=request.user.organization)
-    return render(request, "staff/device/list.html", {"devices": devices})
+    return render(request, "staff/devices/list.html", {"devices": devices})
 
 @login_required
 def addDevice(request):
@@ -259,7 +259,7 @@ def addDevice(request):
 
             return redirect('staff-device')
 
-    return render(request, 'staff/device/form.html', {'form': form})
+    return render(request, 'staff/devices/form.html', {'form': form})
 
 @login_required
 def updateDevice(request, pk):
@@ -275,7 +275,7 @@ def updateDevice(request, pk):
             device.save()
             return redirect('staff-device')
 
-    return render(request, 'staff/device/form.html', {'form': form})
+    return render(request, 'staff/devices/form.html', {'form': form})
 
 @login_required
 def deleteDevice(request, pk):

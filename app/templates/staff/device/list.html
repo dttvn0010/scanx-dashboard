@@ -10,7 +10,7 @@
 <div class="content p-3">
   <div class="row mb-4">
     <div class="col-8">
-      <a href='/staff/device/add' class="btn btn-secondary">Add Devices</a>
+      <a href='/staff/devices/add' class="btn btn-secondary">Add Devices</a>
     </div>
   </div>
 
@@ -39,7 +39,7 @@ $(document).ready(function() {
       { "data": "location" },
       {
         render: function (data, type, row) {
-          return `<a title="Edit" href="/staff/device/update/${row['id']}"><i class="fas fa-edit"></i></a>&nbsp;&nbsp;`
+          return `<a title="Edit" href="/staff/devices/update/${row['id']}"><i class="fas fa-edit"></i></a>&nbsp;&nbsp;`
                + `<a title="Delete" href="#" onclick="deleteItem(${row['id']})" ><i class="fas fa-trash" style="color:red"></i></a>`;
         }
       }
@@ -49,7 +49,7 @@ $(document).ready(function() {
 
 async function deleteItem(id) {
   if (confirm('Do you want to delete?')) {
-    location.href = "/staff/device/delete/" + id;
+    location.href = "/staff/devices/delete/" + id;
   }
 }
 </script>

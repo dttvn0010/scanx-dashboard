@@ -10,11 +10,11 @@
 <div class="content p-3">
   <div class="row mb-4">
     <div class="col-8">
-      <a href='/staff/location/add' class="btn btn-secondary">Add Location</a>
+      <a href='/staff/locations/add' class="btn btn-secondary">Add Location</a>
       <button class="btn btn-secondary mr-2" onclick="showImportModal()">
         <i class="fas fa-upload"></i>Import
       </button>      
-      <a href='/staff/location/export' class="btn btn-secondary mr-2">
+      <a href='/staff/locations/export' class="btn btn-secondary mr-2">
         <i class="fas fa-download"></i>Export
       </a>      
     </div>
@@ -56,7 +56,7 @@
             </div>            
           </form>
 
-          <form id="fmt2" style="display: none;" method="POST" action="/staff/location/import">
+          <form id="fmt2" style="display: none;" method="POST" action="/staff/locations/import">
             {%csrf_token%}
             <label>Select the CSV column you want to use the data from for each field.</label>
             <div id="fmt2Body"></div>
@@ -84,7 +84,7 @@ $(document).ready(function() {
       { "data": "geoLocation" },      
       {
         render: function (data, type, row) {
-          return `<a title="Edit" href="/staff/location/update/${row['id']}"><i class="fas fa-edit"></i></a>&nbsp;&nbsp;`
+          return `<a title="Edit" href="/staff/locations/update/${row['id']}"><i class="fas fa-edit"></i></a>&nbsp;&nbsp;`
                 + `<a title="Delete" href="#" onclick="deleteItem(${row['id']})" ><i class="fas fa-trash" style="color:red"></i></a>`;
         }
       }
@@ -97,7 +97,7 @@ async function deleteItem(id) {
     var response = await fetch('/api/location/delete/' + id);
     var result = await response.json();
     if(result.success) {
-      location.href = "/staff/location";
+      location.href = "/staff/locations";
     }else{
       alert("Error: " + result.message);
     }
@@ -136,7 +136,7 @@ function createOptionsPanel(header, csvHeader) {
 
 async function previewImport() {
   var formData = new FormData(document.getElementById("fmt"));
-  var response = await fetch("/staff/location/import_preview", {
+  var response = await fetch("/staff/locations/import_preview", {
     body: formData,
     method: "POST"
   });

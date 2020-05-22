@@ -38,7 +38,7 @@ def createTenantAdmin(request, organization, adminName, adminEmail):
 
 @login_required
 def listOrganization(request):
-    return render(request, "_admin/organization/list.html")
+    return render(request, "_admin/organizations/list.html")
 
 @login_required
 def addOrganization(request):
@@ -57,7 +57,7 @@ def addOrganization(request):
             createTenantAdmin(request, org, adminName, adminEmail)
             return redirect('admin-home')
 
-    return render(request, '_admin/organization/form.html', {'form': form})
+    return render(request, '_admin/organizations/form.html', {'form': form})
 
 @login_required
 def updateOrganization(request, pk):
@@ -70,7 +70,7 @@ def updateOrganization(request, pk):
             form.save()
             return redirect('admin-home')
 
-    return render(request, '_admin/organization/form.html', {'form': form})
+    return render(request, '_admin/organizations/form.html', {'form': form})
 
 @login_required
 def resendMail(request, pk):
@@ -143,7 +143,7 @@ def importOrganization(request):
 #================================= Permission ====================================================================
 @login_required
 def listPermission(request):
-    return render(request, "_admin/permission/list.html")
+    return render(request, "_admin/permissions/list.html")
 
 def splitToIntArr(st):
     if st:
@@ -187,7 +187,7 @@ def addPermission(request):
             permission.save()
             return redirect('admin-permission')
 
-    return render(request, '_admin/permission/form.html', 
+    return render(request, '_admin/permissions/form.html', 
             {'form': form, 'details': getPermissionDetail(None)})
 
 @login_required
@@ -201,7 +201,7 @@ def updatePermission(request, pk):
             form.save()
             return redirect('admin-permission')
 
-    return render(request, '_admin/permission/form.html', 
+    return render(request, '_admin/permissions/form.html', 
                 {'form': form, 'details': getPermissionDetail(permission)})
 
 
@@ -210,7 +210,7 @@ def updatePermission(request, pk):
 @login_required
 def listUnregisteredDevice(request):
     devices = Device.objects.filter(organization__isnull=True)
-    return render(request, "_admin/device/unregistered/list.html", {"devices": devices})
+    return render(request, "_admin/devices/unregistered/list.html", {"devices": devices})
 
 @login_required
 def addUnregisteredDevice(request):
@@ -225,7 +225,7 @@ def addUnregisteredDevice(request):
             device.save()
             return redirect('admin-unregistered-device')
 
-    return render(request, '_admin/device/unregistered/form.html', {'form': form})
+    return render(request, '_admin/devices/unregistered/form.html', {'form': form})
 
 @login_required
 def updateUnregisteredDevice(request, pk):
@@ -239,7 +239,7 @@ def updateUnregisteredDevice(request, pk):
             form.save()
             return redirect('admin-unregistered-device')
 
-    return render(request, '_admin/device/unregistered/form.html', {'form': form})
+    return render(request, '_admin/devices/unregistered/form.html', {'form': form})
 
 @login_required
 def deleteUnregisteredDevice(request, pk):
@@ -298,7 +298,7 @@ def importUnregisteredDevice(request):
 @login_required
 def listRegisteredDevice(request):
     devices = Device.objects.filter(organization__isnull=False)
-    return render(request, "_admin/device/registered/list.html", {"devices": devices})
+    return render(request, "_admin/devices/registered/list.html", {"devices": devices})
 
 
 # ========================================== Settings ==========================================
