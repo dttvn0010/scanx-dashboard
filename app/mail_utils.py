@@ -1,6 +1,7 @@
 import smtplib, ssl
 import traceback
-from email.mime.text import MIMEText, MIMEMultipart
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from .consts import ADMIN_MAIL_TEMPLATE_PATH, MAIL_TEMPLATE_PATH
 
 HOST_URL = "https://scanx.cloud"
