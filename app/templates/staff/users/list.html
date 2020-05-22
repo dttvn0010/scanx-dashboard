@@ -84,7 +84,8 @@ $(document).ready(function() {
       { "data": "fullname" },
       { "data": "email" },
       { "data": "status", "render": function(data, type, row) {
-          return data == 1? "Active": "Pending"
+          if(data == 0) return "Pending";
+          return row.is_active? "Active": "Inactive";
         } 
       },      
       {
@@ -98,6 +99,10 @@ $(document).ready(function() {
 
           if(row.status == 0) {
             html += `&nbsp;&nbsp;<a title="Resend invitation email" href="#" onclick="resendMail(${row['id']})" ><i class="fas fa-envelope"></i></a>`;
+          }else if(row.is_active) {
+            html += `&nbsp;&nbsp;<a title="Deactivate this user" href="#" onclick="lockUser(${row['id']})" ><i class="fas fa-ban"></i></a>`;
+          }else {
+            html += `&nbsp;&nbsp;<a title="Activate this user" href="#" onclick="unlockUser(${row['id']})" ><i class="fas fa-toggle-on"></i></a>`;
           }
 
           return html;
@@ -122,6 +127,18 @@ async function deleteItem(id) {
 async function resendMail(id) {
   if (confirm('Resend an invitation email to this user?')) {
     location.href = "/staff/users/resend_mail/" + id;
+  }
+}
+
+function lockUser(id) {
+  if(confirm('Deactivate this user?')) {
+    location.href = "/staff/users/lock/" + id;
+  }
+}
+
+function unlockUser(id) {
+  if(confirm('Activate this user?')) {
+    location.href = "/staff/users/unlock/" + id;
   }
 }
 

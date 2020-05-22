@@ -44,6 +44,8 @@ urlpatterns = [
     path('staff/users/import_preview', views_staff.importUserPreview),
     path('staff/users/import', views_staff.importUser),
     path('staff/users/resend_mail/<int:pk>', views_staff.resendMail),
+    path('staff/users/lock/<int:pk>', views_staff.lockUser),
+    path('staff/users/unlock/<int:pk>', views_staff.unlockUser),
 
     path('staff/devices', views_staff.listDevice, name='staff-device'),
     path('staff/devices/add', views_staff.addDevice),

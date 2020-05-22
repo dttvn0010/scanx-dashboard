@@ -143,6 +143,20 @@ def resendMail(request, pk):
     
     return redirect('staff-user')
 
+@login_required
+def lockUser(request, pk):
+    user = get_object_or_404(User, pk=pk)
+    user.is_active = False
+    user.save()
+    return redirect('staff-user')
+
+@login_required
+def unlockUser(request, pk):
+    user = get_object_or_404(User, pk=pk)
+    user.is_active = True
+    user.save()
+    return redirect('staff-user')    
+
 #================================= Location  ====================================================================
 @login_required
 def listLocation(request):
