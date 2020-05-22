@@ -30,8 +30,9 @@ def createTenantAdmin(request, organization, adminName, adminEmail):
     user.save()
 
     hostURL = request.build_absolute_uri('/')    
-    thr = Thread(target=sendAdminInvitationMail, args=(hostURL, organization.name, adminName, adminEmail, genPassword()))
-    thr.start()
+    sendAdminInvitationMail(hostURL, organization.name, adminName, adminEmail, password)
+    #thr = Thread(target=sendAdminInvitationMail, args=(hostURL, organization.name, adminName, adminEmail, password))
+    #thr.start()
 
 # ========================================== Organization ======================================================
 
@@ -80,8 +81,9 @@ def resendMail(request, pk):
         password = genPassword()
         staff.password = make_password(password)
         staff.save()
-        thr = Thread(target=sendAdminInvitationMail, args=(hostURL, org.name, staff.fullname, staff.email, password))
-        thr.start()
+        sendAdminInvitationMail(hostURL, org.name, staff.fullname, staff.email, password)
+        #thr = Thread(target=sendAdminInvitationMail, args=(hostURL, org.name, staff.fullname, staff.email, password))
+        #thr.start()
     
     return redirect('admin-home')
     

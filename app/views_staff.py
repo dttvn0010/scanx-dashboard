@@ -35,8 +35,9 @@ def createUser(request, fullname, email):
     user.save()
     
     hostURL = request.build_absolute_uri('/')        
-    thr = Thread(target=sendInvitationMail, args=(hostURL, user.organization.name, fullname, email, password))
-    thr.start()
+    sendInvitationMail(hostURL, user.organization.name, fullname, email, password)
+    #thr = Thread(target=sendInvitationMail, args=(hostURL, user.organization.name, fullname, email, password))
+    #thr.start()
 
     return user
 
