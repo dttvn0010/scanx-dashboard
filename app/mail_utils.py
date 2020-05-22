@@ -52,4 +52,4 @@ def sendInvitationMail(hostURL, organization, fullname, email, password):
             server.login(SENDER_EMAIL, SENDER_PASSWORD)
             server.sendmail(SENDER_EMAIL, email, msg.as_string())
     except:
-        exec.print_exc()
+        traceback.print_exc()
