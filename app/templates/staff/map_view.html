@@ -22,15 +22,27 @@
     var result = await response.json();
     var items = result.data;
 
-    console.log(items);
+    var position = items.length > 0? items[0].geoLocation : { lat: 52.479865, lng: -1.911067 };
 
-    var position = { lat: 52.479865, lng: -1.911067 };
     map = new google.maps.Map(document.getElementById('map'), { zoom: 16, center: position });
-    items.forEach(item => 
-        new google.maps.Marker({ 
-          position: item.geoLocation, map: map, 
-          label: { text: `${item.user} (${item.datediff} ago)`, color: '#222' } 
-        })
+    items.forEach(item => {
+        var marker =  new google.maps.Marker({ 
+            position: item.geoLocation, map: map, 
+            label: {text:`${item.user}`, color:'#000080'}
+          });
+        
+        var infowindow = new google.maps.InfoWindow({
+          content: 
+          `<div>
+            <div class="d-flex justify-content-center"><div class="flex-column">${item.user}</div></div>
+            <div class="mt-2 d-flex"><div class="flex-column">${item.date} (${item.datediff} ago)</div></div>
+          </div>`
+        });
+
+        marker.addListener('click', function() {
+          infowindow.open(map, marker);
+        });
+      }
     );
   }
 </script>
