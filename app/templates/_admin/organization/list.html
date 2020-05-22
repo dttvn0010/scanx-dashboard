@@ -96,7 +96,8 @@ $(document).ready(function() {
                         <a title="Delete" href="#" onclick="deleteItem(${row['id']})" ><i class="fas fa-trash" style="color:red"></i></a>`;
 
           if(row.status == 0) {
-            html += `&nbsp;<a title="Resend invitation email" href="#" onclick="resendMail(${row['id']})" ><i class="fas fa-envelope"></i></a>`;
+            html += `&nbsp;
+                    <a title="Resend invitation email" href="#" onclick="resendMail(${row['id']})" ><i class="fas fa-envelope"></i></a>`;
           }
           
           return html;          
