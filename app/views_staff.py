@@ -136,8 +136,9 @@ def resendMail(request, pk):
         password = genPassword()
         user.password = make_password(password)
         user.save()
-        thr = Thread(target=sendInvitationMail, args=(hostURL, user.organization.name, user.fullname, user.email, password))
-        thr.start()
+        #thr = Thread(target=sendInvitationMail, args=(hostURL, user.organization.name, user.fullname, user.email, password))
+        #thr.start()
+        sendInvitationMail(hostURL, user.organization.name, user.fullname, user.email, password)
     
     return redirect('staff-user')
 
