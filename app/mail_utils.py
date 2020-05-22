@@ -16,7 +16,7 @@ with open(MAIL_TEMPLATE_PATH, encoding="utf-8") as fi:
 
 SMTP_PORT = 465 
 SMTP_SERVER = "smtp.gmail.com"
-SENDER_EMAIL = "contact@scanx.cloud"
+SENDER_EMAIL = "ScanX <contact@screenx.cloud>"
 GMAIL = "dttvn0010@gmail.com"
 GMAIL_PASS = "Ab01234567"
 
