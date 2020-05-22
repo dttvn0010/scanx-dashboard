@@ -3,6 +3,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
+import traceback
 from datetime import datetime
 
 from .models import *
@@ -20,12 +21,15 @@ def checkIn(request):
     print('Code=', code)
     arr = code.split('-')
     if len(arr) != 3 or arr[0] != "SCANX":
-        return Response({'error': 'Wrong code'})
+        return Response({'error': 'Invalid device code'})
     
     id1, id2 = arr[1:]
     device = Device.objects.filter(id1=id1).filter(id2=id2).first()
     if not device:
-        return Response({'error': 'No device found'})
+        return Response({'error': 'Unknown device'})
+
+    if not device.installationLocation:
+        return Response({'error': 'Device not registered yet'})
 
     print(device.id1, device.id2, device.installationLocation)
 
@@ -112,14 +116,22 @@ def searchOrganization(request):
         "data": data
     })
 
-@api_view(['GET'])
+@api_view(['POST'])
 def deleteOrganization(request, pk):    
     try:
-        organization = Organization.objects.get(pk=pk)    
-        organization.delete()
-        return Response({'success': True})    
-    except:
-        return Response({'success': False, 'message': 'Cannot delete this organization because some records depend on it'})
+        password = request.data.get('password', '')
+        print('pass=', password)
+
+        if request.user.check_password(password):
+            organization = Organization.objects.get(pk=pk)  
+            organization.delete()  
+            return Response({'success': True})    
+        else:
+            return Response({'success': False, 'error': 'Wrong password'})    
+
+    except Exception as e:
+        traceback.print_exc()
+        return Response({'success': False, 'error': str(e)})
 
 # =================================================== User ======================================================
 

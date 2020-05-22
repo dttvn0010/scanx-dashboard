@@ -30,7 +30,7 @@ class User(AbstractUser):
         INVITED = 0
         REGISTERED = 1
 
-    organization = models.ForeignKey(Organization, blank=True, null=True, on_delete=models.PROTECT)
+    organization = models.ForeignKey(Organization, blank=True, null=True, on_delete=models.CASCADE)
     fullname = models.CharField(verbose_name="Full Name", max_length=50, blank=True, null=True, unique=True)
     permissions = models.ManyToManyField(Permission, blank=True)
     nfcEnabled = models.BooleanField(verbose_name='NFC Enabled', blank=True, null=True)
@@ -48,7 +48,7 @@ class User(AbstractUser):
    
     
 class Location(models.Model):
-    organization = models.ForeignKey(Organization, on_delete=models.PROTECT,  blank=True, null=True)
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE,  blank=True, null=True)
     addressLine1 = models.CharField(verbose_name="Address Line 1", max_length=100)
     addressLine2 = models.CharField(verbose_name="Address Line 2", max_length=100)
     postCode = models.CharField(verbose_name="Post Code", max_length=10)
@@ -59,8 +59,8 @@ class Location(models.Model):
         return f'{self.addressLine1}, {self.addressLine2}'
 
 class Device(models.Model):
-    organization = models.ForeignKey(Organization, on_delete=models.PROTECT, blank=True, null=True)    
-    installationLocation = models.ForeignKey(Location, on_delete=models.PROTECT, blank=True, null=True)
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, blank=True, null=True)    
+    installationLocation = models.ForeignKey(Location, on_delete=models.SET_NULL, blank=True, null=True)
     id1 = models.CharField(max_length=30)
     id2 = models.CharField(max_length=30)
     enabled = models.BooleanField()
@@ -71,7 +71,7 @@ class Device(models.Model):
         return f'{self.id1}-{self.id2}'
 
 class CheckIn(models.Model):
-    user = models.ForeignKey(User, on_delete=models.PROTECT)
-    location = models.ForeignKey(Location, on_delete=models.PROTECT)
-    device = models.ForeignKey(Device, on_delete=models.PROTECT)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    location = models.ForeignKey(Location, on_delete=models.CASCADE)
+    device = models.ForeignKey(Device, null=True, on_delete=models.SET_NULL)
     date = models.DateTimeField()
