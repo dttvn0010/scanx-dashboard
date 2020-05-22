@@ -46,7 +46,7 @@ $(document).ready(function() {
               return '';
           }
 
-          return `<a title="Edit" href="/_admin/permission/update/${row['id']}"><i class="fas fa-edit"></i></a>&nbsp;`
+          return `<a title="Edit" href="/_admin/permission/update/${row['id']}"><i class="fas fa-edit"></i></a>&nbsp;&nbsp;`
                 + `<a title="Delete" href="#" onclick="deleteItem(${row['id']})" ><i class="fas fa-trash" style="color:red"></i></a>`;
         }
       }

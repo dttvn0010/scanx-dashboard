@@ -123,11 +123,11 @@ $(document).ready(function() {
       },     
       {
         render: function (data, type, row) {
-          var html =  `<a title="Edit" href="/_admin/organization/update/${row['id']}"><i class="fas fa-edit"></i></a>&nbsp;`
+          var html =  `<a title="Edit" href="/_admin/organization/update/${row['id']}"><i class="fas fa-edit"></i></a>&nbsp;&nbsp;`
                      + `<a title="Delete" href="#" onclick="openDeleteConfirmation(${row['id']})" ><i class="fas fa-trash" style="color:red"></i></a>`;
 
           if(row.status == 0) {
-            html += `&nbsp;<a title="Resend invitation email" href="#" onclick="resendMail(${row['id']})" ><i class="fas fa-envelope"></i></a>`;
+            html += `&nbsp;&nbsp;<a title="Resend invitation email" href="#" onclick="resendMail(${row['id']})" ><i class="fas fa-envelope"></i></a>`;
           }
           
           return html;          
