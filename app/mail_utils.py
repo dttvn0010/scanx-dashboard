@@ -15,8 +15,32 @@ with open(MAIL_TEMPLATE_PATH, encoding="utf-8") as fi:
 
 SMTP_PORT = 465 
 SMTP_SERVER = "smtp.gmail.com"
-SENDER_EMAIL = "dttvn0010@gmail.com"
-SENDER_PASSWORD = "Ab01234567"
+SENDER_EMAIL = "contact@scanx.cloud"
+GMAIL = "dttvn0010@gmail.com"
+GMAIL_PASS = "Ab01234567"
+
+def sendMail(fro, to, subject, body):
+    proc = subprocess.Popen(['mail',
+                 '-s', f'{subject}\nContent-Type: text/html', 
+                 '-a', f'From: {fro}',
+                 to],
+             stdin=subprocess.PIPE)
+    proc.stdin.write(body.encode())
+    proc.stdin.close()
+
+def sendMail2(fro, to, subject, body):
+    context = ssl.create_default_context()
+
+    msg = MIMEMultipart('alternative')
+    msg['Subject'] = subject
+    msg['From'] = fro
+    msg.attach(MIMEText(body, 'html'))
+    
+    context = ssl.create_default_context()
+
+    with smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT, context=context) as server:
+        server.login(GMAIL, GMAIL_PASS)
+        server.sendmail(fro, to, msg.as_string())
 
 def sendAdminInvitationMail(hostURL, organization, fullname, email, password):
     try:
@@ -25,17 +49,7 @@ def sendAdminInvitationMail(hostURL, organization, fullname, email, password):
         html = html.replace('${User.FULL_NAME}', fullname)
         html = html.replace('${User.PASSWORD}', password)
 
-        #msg = MIMEText(html, 'html')
-        msg = MIMEMultipart('alternative')
-        msg['Subject'] = INVITE_TITLE
-        msg['From'] = 'ScanX'
-        msg.attach(MIMEText(html, 'html'))
-
-        context = ssl.create_default_context()
-
-        with smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT, context=context) as server:
-            server.login(SENDER_EMAIL, SENDER_PASSWORD)
-            server.sendmail(SENDER_EMAIL, email, msg.as_string())
+        sendMail(SENDER_EMAIL, email, html)
     except:
         traceback.print_exc()
 
@@ -46,16 +60,6 @@ def sendInvitationMail(hostURL, organization, fullname, email, password):
         html = html.replace('${User.FULL_NAME}', fullname)
         html = html.replace('${User.PASSWORD}', password)
 
-        #msg = MIMEText(html, 'html')
-        msg = MIMEMultipart('alternative')
-        msg['Subject'] = INVITE_TITLE
-        msg['From'] = 'ScanX'
-        msg.attach(MIMEText(html, 'html'))
-
-        context = ssl.create_default_context()
-
-        with smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT, context=context) as server:
-            server.login(SENDER_EMAIL, SENDER_PASSWORD)
-            server.sendmail(SENDER_EMAIL, email, msg.as_string())
+        sendMail(SENDER_EMAIL, email, html)
     except:
         traceback.print_exc()

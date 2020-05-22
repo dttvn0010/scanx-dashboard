@@ -9,13 +9,6 @@ class OrganizationCreationForm(forms.ModelForm):
     adminName = forms.CharField(max_length=30, label="Admin name")
     adminEmail = forms.EmailField(max_length=50, label="Admin email")
 
-    def clean_adminName(self):
-        adminName = self.cleaned_data.get('adminName')
-        if User.objects.filter(fullname=adminName):
-            raise forms.ValidationError('User with name "%s" already exists' % (adminName))
-
-        return adminName
-
     def clean_adminEmail(self):
         email = self.cleaned_data.get('adminEmail')
         if User.objects.filter(email=email):
