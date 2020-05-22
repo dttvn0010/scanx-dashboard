@@ -281,5 +281,6 @@ def updateDevice(request, pk):
 def deleteDevice(request, pk):
     device = get_object_or_404(Device, pk=pk)
     device.organization = None
+    device.installationLocation = None
     device.save()
     return redirect("staff-device")    
