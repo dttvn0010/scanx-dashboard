@@ -59,7 +59,7 @@ class Location(models.Model):
         return f'{self.addressLine1}, {self.addressLine2}'
 
 class Device(models.Model):
-    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, blank=True, null=True)    
+    organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, blank=True, null=True)    
     installationLocation = models.ForeignKey(Location, on_delete=models.SET_NULL, blank=True, null=True)
     id1 = models.CharField(max_length=30)
     id2 = models.CharField(max_length=30)
