@@ -49,7 +49,7 @@ def sendAdminInvitationMail(hostURL, organization, fullname, email, password):
         html = html.replace('${User.FULL_NAME}', fullname)
         html = html.replace('${User.PASSWORD}', password)
 
-        sendMail(SENDER_EMAIL, email, html)
+        sendMail(SENDER_EMAIL, email, INVITE_TITLE, html)
     except:
         traceback.print_exc()
 
@@ -60,6 +60,6 @@ def sendInvitationMail(hostURL, organization, fullname, email, password):
         html = html.replace('${User.FULL_NAME}', fullname)
         html = html.replace('${User.PASSWORD}', password)
 
-        sendMail(SENDER_EMAIL, email, html)
+        sendMail(SENDER_EMAIL, email, INVITE_TITLE, html)
     except:
         traceback.print_exc()
