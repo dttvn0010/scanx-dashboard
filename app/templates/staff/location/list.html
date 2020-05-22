@@ -84,11 +84,8 @@ $(document).ready(function() {
       { "data": "geoLocation" },      
       {
         render: function (data, type, row) {
-          return `
-          <a title="Edit" href="/staff/location/update/${row['id']}"><i class="fas fa-edit"></i></a> 
-          &nbsp;
-          <a title="Delete" href="#" onclick="deleteItem(${row['id']})" ><i class="fas fa-trash" style="color:red"></i>
-          </a>`;
+          return `<a title="Edit" href="/staff/location/update/${row['id']}"><i class="fas fa-edit"></i></a>&nbsp;`
+                + `<a title="Delete" href="#" onclick="deleteItem(${row['id']})" ><i class="fas fa-trash" style="color:red"></i></a>`;
         }
       }
     ],
