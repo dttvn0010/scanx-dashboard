@@ -48,7 +48,7 @@ def completeRegistration(request):
             user.profilePicture = form.cleaned_data['profilePicture']
             user.save()
 
-            if user.is_staff:
+            if False:
                 org = user.organization
                 org.name = form.cleaned_data['organization']
                 org.save()
