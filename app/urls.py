@@ -47,17 +47,19 @@ urlpatterns = [
     path('staff/users/lock/<int:pk>', views_staff.lockUser),
     path('staff/users/unlock/<int:pk>', views_staff.unlockUser),
 
-    path('staff/devices', views_staff.listDevice, name='staff-device'),
-    path('staff/devices/add', views_staff.addDevice),
-    path('staff/devices/update/<int:pk>', views_staff.updateDevice,),    
-    path('staff/devices/delete/<int:pk>', views_staff.deleteDevice),    
-
     path('staff/locations', views_staff.listLocation, name='staff-location'),
     path('staff/locations/add', views_staff.addLocation),
     path('staff/locations/update/<int:pk>', views_staff.updateLocation),  
     path('staff/locations/export', views_staff.exportLocation),
     path('staff/locations/import_preview', views_staff.importLocationPreview),
-    path('staff/locations/import', views_staff.importLocation),  
+    path('staff/locations/import', views_staff.importLocation), 
+
+    path('staff/devices', views_staff.listDevice, name='staff-device'),
+    path('staff/devices/add', views_staff.addDevice),
+    path('staff/devices/update/<int:pk>', views_staff.updateDevice,),    
+    path('staff/devices/delete/<int:pk>', views_staff.deleteDevice),    
+    
+    path('staff/reports', views_staff.viewReport),
 
     # API
     path('api/test', views_api.test),

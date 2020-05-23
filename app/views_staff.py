@@ -298,3 +298,9 @@ def deleteDevice(request, pk):
     device.installationLocation = None
     device.save()
     return redirect("staff-device")    
+
+#================================= Report  ====================================================================
+
+@login_required
+def viewReport(request):
+    return render(request, 'staff/reports/list.html')
