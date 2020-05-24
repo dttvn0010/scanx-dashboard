@@ -1,0 +1,15 @@
+{% extends "../base.html" %}
+
+{% block sidebar %}
+{% with page=4 %}
+{{ block.super }}
+{% endwith %}
+{% endblock %}
+
+
+{% block content %}
+<div class="content p-3">
+  Report
+</div>
+
+{% endblock %}
