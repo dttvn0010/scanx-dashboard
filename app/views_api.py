@@ -21,7 +21,7 @@ def test(request):
 def logIn(request):
     logIn = LogIn()
     logIn.user = request.user
-    login.date = datetime.now()
+    logIn.date = datetime.now()
     logIn.save()
     return Response({'success': True})
 
