@@ -59,10 +59,14 @@ urlpatterns = [
     path('staff/devices/update/<int:pk>', views_staff.updateDevice,),    
     path('staff/devices/delete/<int:pk>', views_staff.deleteDevice),    
     
-    path('staff/reports', views_staff.viewReport),
+    path('staff/report/check_in', views_staff.reportCheckIn),
+    path('staff/report/log_in', views_staff.reportLogIn),
 
     # API
     path('api/test', views_api.test),
+    path('api/login', views_api.logIn),
+    path('api/login/search', views_api.searchLogIn),
+
     path('api/checkin', views_api.checkIn),
     path('api/checkin/search', views_api.searchCheckIn),
     

@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
 import traceback
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from .models import *
 from .serializers import *
@@ -13,6 +13,70 @@ from .serializers import *
 @permission_classes((IsAuthenticated,))
 def test(request):
     return Response({'success': True})
+
+# ================================================ LogIn ========================================================
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticated,))
+def logIn(request):
+    logIn = LogIn()
+    logIn.user = request.user
+    login.date = datetime.now()
+    logIn.save()
+    return Response({'success': True})
+
+@api_view(['GET'])
+def searchLogIn(request):
+    draw = request.query_params.get('draw', 1)    
+    keyword = request.query_params.get('search[value]', '')    
+    userId = request.query_params.get("userId")
+    startDate = request.query_params.get("startDate")
+    endDate = request.query_params.get("endDate")
+
+    start = int(request.query_params.get('start', 0))
+    length = int(request.query_params.get('length', 0))
+    
+    logIns = LogIn.objects.filter(user__organization=request.user.organization)
+    recordsTotal = logIns.count()
+
+    if keyword != '':
+        logIns = logIns.filter(user__fullname__contains=keyword)
+
+    if userId:
+        logIns = logIns.filter(user__id=int(userId))
+
+    if startDate:
+        startDate = datetime.strptime(startDate, '%d/%m/%Y')
+        logIns = logIns.filter(date__gte=startDate)
+
+    if endDate:
+        endDate = datetime.strptime(endDate, '%d/%m/%Y') + timedelta(days=1)
+        logIns = logIns.filter(date__lt=endDate)                        
+
+    logIns = logIns.order_by('-date')
+    recordsFiltered = logIns.count()
+    logIns = logIns[start:start+length]
+    data = LogInSerializer(logIns, many=True).data
+
+    for item in data:
+        item['user'] = f'{item["userFullName"]}'
+        d = datetime.strptime(item['date'], "%d/%m/%Y %H:%M:%S")
+        minutes = (datetime.now() - d).seconds // 60
+        hours = (datetime.now() - d).seconds // 3600
+        
+        if hours == 0:
+            item['datediff'] = f'{minutes} minute{"" if minutes == 1 else "s"}'
+        else:
+            item['datediff'] = f'{hours} hour{"" if hours == 1 else "s"}'
+
+    return Response({
+        "draw": draw,
+        "recordsTotal": recordsTotal,
+        "recordsFiltered": recordsFiltered,
+        "data": data
+    })
+
+# ================================================ CheckIn ========================================================
 
 @api_view(['POST'])
 @permission_classes((IsAuthenticated,))
@@ -45,25 +109,46 @@ def checkIn(request):
 @api_view(['GET'])
 def searchCheckIn(request):
     draw = request.query_params.get('draw', 1)    
-    keyword = request.query_params.get('search[value]', '')
+    keyword = request.query_params.get('search[value]', '')    
+    userId = request.query_params.get("userId")
+    locationId = request.query_params.get("locationId")
+    startDate = request.query_params.get("startDate")
+    endDate = request.query_params.get("endDate")
+
     start = int(request.query_params.get('start', 0))
     length = int(request.query_params.get('length', 0))
     
     checkIns = CheckIn.objects.filter(user__organization=request.user.organization)
     recordsTotal = checkIns.count()
 
-    checkIns = checkIns.filter(Q(user__fullname__contains=keyword) 
+    if keyword != '':
+        checkIns = checkIns.filter(Q(user__fullname__contains=keyword) 
                                 | Q(location__addressLine1__contains=keyword) 
-                                | Q(location__addressLine1__contains=keyword)) \
-                        .order_by('-date')
+                                | Q(location__addressLine1__contains=keyword))
 
+    if userId:
+        checkIns = checkIns.filter(user__id=int(userId))
+
+    if locationId:
+        checkIns = checkIns.filter(location__id=int(locationId))
+
+    if startDate:
+        startDate = datetime.strptime(startDate, '%d/%m/%Y')
+        checkIns = checkIns.filter(date__gte=startDate)
+
+    if endDate:
+        endDate = datetime.strptime(endDate, '%d/%m/%Y') + timedelta(days=1)
+        checkIns = checkIns.filter(date__lt=endDate)                        
+
+    checkIns = checkIns.order_by('-date')
     recordsFiltered = checkIns.count()
     checkIns = checkIns[start:start+length]
     data = CheckInSerializer(checkIns, many=True).data
 
     for item in data:
+        item['user'] = f'{item["userFullName"]}'
         item['location'] = f'{item["addressLine1"]}, {item["addressLine2"]}'
-        d = datetime.strptime(item['date'], "%d %b %Y at %I:%M %p")
+        d = datetime.strptime(item['date'], "%d/%m/%Y %H:%M:%S")
         minutes = (datetime.now() - d).seconds // 60
         hours = (datetime.now() - d).seconds // 3600
         

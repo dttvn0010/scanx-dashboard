@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.signals import user_logged_in
 
 from datetime import datetime
 import string
@@ -18,6 +19,13 @@ from .consts import MAIL_TEMPLATE_PATH
 from .mail_utils import sendAdminInvitationMail, sendInvitationMail
 from .permissions import PERMISSIONS
 
+def logInHook(sender, user, request, **kwargs):
+    logIn = LogIn()
+    logIn.user = user
+    logIn.date = datetime.now()
+    logIn.save()
+
+user_logged_in.connect(logInHook)
 
 @login_required
 def home(request):

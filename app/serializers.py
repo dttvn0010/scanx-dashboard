@@ -33,11 +33,20 @@ class LocationSerializer(ModelSerializer):
         fields = '__all__'        
 
 class CheckInSerializer(ModelSerializer):    
-    user = CharField(source='user.fullname', default="")
+    userFullName = CharField(source='user.fullname', default="")
+    username = CharField(source='user.username', default="")
     addressLine1 = CharField(source='location.addressLine1', default="")
     addressLine2 = CharField(source='location.addressLine2', default="")
     geoLocation = CharField(source='location.geoLocation', default="")
-    date = DateTimeField(format="%d %b %Y at %I:%M %p", required=False, read_only=True)
+    date = DateTimeField(format="%d/%m/%Y %H:%M:%S", required=False, read_only=True)
     class Meta:
         model = CheckIn
-        fields = ('user', 'addressLine1', 'addressLine2', 'geoLocation', 'date',)
+        fields = ('username', 'userFullName', 'addressLine1', 'addressLine2', 'geoLocation', 'date',)
+
+class LogInSerializer(ModelSerializer):    
+    userFullName = CharField(source='user.fullname', default="")
+    username = CharField(source='user.username', default="")
+    date = DateTimeField(format="%d/%m/%Y %H:%M:%S", required=False, read_only=True)
+    class Meta:
+        model = CheckIn
+        fields = ('username', 'userFullName', 'date',)        

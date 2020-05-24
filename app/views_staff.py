@@ -302,5 +302,42 @@ def deleteDevice(request, pk):
 #================================= Report  ====================================================================
 
 @login_required
-def viewReport(request):
-    return render(request, 'staff/reports/list.html')
+def reportCheckIn(request):
+    query_params = request.GET
+    reported = query_params.get('reported', '')
+    userId = query_params.get('userId', '')
+    locationId = query_params.get('locationId', '')
+    startDate = query_params.get('startDate', '')
+    endDate = query_params.get('endDate', '')
+
+    users = User.objects.filter(organization=request.user.organization)
+    locations = Location.objects.filter(organization=request.user.organization)
+
+    return render(request, 'staff/reports/check_in.html', 
+        {
+            'users': users, 
+            'locations': locations,
+            'reported': reported,
+            'userId': userId,
+            'locationId': locationId,
+            'startDate': startDate,
+            'endDate': endDate
+        })
+
+@login_required
+def reportLogIn(request):
+    query_params = request.GET
+    reported = query_params.get('reported', '')
+    userId = query_params.get('userId', '')
+    startDate = query_params.get('startDate', '')
+    endDate = query_params.get('endDate', '')
+
+    users = User.objects.filter(organization=request.user.organization)
+    return render(request, 'staff/reports/log_in.html', 
+        {
+            'users': users,
+            'reported': reported,
+            'userId': userId,
+            'startDate': startDate,
+            'endDate': endDate
+        })    

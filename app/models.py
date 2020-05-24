@@ -75,3 +75,7 @@ class CheckIn(models.Model):
     location = models.ForeignKey(Location, on_delete=models.CASCADE)
     device = models.ForeignKey(Device, null=True, on_delete=models.SET_NULL)
     date = models.DateTimeField()
+
+class LogIn(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    date = models.DateTimeField()
