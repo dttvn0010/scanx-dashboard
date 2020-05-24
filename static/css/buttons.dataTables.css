@@ -70,7 +70,7 @@ a.dt-button {
   box-sizing: border-box;
   margin-right: 0.333em;
   margin-bottom: 0.333em;
-  padding: 0.5em 1em;
+  padding: 0.2em 1em;
   border: 1px solid #999;
   border-radius: 2px;
   cursor: pointer;
@@ -205,6 +205,7 @@ a.dt-button:focus:not(.disabled) {
 div.dt-buttons {
   position: relative;
   float: right;
+  margin-left: 15px;
 }
 div.dt-buttons.buttons-right {
   float: right;
