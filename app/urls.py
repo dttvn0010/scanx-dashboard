@@ -66,6 +66,7 @@ urlpatterns = [
     path('api/test', views_api.test),
     path('api/login', views_api.logIn),
     path('api/login/search', views_api.searchLogIn),
+    path('api/get_user_config', views_api.getUserConfig),
 
     path('api/checkin', views_api.checkIn),
     path('api/checkin/search', views_api.searchCheckIn),

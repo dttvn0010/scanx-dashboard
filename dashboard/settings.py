@@ -154,3 +154,7 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
 }
+
+SCANX = {
+    'MIN_WAIT_TIME': 2 # Minutes
+}

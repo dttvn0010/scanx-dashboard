@@ -1,4 +1,5 @@
 from django.db.models import Q
+from django.conf import settings
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
@@ -13,6 +14,15 @@ from .serializers import *
 @permission_classes((IsAuthenticated,))
 def test(request):
     return Response({'success': True})
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticated,))
+def getUserConfig(request):
+    return Response({ 
+        'nfcEnabled': request.user.nfcEnabled,
+        'qrScanEnabled': request.user.qrScanEnabled,
+        'sharedLocation': request.user.sharedLocation
+    })
 
 # ================================================ LogIn ========================================================
 
@@ -82,7 +92,6 @@ def searchLogIn(request):
 @permission_classes((IsAuthenticated,))
 def checkIn(request):
     code = request.data.get("code")
-    print('Code=', code)
     arr = code.split('-')
     if len(arr) != 3 or arr[0] != "SCANX":
         return Response({'error': 'Invalid device code'})
@@ -95,8 +104,13 @@ def checkIn(request):
     if not device.installationLocation:
         return Response({'error': 'Device not registered yet'})
 
-    print(device.id1, device.id2, device.installationLocation)
-
+    lastCheckIn = CheckIn.objects.filter(user=request.user).order_by('-date').first()
+    minWaitTime = settings.SCANX.get('MIN_WAIT_TIME')
+    if lastCheckIn and minWaitTime:
+        timediff = (datetime.now() - lastCheckIn.date.replace(tzinfo=None)).seconds
+        if timediff < minWaitTime * 60:
+            return Response({'error': f'Please wait a minimum of {minWaitTime} minutes before next scan'})
+        
     checkIn = CheckIn()
     checkIn.location = device.installationLocation
     checkIn.device = device
