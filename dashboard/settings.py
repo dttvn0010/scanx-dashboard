@@ -156,5 +156,5 @@ SIMPLE_JWT = {
 }
 
 SCANX = {
-    'MIN_WAIT_TIME': 2 # Minutes
+    'MIN_WAIT_TIME': 10 # Minutes
 }
