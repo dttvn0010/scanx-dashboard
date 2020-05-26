@@ -16,10 +16,16 @@ from .mail_utils import sendInvitationMail
 
 @login_required
 def tableView(request):
+    if not request.user.organization:
+        return redirect('login')
+
     return render(request, "staff/table_view.html")
 
 @login_required
 def mapView(request):
+    if not request.user.organization:
+        return redirect('login')
+        
     return render(request, "staff/map_view.html")
 
 def createUser(request, fullname, email):
@@ -48,14 +54,14 @@ def createUser(request, fullname, email):
 @login_required
 def listUser(request):
     if not request.user.organization:
-        return redirect('home')
+        return redirect('login')
 
     return render(request, "staff/users/list.html")
 
 @login_required
 def addUser(request):
     if not request.user.organization:
-        return redirect('home')
+        return redirect('login')
 
     form = UserCreateForm(initial={'nfcEnabled': True, 'qrScanEnabled': True, 'sharedLocation': True})
 
@@ -76,7 +82,7 @@ def addUser(request):
 @login_required
 def updateUser(request, pk):
     if not request.user.organization:
-        return redirect('home')
+        return redirect('login')
 
     user = get_object_or_404(User, pk=pk)
     form = UserChangeForm(instance=user)
@@ -92,7 +98,7 @@ def updateUser(request, pk):
 @login_required
 def deleteUser(request, pk):
     if not request.user.organization:
-        return redirect('home')
+        return redirect('login')
 
     user = get_object_or_404(User, pk=pk)
     user.delete()
@@ -103,7 +109,7 @@ USER_HEADER = ['Full Name', 'Email', 'NFC Enabled', 'QR Scan Enabled', 'Location
 @login_required
 def exportUser(request):
     if not request.user.organization:
-        return redirect('home')
+        return redirect('login')
 
     lst = User.objects.all()
     with open('users.csv', 'w', newline='') as fo:
@@ -121,14 +127,14 @@ def exportUser(request):
 @login_required
 def importUserPreview(request):
     if not request.user.organization:
-        return redirect('home')
+        return redirect('login')
 
     return importPreview(request, USER_HEADER)
 
 @login_required
 def importUser(request):
     if not request.user.organization:
-        return redirect('home')
+        return redirect('login')
 
     if request.method == 'POST':
         records = request.session.get("records", [])
@@ -155,7 +161,7 @@ def importUser(request):
 @login_required
 def resendMail(request, pk):
     if not request.user.organization:
-        return redirect('home')
+        return redirect('login')
 
     user = get_object_or_404(User, pk=pk)
     if user.organization and user.status == User.Status.INVITED:
@@ -172,7 +178,7 @@ def resendMail(request, pk):
 @login_required
 def lockUser(request, pk):
     if not request.user.organization:
-        return redirect('home')
+        return redirect('login')
 
     user = get_object_or_404(User, pk=pk)
     user.is_active = False
@@ -182,7 +188,7 @@ def lockUser(request, pk):
 @login_required
 def unlockUser(request, pk):
     if not request.user.organization:
-        return redirect('home')
+        return redirect('login')
 
     user = get_object_or_404(User, pk=pk)
     user.is_active = True
@@ -193,14 +199,14 @@ def unlockUser(request, pk):
 @login_required
 def listLocation(request):
     if not request.user.organization:
-        return redirect('home')
+        return redirect('login')
 
     return render(request, "staff/locations/list.html")
 
 @login_required
 def addLocation(request):
     if not request.user.organization:
-        return redirect('home')
+        return redirect('login')
 
     form = LocationForm()
 
@@ -218,7 +224,7 @@ def addLocation(request):
 @login_required
 def updateLocation(request, pk):
     if not request.user.organization:
-        return redirect('home')
+        return redirect('login')
 
     location = get_object_or_404(Location, pk=pk)
     form = LocationForm(instance=location)
@@ -236,7 +242,7 @@ LOCATION_HEADER = ['Address Line 1', 'Address Line 2', 'Postcode', 'Geo Location
 @login_required
 def exportLocation(request):
     if not request.user.organization:
-        return redirect('home')
+        return redirect('login')
 
     lst = Location.objects.all()
     with open('location.csv', 'w', newline='') as fo:
@@ -254,7 +260,7 @@ def exportLocation(request):
 @login_required
 def importLocationPreview(request):
     if not request.user.organization:
-        return redirect('home')
+        return redirect('login')
 
     return importPreview(request, LOCATION_HEADER)
 
@@ -267,7 +273,7 @@ def parseFloat(st):
 @login_required
 def importLocation(request):
     if not request.user.organization:
-        return redirect('home')
+        return redirect('login')
 
     if request.method == 'POST':
         records = request.session.get("records", [])
@@ -301,7 +307,7 @@ def importLocation(request):
 @login_required
 def listDevice(request):
     if not request.user.organization:
-        return redirect('home')
+        return redirect('login')
 
     devices = Device.objects.filter(organization=request.user.organization)
     return render(request, "staff/devices/list.html", {"devices": devices})
@@ -309,7 +315,7 @@ def listDevice(request):
 @login_required
 def addDevice(request):
     if not request.user.organization:
-        return redirect('home')
+        return redirect('login')
 
     form = DeviceCreateForm(organization=request.user.organization)
 
@@ -334,7 +340,7 @@ def addDevice(request):
 @login_required
 def updateDevice(request, pk):
     if not request.user.organization:
-        return redirect('home')
+        return redirect('login')
 
     device = get_object_or_404(Device, pk=pk)
     form = DeviceChangeForm(organization=request.user.organization, initial={'installationLocation': device.installationLocation})
@@ -353,7 +359,7 @@ def updateDevice(request, pk):
 @login_required
 def deleteDevice(request, pk):
     if not request.user.organization:
-        return redirect('home')
+        return redirect('login')
 
     device = get_object_or_404(Device, pk=pk)
     device.organization = None
@@ -366,7 +372,7 @@ def deleteDevice(request, pk):
 @login_required
 def reportCheckIn(request):
     if not request.user.organization:
-        return redirect('home')
+        return redirect('login')
 
     query_params = request.GET
     reported = query_params.get('reported', '')
@@ -392,7 +398,7 @@ def reportCheckIn(request):
 @login_required
 def reportLogIn(request):
     if not request.user.organization:
-        return redirect('home')
+        return redirect('login')
 
     query_params = request.GET
     reported = query_params.get('reported', '')
