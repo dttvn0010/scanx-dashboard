@@ -111,7 +111,7 @@ def checkIn(request):
     lastCheckIn = CheckIn.objects.filter(user=request.user).order_by('-date').first()
     minWaitTime = settings.SCANX.get('MIN_WAIT_TIME')
     if lastCheckIn and minWaitTime:
-        timediff = (datetime.now() - lastCheckIn.date.replace(tzinfo=timezone(settings.TIME_ZONE))).seconds
+        timediff = datetime.timestamp(datetime.now()) - datetime.timestamp(lastCheckIn.date)
         if timediff < minWaitTime * 60:
             return Response({'error': f'Please wait a minimum of {minWaitTime} minutes before next scan'})
         
