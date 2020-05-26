@@ -120,7 +120,7 @@
           </ul>
           <ul class="navbar-nav ml-auto">
             <li class="nav-item d-flex mr-4">
-              <span class="align-self-center">Last Login: {{ user.last_login | date:"d/m/Y H:i:s" }}</span>
+              <span class="align-self-center">Last Login: {{ user.last_login |timezone:"UTC" }}</span>
             </li>
          
             <li class="nav-item dropdown no-arrow d-flex">

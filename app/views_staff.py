@@ -43,12 +43,19 @@ def createUser(request, fullname, email):
 
 
 # ========================================== User ======================================================
+
 @login_required
 def listUser(request):
+    if not request.user.organization:
+        return redirect('home')
+
     return render(request, "staff/users/list.html")
 
 @login_required
 def addUser(request):
+    if not request.user.organization:
+        return redirect('home')
+
     form = UserCreateForm(initial={'nfcEnabled': True, 'qrScanEnabled': True, 'sharedLocation': True})
 
     if request.method == 'POST':
@@ -67,6 +74,9 @@ def addUser(request):
 
 @login_required
 def updateUser(request, pk):
+    if not request.user.organization:
+        return redirect('home')
+
     user = get_object_or_404(User, pk=pk)
     form = UserChangeForm(instance=user)
 
@@ -80,6 +90,9 @@ def updateUser(request, pk):
 
 @login_required
 def deleteUser(request, pk):
+    if not request.user.organization:
+        return redirect('home')
+
     user = get_object_or_404(User, pk=pk)
     user.delete()
     return redirect("staff-user")
@@ -88,6 +101,9 @@ USER_HEADER = ['Full Name', 'Email', 'NFC Enabled', 'QR Scan Enabled', 'Location
 
 @login_required
 def exportUser(request):
+    if not request.user.organization:
+        return redirect('home')
+
     lst = User.objects.all()
     with open('users.csv', 'w', newline='') as fo:
         writer = csv.writer(fo)
@@ -103,10 +119,16 @@ def exportUser(request):
 
 @login_required
 def importUserPreview(request):
+    if not request.user.organization:
+        return redirect('home')
+
     return importPreview(request, USER_HEADER)
 
 @login_required
 def importUser(request):
+    if not request.user.organization:
+        return redirect('home')
+
     if request.method == 'POST':
         records = request.session.get("records", [])
         indexes = [0] * len(USER_HEADER)
@@ -131,6 +153,9 @@ def importUser(request):
 
 @login_required
 def resendMail(request, pk):
+    if not request.user.organization:
+        return redirect('home')
+
     user = get_object_or_404(User, pk=pk)
     if user.organization and user.status == User.Status.INVITED:
         hostURL = request.build_absolute_uri('/')    
@@ -145,6 +170,9 @@ def resendMail(request, pk):
 
 @login_required
 def lockUser(request, pk):
+    if not request.user.organization:
+        return redirect('home')
+
     user = get_object_or_404(User, pk=pk)
     user.is_active = False
     user.save()
@@ -152,6 +180,9 @@ def lockUser(request, pk):
 
 @login_required
 def unlockUser(request, pk):
+    if not request.user.organization:
+        return redirect('home')
+
     user = get_object_or_404(User, pk=pk)
     user.is_active = True
     user.save()
@@ -160,10 +191,16 @@ def unlockUser(request, pk):
 #================================= Location  ====================================================================
 @login_required
 def listLocation(request):
+    if not request.user.organization:
+        return redirect('home')
+
     return render(request, "staff/locations/list.html")
 
 @login_required
 def addLocation(request):
+    if not request.user.organization:
+        return redirect('home')
+
     form = LocationForm()
 
     if request.method == 'POST':
@@ -179,6 +216,9 @@ def addLocation(request):
 
 @login_required
 def updateLocation(request, pk):
+    if not request.user.organization:
+        return redirect('home')
+
     location = get_object_or_404(Location, pk=pk)
     form = LocationForm(instance=location)
 
@@ -194,6 +234,9 @@ LOCATION_HEADER = ['Address Line 1', 'Address Line 2', 'Postcode', 'Geo Location
 
 @login_required
 def exportLocation(request):
+    if not request.user.organization:
+        return redirect('home')
+
     lst = Location.objects.all()
     with open('location.csv', 'w', newline='') as fo:
         writer = csv.writer(fo)
@@ -209,6 +252,9 @@ def exportLocation(request):
 
 @login_required
 def importLocationPreview(request):
+    if not request.user.organization:
+        return redirect('home')
+
     return importPreview(request, LOCATION_HEADER)
 
 def parseFloat(st):
@@ -219,6 +265,9 @@ def parseFloat(st):
 
 @login_required
 def importLocation(request):
+    if not request.user.organization:
+        return redirect('home')
+
     if request.method == 'POST':
         records = request.session.get("records", [])
         indexes = [0] * len(LOCATION_HEADER)
@@ -250,11 +299,17 @@ def importLocation(request):
 
 @login_required
 def listDevice(request):
+    if not request.user.organization:
+        return redirect('home')
+
     devices = Device.objects.filter(organization=request.user.organization)
     return render(request, "staff/devices/list.html", {"devices": devices})
 
 @login_required
 def addDevice(request):
+    if not request.user.organization:
+        return redirect('home')
+
     form = DeviceCreateForm(organization=request.user.organization)
 
     if request.method == 'POST':
@@ -277,6 +332,9 @@ def addDevice(request):
 
 @login_required
 def updateDevice(request, pk):
+    if not request.user.organization:
+        return redirect('home')
+
     device = get_object_or_404(Device, pk=pk)
     form = DeviceChangeForm(organization=request.user.organization, initial={'installationLocation': device.installationLocation})
 
@@ -293,6 +351,9 @@ def updateDevice(request, pk):
 
 @login_required
 def deleteDevice(request, pk):
+    if not request.user.organization:
+        return redirect('home')
+
     device = get_object_or_404(Device, pk=pk)
     device.organization = None
     device.installationLocation = None
@@ -303,6 +364,9 @@ def deleteDevice(request, pk):
 
 @login_required
 def reportCheckIn(request):
+    if not request.user.organization:
+        return redirect('home')
+
     query_params = request.GET
     reported = query_params.get('reported', '')
     userId = query_params.get('userId', '')
@@ -326,6 +390,9 @@ def reportCheckIn(request):
 
 @login_required
 def reportLogIn(request):
+    if not request.user.organization:
+        return redirect('home')
+        
     query_params = request.GET
     reported = query_params.get('reported', '')
     userId = query_params.get('userId', '')
