@@ -4,7 +4,6 @@ from django.contrib.auth.hashers import make_password
 
 import csv
 from datetime import datetime
-from dateutil import tz 
 from threading import Thread
 
 from .models import *
@@ -25,7 +24,7 @@ def tableView(request):
 def mapView(request):
     if not request.user.organization:
         return redirect('login')
-        
+
     return render(request, "staff/map_view.html")
 
 def createUser(request, fullname, email):
