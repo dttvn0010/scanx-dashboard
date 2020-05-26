@@ -73,6 +73,7 @@ def searchLogIn(request):
         d = datetime.strptime(item['date'], "%d/%m/%Y %H:%M:%S")
         diff = datetime.now() - d
         seconds = diff.seconds + diff.days * 24 * 3600
+        
         minutes = seconds // 60
         hours = seconds // 3600
         
@@ -164,9 +165,13 @@ def searchCheckIn(request):
     for item in data:
         item['user'] = f'{item["userFullName"]}'
         item['location'] = f'{item["addressLine1"]}, {item["addressLine2"]}'
+        
         d = datetime.strptime(item['date'], "%d/%m/%Y %H:%M:%S")
-        minutes = (datetime.now() - d).seconds // 60
-        hours = (datetime.now() - d).seconds // 3600
+        diff = datetime.now() - d        
+        seconds = diff.seconds + diff.days * 24 * 3600
+        
+        minutes = seconds // 60
+        hours = seconds // 3600
         
         if hours == 0:
             item['datediff'] = f'{minutes} minute{"" if minutes == 1 else "s"}'

@@ -92,7 +92,7 @@
         <nav class="navbar navbar-expand navbar-light topbar shadow">
           <ul class="navbar-nav ml-auto">
             <li class="nav-item d-flex mr-4">
-              <span class="align-self-center">Last Login: {{ user.last_login }}</span>
+              <span class="align-self-center">Last Login: {{ user.last_login|date:"d/m/Y H:i:s"" }}</span>
             </li>
             <li class="nav-item dropdown no-arrow">
               <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" aria-haspopup="true"

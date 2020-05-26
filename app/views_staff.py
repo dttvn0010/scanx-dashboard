@@ -4,6 +4,7 @@ from django.contrib.auth.hashers import make_password
 
 import csv
 from datetime import datetime
+from dateutil import tz 
 from threading import Thread
 
 from .models import *
@@ -392,7 +393,7 @@ def reportCheckIn(request):
 def reportLogIn(request):
     if not request.user.organization:
         return redirect('home')
-        
+
     query_params = request.GET
     reported = query_params.get('reported', '')
     userId = query_params.get('userId', '')
