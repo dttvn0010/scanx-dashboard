@@ -38,14 +38,14 @@ def createTenantAdmin(request, organization, adminName, adminEmail):
 
 @login_required
 def listOrganization(request):
-    if not request.user.is_superadmin:
+    if not request.user.is_superuser:
         return redirect('home')
 
     return render(request, "_admin/organizations/list.html")
 
 @login_required
 def addOrganization(request):
-    if not request.user.is_superadmin:
+    if not request.user.is_superuser:
         return redirect('home')
 
     form = OrganizationCreationForm(initial={'nfcEnabled': True, 'qrScanEnabled': True, 'active': True})
@@ -67,7 +67,7 @@ def addOrganization(request):
 
 @login_required
 def updateOrganization(request, pk):
-    if not request.user.is_superadmin:
+    if not request.user.is_superuser:
         return redirect('home')
 
     org = get_object_or_404(Organization, pk=pk)
@@ -83,7 +83,7 @@ def updateOrganization(request, pk):
 
 @login_required
 def resendMail(request, pk):
-    if not request.user.is_superadmin:
+    if not request.user.is_superuser:
         return redirect('home')
 
     org = get_object_or_404(Organization, pk=pk)
@@ -104,7 +104,7 @@ ORG_HEADER = ['Name', 'Admin Name', 'Admin Email', 'NFC Enabled', 'QR Scan Enabl
 
 @login_required
 def exportOrganization(request):
-    if not request.user.is_superadmin:
+    if not request.user.is_superuser:
         return redirect('home')
 
     lst = Organization.objects.all()
@@ -125,14 +125,14 @@ def exportOrganization(request):
 
 @login_required
 def importOrganizationPreview(request):
-    if not request.user.is_superadmin:
+    if not request.user.is_superuser:
         return redirect('home')
 
     return importPreview(request, ORG_HEADER)
 
 @login_required
 def importOrganization(request):
-    if not request.user.is_superadmin:
+    if not request.user.is_superuser:
         return redirect('home')
 
     if request.method == 'POST':
@@ -164,7 +164,7 @@ def importOrganization(request):
 #================================= Permission ====================================================================
 @login_required
 def listPermission(request):
-    if not request.user.is_superadmin:
+    if not request.user.is_superuser:
         return redirect('home')
 
     return render(request, "_admin/permissions/list.html")
@@ -201,7 +201,7 @@ def getPermissionDetail(permission):
 
 @login_required
 def addPermission(request):
-    if not request.user.is_superadmin:
+    if not request.user.is_superuser:
         return redirect('home')
 
     form = PermissionForm()
@@ -236,7 +236,7 @@ def updatePermission(request, pk):
 
 @login_required
 def listUnregisteredDevice(request):
-    if not request.user.is_superadmin:
+    if not request.user.is_superuser:
         return redirect('home')
 
     devices = Device.objects.filter(organization__isnull=True)
@@ -244,7 +244,7 @@ def listUnregisteredDevice(request):
 
 @login_required
 def addUnregisteredDevice(request):
-    if not request.user.is_superadmin:
+    if not request.user.is_superuser:
         return redirect('home')
 
     form = UnRegisteredDeviceForm()
@@ -262,7 +262,7 @@ def addUnregisteredDevice(request):
 
 @login_required
 def updateUnregisteredDevice(request, pk):
-    if not request.user.is_superadmin:
+    if not request.user.is_superuser:
         return redirect('home')
 
     device = get_object_or_404(Device, pk=pk)
@@ -279,7 +279,7 @@ def updateUnregisteredDevice(request, pk):
 
 @login_required
 def deleteUnregisteredDevice(request, pk):
-    if not request.user.is_superadmin:
+    if not request.user.is_superuser:
         return redirect('home')
 
     device = get_object_or_404(Device, pk=pk)
@@ -290,7 +290,7 @@ DEVICE_HEADER = ['ID #1', 'ID #2']
 
 @login_required
 def exportUnregisteredDevice(request):
-    if not request.user.is_superadmin:
+    if not request.user.is_superuser:
         return redirect('home')
 
     lst = Device.objects.filter(organization__isnull=True)
@@ -308,14 +308,14 @@ def exportUnregisteredDevice(request):
 
 @login_required
 def importUnregisteredDevicePreview(request):
-    if not request.user.is_superadmin:
+    if not request.user.is_superuser:
         return redirect('home')
 
     return importPreview(request, DEVICE_HEADER)
 
 @login_required
 def importUnregisteredDevice(request):
-    if not request.user.is_superadmin:
+    if not request.user.is_superuser:
         return redirect('home')
 
     if request.method == 'POST':
@@ -345,7 +345,7 @@ def importUnregisteredDevice(request):
 
 @login_required
 def listRegisteredDevice(request):
-    if not request.user.is_superadmin:
+    if not request.user.is_superuser:
         return redirect('home')
 
     devices = Device.objects.filter(organization__isnull=False)
@@ -356,7 +356,7 @@ def listRegisteredDevice(request):
 
 @login_required
 def editAdminMailTemplate(request):
-    if not request.user.is_superadmin:
+    if not request.user.is_superuser:
         return redirect('home')
 
     with open(ADMIN_MAIL_TEMPLATE_PATH, encoding="utf-8") as fi:
@@ -375,9 +375,9 @@ def editAdminMailTemplate(request):
 
 @login_required
 def editMailTemplate(request):
-    if not request.user.is_superadmin:
+    if not request.user.is_superuser:
         return redirect('home')
-        
+
     with open(MAIL_TEMPLATE_PATH, encoding="utf-8") as fi:
         mail_template = fi.read()
 
