@@ -1,0 +1,32 @@
+{% extends "../base.html" %}
+
+{% block sidebar %}
+{% with group=4 page=6 %}
+{{ block.super }}
+{% endwith %}
+{% endblock %}
+
+{% block content %}
+<div class="content p-3">
+  {%if saved%}
+  <span class="badge badge-success mb-3">Parameters successfully saved!</span>
+  {%endif%}
+  <form method="POST">
+    {% csrf_token %}
+    <table class="table">
+      {% for param in params %}
+      <tr>
+        <th style="width:30%">{{param.name}}:</th>
+        <td>
+          <input type='{{param.type}}' value='{{param.value}}' 
+            {%if param.min or param.min == 0 %} min='{{param.min}}' {%endif%}
+            {%if param.max %} max='{{param.max}}' {%endif%}
+            class="form-control" name='{{ param.key }}'>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>    
+    <button type="submit" class="btn btn-primary">Save</button>
+  </form>
+</div>
+{% endblock %}

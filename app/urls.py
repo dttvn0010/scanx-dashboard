@@ -5,9 +5,11 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('accounts/signup', views.signup),
     path('complete_registration', views.completeRegistration),
+    path('profile/update', views.updateAccount),
+    path('profile/change_password', views.changePassword),
 
     path('users', views_user.home, name='user-home'),
-
+    
     # Admin pages
     path('_admin', views_admin.listOrganization, name='admin-home'),
     path('_admin/organizations/add', views_admin.addOrganization),
@@ -17,10 +19,6 @@ urlpatterns = [
     path('_admin/organizations/import', views_admin.importOrganization),
     path('_admin/organizations/resend_mail/<int:pk>', views_admin.resendMail),
 
-    path('_admin/permissions', views_admin.listPermission, name='admin-permission'),
-    path('_admin/permissions/add', views_admin.addPermission),
-    path('_admin/permissions/update/<int:pk>', views_admin.updatePermission),    
-    
     path('_admin/devices/unregistered', views_admin.listUnregisteredDevice, name='admin-unregistered-device'),
     path('_admin/devices/unregistered/add', views_admin.addUnregisteredDevice),
     path('_admin/devices/unregistered/update/<int:pk>', views_admin.updateUnregisteredDevice),    
@@ -32,6 +30,7 @@ urlpatterns = [
 
     path('_admin/settings/admin_mail_template', views_admin.editAdminMailTemplate),
     path('_admin/settings/mail_template', views_admin.editMailTemplate),
+    path('_admin/settings/system_params', views_admin.editSystemParams),
 
     # Tenant pages
     path('staff', views_staff.tableView),
@@ -76,9 +75,6 @@ urlpatterns = [
 
     path('api/user/search', views_api.searchUser),
     path('api/user/delete/<int:pk>', views_api.deleteUser),
-
-    path('api/permission/search', views_api.searchPermission),
-    path('api/permission/delete/<int:pk>', views_api.deletePermission),
 
     path('api/device/unregistered/search', views_api.searchUnregisteredDevice),    
     path('api/device/registered/search', views_api.searchRegisteredDevice),

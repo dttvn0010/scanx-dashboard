@@ -109,9 +109,16 @@ def checkIn(request):
         return Response({'error': 'Device not registered yet'})
 
     lastCheckIn = CheckIn.objects.filter(user=request.user).order_by('-date').first()
-    minWaitTime = settings.SCANX.get('MIN_WAIT_TIME')
-    if lastCheckIn and minWaitTime:
+    delayParam = Parameter.objects.get(key='SCAN_TIME_DELAY')
+    
+    if lastCheckIn and delayParam and delayParam.value:
+        minWaitTime = float(delayParam.value)
+        
+        if minWaitTime == int(minWaitTime):
+            minWaitTime = int(minWaitTime)
+
         timediff = datetime.timestamp(datetime.now()) - datetime.timestamp(lastCheckIn.date)
+
         if timediff < minWaitTime * 60:
             return Response({'error': f'Please wait a minimum of {minWaitTime} minutes before next scan'})
         
@@ -165,7 +172,7 @@ def searchCheckIn(request):
 
     for item in data:
         item['user'] = f'{item["userFullName"]}'
-        item['location'] = f'{item["addressLine1"]}, {item["addressLine2"]}'
+        item['location'] = f'{item["addressLine1"]}, {item["addressLine2"]}, {item["postCode"]}, {item["city"]}'
         
         d = datetime.strptime(item['date'], "%d/%m/%Y %H:%M:%S")
         diff = datetime.now() - d        
@@ -210,7 +217,7 @@ def searchOrganization(request):
     data = OrganizationSerializer(organizations, many=True).data
 
     for i, org in enumerate(organizations):
-        staff = User.objects.filter(organization=org).filter(is_staff=True).first()
+        staff = User.objects.filter(organization=org).filter(role__code=settings.ROLES['ADMIN']).first()
         data[i]['admin'] = {'name': staff.fullname if staff else "", 'email': staff.email if staff else ""}
         data[i]['userCount'] = User.objects.filter(organization=org).count()
         data[i]['deviceCount'] = Device.objects.filter(organization=org).count()
@@ -252,15 +259,12 @@ def searchUser(request):
     users = User.objects.filter(organization=request.user.organization)
     recordsTotal = users.count()
 
-    users = users.filter(Q(fullname__contains=keyword) | Q(email__contains=keyword)).order_by('-createdDate')
+    users = users.filter(Q(fullname__contains=keyword) | Q(email__contains=keyword))
+    users = users.order_by('role__level', '-createdDate')
+    
     recordsFiltered = users.count()
     users = users[start:start+length]
     data = UserSerializer(users, many=True).data
-
-    staff = [item for item in data if item['is_staff']]
-    non_staff = [item for item in data if not item['is_staff']]
-
-    data = staff + non_staff
         
     return Response({
         "draw": draw,
@@ -277,38 +281,6 @@ def deleteUser(request, pk):
         return Response({'success': True})    
     except:
         return Response({'success': False, 'message': 'Cannot delete this user because some records depend on it'})
-
-# =================================================== Permission ======================================================
-@api_view(['GET'])
-def searchPermission(request):
-    draw = request.query_params.get('draw', 1)    
-    keyword = request.query_params.get('search[value]', '')
-    start = int(request.query_params.get('start', 0))
-    length = int(request.query_params.get('length', 0))
-    
-    permissions = Permission.objects.all()
-    recordsTotal = permissions.count()
-
-    permissions = permissions.filter(Q(name__contains=keyword) | Q(description__contains=keyword)).order_by('-createdDate')    
-    recordsFiltered = permissions.count()
-    permissions = permissions[start:start+length]
-    data = PermissionSerializer(permissions, many=True).data
-    
-    return Response({
-        "draw": draw,
-        "recordsTotal": recordsTotal,
-        "recordsFiltered": recordsFiltered,
-        "data": data
-    })     
-
-@api_view(['GET'])
-def deletePermission(request, pk):
-    try:
-        permission = Permission.objects.get(pk=pk)
-        permission.delete()
-        return Response({'success': True})
-    except:
-        return Response({'success': False, 'message': 'Cannot delete this permission because some records depend on it'})
 
 # =================================================== Device ======================================================
 
@@ -382,7 +354,7 @@ def searchDeviceByOrganization(request):
     data = DeviceSerializer(devices, many=True).data
 
     for item in data:
-        item['location'] = f'{item["addressLine1"]}, {item["addressLine2"]}'
+        item['location'] = f'{item["addressLine1"]}, {item["addressLine2"]}, {item["postCode"]}, {item["city"]}'
     
     return Response({
         "draw": draw,

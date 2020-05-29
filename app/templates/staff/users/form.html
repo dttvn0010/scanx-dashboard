@@ -8,7 +8,7 @@
 
 {% block content %}
 <div class="content p-3">
-  <form method="POST" novalidate> 
+  <form id="fmt" method="POST" novalidate> 
     {% csrf_token %}
     {% if edit_user %}
     <h5>
@@ -19,8 +19,20 @@
     </h5>
     {%endif%}
     <table class="table table-form mt-2">{{ form }}</table>
-    <button class="btn btn-primary" type="submit">Save</button>
+    <button id="btn_save" onclick="save()" class="btn btn-primary" type="button">Save</button>
     <a class="btn btn-secondary" href='/staff/users'>Back</a>
   </form>
 </div>
+<script>
+  function save() {
+    $('#btn_save').prop('disabled', true);
+    if($('#id_role').val() == '1') {
+      if(!confirm('This user will have complete access to all features of Dashboard (can add/remove users etc.). Do you want to continue')) {
+        $('#btn_save').prop('disabled', false);
+        return;
+      }
+    }
+    $('#fmt').submit();
+  }
+</script>
 {% endblock %}

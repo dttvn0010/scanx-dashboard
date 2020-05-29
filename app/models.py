@@ -13,17 +13,19 @@ class Organization(models.Model):
     def __str__(self):
         return self.name
 
-class Permission(models.Model):
-    name = models.CharField(max_length=200, unique=True)
+class Role(models.Model):
+    code = models.CharField(max_length=30, unique=True)
+    name = models.CharField(max_length=200)
+    level = models.IntegerField()
     description = models.CharField(max_length=500, blank=True, null=True)
-    accessFunctions = models.CharField(max_length=1000, blank=True)
-    viewFunctions = models.CharField(max_length=1000, blank=True)
-    editFunctions = models.CharField(max_length=1000, blank=True)
-    deleteFunctions = models.CharField(max_length=1000, blank=True)
-    createdDate = models.DateTimeField(null=True)
 
     def __str__(self):
-        return self.name
+        st = self.name
+
+        if self.description:
+            st += f'({self.description})'
+        
+        return st
 
 class User(AbstractUser):
     class Status:
@@ -32,7 +34,7 @@ class User(AbstractUser):
 
     organization = models.ForeignKey(Organization, blank=True, null=True, on_delete=models.CASCADE)
     fullname = models.CharField(verbose_name="Full Name", max_length=50, blank=True, null=True)
-    permissions = models.ManyToManyField(Permission)
+    role = models.ForeignKey(Role, null=True, on_delete=models.SET_NULL)
     nfcEnabled = models.BooleanField(verbose_name='NFC Enabled', blank=True, null=True)
     qrScanEnabled = models.BooleanField(verbose_name='QR Scanning Enabled', blank=True, null=True)
     sharedLocation = models.BooleanField(verbose_name='Geo Location Enabled', blank=True, null=True)
@@ -52,11 +54,12 @@ class Location(models.Model):
     addressLine1 = models.CharField(verbose_name="Address Line 1", max_length=100)
     addressLine2 = models.CharField(verbose_name="Address Line 2", max_length=100)
     postCode = models.CharField(verbose_name="Post Code", max_length=10)
+    city = models.CharField(verbose_name='City', max_length=50)
     geoLocation = models.CharField(verbose_name="Map Coordinates", max_length=30, null=True)
     createdDate = models.DateTimeField(null=True)
 
     def __str__(self):
-        return f'{self.addressLine1}, {self.addressLine2}'
+        return f'{self.addressLine1}, {self.addressLine2}, {self.postCode}, {self.city}'
 
 class Device(models.Model):
     organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, blank=True, null=True)    
@@ -79,3 +82,14 @@ class CheckIn(models.Model):
 class LogIn(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     date = models.DateTimeField()
+
+class Parameter(models.Model):
+    key = models.CharField(max_length=50, unique=True)
+    name = models.CharField(max_length=200)
+    type = models.CharField(max_length=50)
+    value = models.CharField(max_length=500, null=True, blank=True)
+    min = models.CharField(max_length=50, null=True, blank=True)  
+    max = models.CharField(max_length=50, null=True, blank=True)  
+
+    def __str__(self):
+        return self.name

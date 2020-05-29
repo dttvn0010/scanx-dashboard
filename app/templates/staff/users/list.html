@@ -81,7 +81,18 @@ $(document).ready(function() {
     "serverSide": true,
     "ajax": "/api/user/search",
     "columns": [
-      { "data": "fullname" },
+      { "data": "fullname",
+        render: function(data, type, row) {
+          var html = '';
+          if(row.profilePicture) {
+            html += `<img class="img-profile rounded-circle mr-2" src="/${ row.profilePicture }">`;
+          }else {
+            html += `<img class="img-profile rounded-circle mr-2" src="/static/img/user.png">`;
+          }
+          html += `<span>${data}</span>`;
+          return html;
+        } 
+      },
       { "data": "email" },
       { "data": "status", "render": function(data, type, row) {
           if(data == 0) return "Pending";
@@ -90,19 +101,22 @@ $(document).ready(function() {
       },      
       {
         render: function (data, type, row) {  
-          if(row.username == '{{ request.user.username }}'){
-            return `<a href="javascript:void(0)"><i class="fas fa-lock"></i></a>`;
+          var html = '';
+          if(row.role == 'ADMIN'){
+            html = `<a><i class="fas fa-lock"></i></a>`;
+          }else {
+            html = `<a title="Edit" href="/staff/users/update/${row['id']}"><i class="fas fa-edit"></i></a>&nbsp;&nbsp;`
+                    +`<a title="Delete" href="#" onclick="deleteItem(${row['id']})" ><i class="fas fa-trash" style="color:red"></i></a>`;
           }
           
-          var html = `<a title="Edit" href="/staff/users/update/${row['id']}"><i class="fas fa-edit"></i></a>&nbsp;&nbsp;`
-                    +`<a title="Delete" href="#" onclick="deleteItem(${row['id']})" ><i class="fas fa-trash" style="color:red"></i></a>`;
-
           if(row.status == 0) {
             html += `&nbsp;&nbsp;<a title="Resend invitation email" href="#" onclick="resendMail(${row['id']})" ><i class="fas fa-envelope"></i></a>`;
-          }else if(row.is_active) {
-            html += `&nbsp;&nbsp;<a title="Deactivate this user" href="#" onclick="lockUser(${row['id']})" ><i class="fas fa-ban"></i></a>`;
-          }else {
-            html += `&nbsp;&nbsp;<a title="Activate this user" href="#" onclick="unlockUser(${row['id']})" ><i class="fas fa-toggle-on"></i></a>`;
+          }else if(row.role != 'ADMIN') {
+            if(row.is_active) {
+              html += `&nbsp;&nbsp;<a title="Deactivate this user" href="#" onclick="lockUser(${row['id']})" ><i class="fas fa-ban"></i></a>`;
+            }else {
+              html += `&nbsp;&nbsp;<a title="Activate this user" href="#" onclick="unlockUser(${row['id']})" ><i class="fas fa-toggle-on"></i></a>`;
+            }
           }
 
           return html;

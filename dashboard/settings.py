@@ -155,6 +155,11 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
 }
 
-SCANX = {
-    'MIN_WAIT_TIME': 10 # Minutes
+ADMIN_MAIL_TEMPLATE_PATH = "static/templates/admin_invitation_mail.tmpl"
+MAIL_TEMPLATE_PATH = "static/templates/invitation_mail.tmpl"
+
+ROLES = {
+    'ADMIN': 'ADMIN',
+    'STAFF': 'STAFF',
+    'USER': 'USER'
 }

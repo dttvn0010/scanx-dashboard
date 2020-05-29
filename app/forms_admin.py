@@ -21,16 +21,6 @@ class OrganizationChangeForm(forms.ModelForm):
         model = Organization
         fields = ('name', 'nfcEnabled', 'qrScanEnabled', 'active')
 
-class PermissionForm(forms.ModelForm):
-    class Meta:
-        model = Permission
-        exclude = ('createdDate',)
-    
-    accessFunctions = forms.CharField(widget=forms.HiddenInput, required=False)
-    viewFunctions = forms.CharField(widget=forms.HiddenInput, required=False)
-    editFunctions = forms.CharField(widget=forms.HiddenInput, required=False)
-    deleteFunctions = forms.CharField(widget=forms.HiddenInput, required=False)
-
 class UnRegisteredDeviceForm(forms.ModelForm):
     class Meta:
         model = Device

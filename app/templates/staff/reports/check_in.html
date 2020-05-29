@@ -40,7 +40,7 @@
           <select name="locationId" class="form-control">
             <option value="">All Location</option>
             {% for l in locations %}
-              <option value="{{l.id}}" {% if locationId|add:0 == l.id %}selected{%endif%}>{{l.addressLine1}}, {{l.addressLine2}}</option>
+              <option value="{{l.id}}" {% if locationId|add:0 == l.id %}selected{%endif%}>{{l}}</option>
             {% endfor %}
           </select>
         </div>

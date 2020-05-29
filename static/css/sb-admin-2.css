@@ -10964,10 +10964,14 @@ a:focus {
   margin-top: -.25rem;
 }
 
-.sidebar .nav-item .nav-link .img-profile,
-.topbar .nav-item .nav-link .img-profile {
-  height: 3rem;
-  width: 3rem;
+.img-profile {
+  height: 3.5rem;
+  width: 3.5rem;
+}
+
+.img-profile-2 {
+  height: 5rem;
+  width: 5rem;
 }
 
 .topbar {

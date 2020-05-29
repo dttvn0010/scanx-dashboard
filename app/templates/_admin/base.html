@@ -1,15 +1,15 @@
 <meta charset="utf-8">
 <title>ScanX Cloud Dashboard</title>
-<link rel="/static/images/apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=XBb4w6pr3a">
-<link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon-32x32.png?v=XBb4w6pr3a">
-<link rel="icon" type="image/png" sizes="16x16" href="/static/images/favicon-16x16.png?v=XBb4w6pr3a">
-<link rel="manifest" href="/static/images/site.webmanifest?v=XBb4w6pr3a">
-<link rel="mask-icon" href="/static/images/safari-pinned-tab.svg?v=XBb4w6pr3a" color="#5bbad5">
-<link rel="shortcut icon" href="/static/images/favicon.ico?v=XBb4w6pr3a">
+<link rel="/static/img/apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=XBb4w6pr3a">
+<link rel="icon" type="image/png" sizes="32x32" href="/static/img/favicon-32x32.png?v=XBb4w6pr3a">
+<link rel="icon" type="image/png" sizes="16x16" href="/static/img/favicon-16x16.png?v=XBb4w6pr3a">
+<link rel="manifest" href="/static/img/site.webmanifest?v=XBb4w6pr3a">
+<link rel="mask-icon" href="/static/img/safari-pinned-tab.svg?v=XBb4w6pr3a" color="#5bbad5">
+<link rel="shortcut icon" href="/static/img/favicon.ico?v=XBb4w6pr3a">
 <meta name="apple-mobile-web-app-title" content="ScanX">
 <meta name="application-name" content="ScanX">
 <meta name="msapplication-TileColor" content="#da532c">
-<meta name="msapplication-TileImage" content="/static/images/mstile-144x144.png?v=XBb4w6pr3a">
+<meta name="msapplication-TileImage" content="/static/img/mstile-144x144.png?v=XBb4w6pr3a">
 <meta name="theme-color" content="#000000">
 
 <link href="/static/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
@@ -37,16 +37,9 @@
 
       <hr class="sidebar-divider">
 
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true">
-          <span>Users & Organizations</span>
-        </a>
-        <div id="collapseOne" class="collapse {% if group == 1%}show{%endif%}" data-parent="#accordionSidebar">
-          <div class="bg-white py-2 collapse-inner rounded">
-            <a class="collapse-item {% if page == 1 %} active {%endif%}" href="/_admin">Organizations</a>
-            <a class="collapse-item {% if page == 2 %} active {%endif%}" href="/_admin/permissions">Permissions</a>
-          </div>
-        </div>
+      <li class="nav-item {% if page == 1 %} active {%endif%}">
+        <a class="nav-link" href="/_admin">
+          <span>Organizations</span></a>
       </li>
 
       <hr class="sidebar-divider">
@@ -57,8 +50,8 @@
         </a>
         <div id="collapseTwo" class="collapse {% if group == 2%}show{%endif%}" data-parent="#accordionSidebar">
           <div class="bg-white py-2 collapse-inner rounded">
-            <a class="collapse-item {% if page == 3 %} active {%endif%}" href="/_admin/devices/unregistered">Unregistered Devices</a>
-            <a class="collapse-item {% if page == 4 %} active {%endif%}" href="/_admin/devices/registered">Registered Devices</a>
+            <a class="collapse-item {% if page == 2 %} active {%endif%}" href="/_admin/devices/unregistered">Unregistered Devices</a>
+            <a class="collapse-item {% if page == 3 %} active {%endif%}" href="/_admin/devices/registered">Registered Devices</a>
           </div>
         </div>
       </li>
@@ -71,8 +64,9 @@
         </a>
         <div id="collapseThree" class="collapse {% if group == 4%}show{%endif%}" data-parent="#accordionSidebar">
           <div class="bg-white py-2 collapse-inner rounded">
-            <a class="collapse-item {% if page == 5 %} active {%endif%}" href="/_admin/settings/admin_mail_template">Admin Mail template</a>
-            <a class="collapse-item {% if page == 6 %} active {%endif%}" href="/_admin/settings/mail_template">Mail template</a>
+            <a class="collapse-item {% if page == 4 %} active {%endif%}" href="/_admin/settings/admin_mail_template">Admin Mail template</a>
+            <a class="collapse-item {% if page == 5 %} active {%endif%}" href="/_admin/settings/mail_template">Mail template</a>
+            <a class="collapse-item {% if page == 6 %} active {%endif%}" href="/_admin/settings/system_params">System parameters</a>
           </div>
         </div>
       </li>
@@ -94,13 +88,18 @@
             <li class="nav-item d-flex mr-4">
               <span class="align-self-center">Last Login: {{ user.last_login|date:"d/m/Y H:i:s" }}</span>
             </li>
-            <li class="nav-item dropdown no-arrow">
-              <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" aria-haspopup="true"
+            <li class="nav-item dropdown no-arrow d-flex">
+              <span class="mr-2 align-self-center">{{ user.fullname|default:'' }}</span>              
+              <a class="p-0 nav-link dropdown-toggle" href="#" data-toggle="dropdown" aria-haspopup="true"
                 aria-expanded="false">
-                <img class="img-profile rounded-circle" src="/static/img/user.svg">
+                {% if user.profilePicture %}
+                  <img class="img-profile rounded-circle" src="/{{ user.profilePicture.url }}">
+                {%else%}
+                  <img class="img-profile rounded-circle" src="/static/img/user.png">
+                {%endif%}
               </a>
               <div class="dropdown-menu dropdown-menu-right">
-                <a class="dropdown-item" href="#">
+                <a class="dropdown-item" href="/profile/update">
                   <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                   Profile
                 </a>

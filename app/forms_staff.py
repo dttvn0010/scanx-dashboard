@@ -4,7 +4,7 @@ from .models import *
 class UserCreateForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ('fullname', 'email', 'nfcEnabled', 'qrScanEnabled', 'sharedLocation', 'permissions')
+        fields = ('fullname', 'email', 'nfcEnabled', 'qrScanEnabled', 'sharedLocation', 'role')
 
     fullname = forms.CharField(max_length=30, label="Full Name")
     email = forms.EmailField(max_length=50, label="Email address")
@@ -23,7 +23,7 @@ class UserCreateForm(forms.ModelForm):
 class UserChangeForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ( 'nfcEnabled', 'qrScanEnabled', 'sharedLocation', 'permissions')
+        fields = ( 'nfcEnabled', 'qrScanEnabled', 'sharedLocation', 'role')
 
     nfcEnabled = forms.BooleanField(label='NFC Enabled', required=False)
     qrScanEnabled = forms.BooleanField(label='QR Scanning Enabled', required=False)

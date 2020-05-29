@@ -5,6 +5,7 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.signals import user_logged_in
+from django.conf import settings
 
 from datetime import datetime
 import string
@@ -15,9 +16,7 @@ from threading import Thread
 
 from .models import *
 from .forms import *
-from .consts import MAIL_TEMPLATE_PATH
 from .mail_utils import sendAdminInvitationMail, sendInvitationMail
-from .permissions import PERMISSIONS
 
 def logInHook(sender, user, request, **kwargs):
     logIn = LogIn()
@@ -34,7 +33,7 @@ def home(request):
     else:
         if(request.user.status == User.Status.INVITED):
             return HttpResponseRedirect("/complete_registration")
-        elif request.user.is_staff:
+        elif request.user.role and request.user.role.code in [settings.ROLES['ADMIN'], settings.ROLES['STAFF']]:
             return HttpResponseRedirect("/staff")
         else:
             return HttpResponseRedirect("/users")
@@ -84,3 +83,42 @@ def signup(request):
    return render(request, 'registration/signup.html', { 'form':  form})
 
 
+
+def updateAccount(request):
+    form = UpdateAccountForm(initial={
+            'fullname': request.user.fullname, 
+            'email': request.user.email
+        })
+
+    if request.method == 'POST':
+        form = UpdateAccountForm(request.POST, request.FILES, initial={'email': request.user.email})
+        if form.is_valid():
+            user = request.user
+            user.username = form.cleaned_data['email']
+            user.email = form.cleaned_data['email']
+            user.fullname = form.cleaned_data['fullname']
+            if form.cleaned_data['profilePicture']:
+                user.profilePicture = form.cleaned_data['profilePicture']
+            user.save()
+            
+            return HttpResponseRedirect("/")
+
+    return render(request, 'profile/update_account.html', {'form': form})
+
+def changePassword(request):
+    form = ChangePasswordForm(initial={'user': request.user})
+
+    if request.method == 'POST':
+        form = ChangePasswordForm(request.POST, initial={'user': request.user})
+        if form.is_valid():
+            user = request.user
+            user.password = make_password(form.cleaned_data['password'])
+            user.save()
+            
+            user = authenticate(username=user.username,
+                                    password=form.cleaned_data['password'])
+            login(request, user)
+
+            return HttpResponseRedirect("/")
+
+    return render(request, 'profile/change_password.html', {'form': form})

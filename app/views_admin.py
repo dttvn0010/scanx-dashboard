@@ -1,8 +1,10 @@
 from django.shortcuts import render, get_object_or_404, HttpResponse, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password
+from django.conf import settings
 
 import csv
+import json
 from datetime import datetime
 from threading import Thread
 
@@ -12,8 +14,6 @@ from .forms_admin import *
 from .user_utils import genPassword
 from .import_utils import getPermutation, importPreview
 from .mail_utils import sendAdminInvitationMail
-from .permissions import PERMISSIONS
-from .consts import MAIL_TEMPLATE_PATH, ADMIN_MAIL_TEMPLATE_PATH
 
 def createTenantAdmin(request, organization, adminName, adminEmail):
     if adminEmail == "":
@@ -26,7 +26,7 @@ def createTenantAdmin(request, organization, adminName, adminEmail):
     user.status = User.Status.INVITED
     user.createdDate = datetime.now()
     user.organization = organization
-    user.is_staff = True
+    user.role = Role.objects.get(code=settings.ROLES['ADMIN'])
     user.save()
 
     hostURL = request.build_absolute_uri('/')    
@@ -87,7 +87,7 @@ def resendMail(request, pk):
         return redirect('login')
 
     org = get_object_or_404(Organization, pk=pk)
-    staff = User.objects.filter(organization=org).filter(is_staff=True).first()
+    admin = User.objects.filter(organization=org).filter(role__code=settings.ROLES['ADMIN']).first()
     if staff and staff.status == User.Status.INVITED:
         hostURL = request.build_absolute_uri('/')    
         password = genPassword()
@@ -112,7 +112,7 @@ def exportOrganization(request):
         writer = csv.writer(fo)
         writer.writerow(ORG_HEADER)
         for item in lst:
-            staff = User.objects.filter(organization=item).filter(is_staff=True).first()
+            staff = User.objects.filter(organization=item).filter(role__code=settings.ROLES['ADMIN']).first()
             adminName = staff.fullname if staff else ''
             adminEmail = staff.email if staff else ''
             writer.writerow([item.name, adminName, adminEmail, item.nfcEnabled, item.qrScanEnabled, item.active])
@@ -160,77 +160,6 @@ def importOrganization(request):
         del request.session['records']
     
     return redirect('admin-home')
-
-#================================= Permission ====================================================================
-@login_required
-def listPermission(request):
-    if not request.user.is_superuser:
-        return redirect('login')
-
-    return render(request, "_admin/permissions/list.html")
-
-def splitToIntArr(st):
-    if st:
-        arr = st.split(',')
-        return [int(x) for x in arr]
-
-    return []
-
-def getPermissionDetail(permission):
-    if not permission:
-        return [{'permission': p['name']} for p in PERMISSIONS]
-        
-    details = {}
-    accessFunctions = splitToIntArr(permission.accessFunctions)
-    viewFunctions = splitToIntArr(permission.viewFunctions)
-    editFunctions = splitToIntArr(permission.editFunctions)
-    deleteFunctions = splitToIntArr(permission.deleteFunctions)
-    
-    safe_get = lambda arr, i : arr[i] if i < len(arr) else 0
-
-    return [
-        {
-            'permission': PERMISSIONS[i]['name'],
-            'access': safe_get(accessFunctions,i),
-            'view': safe_get(viewFunctions,i),
-            'edit': safe_get(editFunctions,i),
-            'delete': safe_get(deleteFunctions,i),
-        }
-        for i in range(len(PERMISSIONS))
-    ]
-
-@login_required
-def addPermission(request):
-    if not request.user.is_superuser:
-        return redirect('login')
-
-    form = PermissionForm()
-
-    if request.method == 'POST':
-        form = PermissionForm(request.POST)
-        if form.is_valid():
-            permission = form.save(commit=False)
-            permission.createdDate = datetime.now()
-            permission.save()
-            return redirect('admin-permission')
-
-    return render(request, '_admin/permissions/form.html', 
-            {'form': form, 'details': getPermissionDetail(None)})
-
-@login_required
-def updatePermission(request, pk):
-    permission = get_object_or_404(Permission, pk=pk)
-    form = PermissionForm(instance=permission)
-
-    if request.method == 'POST':
-        form = PermissionForm(request.POST, instance=permission)
-        if form.is_valid():
-            form.save()
-            return redirect('admin-permission')
-
-    return render(request, '_admin/permissions/form.html', 
-                {'form': form, 'details': getPermissionDetail(permission)})
-
 
 # ========================================== Unregistered devices ==========================================
 
@@ -359,14 +288,14 @@ def editAdminMailTemplate(request):
     if not request.user.is_superuser:
         return redirect('login')
 
-    with open(ADMIN_MAIL_TEMPLATE_PATH, encoding="utf-8") as fi:
+    with open(settings.ADMIN_MAIL_TEMPLATE_PATH, encoding="utf-8") as fi:
         admin_mail_template = fi.read()
 
     saved = False
 
     if request.method == 'POST':
         admin_mail_template = request.POST["admin_mail_template"]
-        with open(ADMIN_MAIL_TEMPLATE_PATH, 'w', encoding="utf-8", newline="") as fo:
+        with open(settings.ADMIN_MAIL_TEMPLATE_PATH, 'w', encoding="utf-8", newline="") as fo:
             fo.write(admin_mail_template.replace("\n\n", "\n"))
             saved = True        
     
@@ -378,16 +307,40 @@ def editMailTemplate(request):
     if not request.user.is_superuser:
         return redirect('login')
 
-    with open(MAIL_TEMPLATE_PATH, encoding="utf-8") as fi:
+    with open(settings.MAIL_TEMPLATE_PATH, encoding="utf-8") as fi:
         mail_template = fi.read()
 
     saved = False
 
     if request.method == 'POST':
         mail_template = request.POST["mail_template"]
-        with open(MAIL_TEMPLATE_PATH, 'w', encoding="utf-8", newline="") as fo:
+        with open(settings.MAIL_TEMPLATE_PATH, 'w', encoding="utf-8", newline="") as fo:
             fo.write(mail_template.replace("\n\n", "\n"))
             saved = True        
     
     return render(request, "_admin/settings/mail_template.html", 
             {"mail_template": mail_template, "saved": saved})    
+
+@login_required
+def editSystemParams(request):
+    if not request.user.is_superuser:
+        return redirect('login')
+
+    params = Parameter.objects.all()
+
+    saved = False
+
+    if request.method == 'POST':
+        for key in request.POST:
+            value = request.POST[key]
+            for p in params:
+                if p.key == key:                    
+                    p.value = value
+
+        for param in params:
+            param.save()
+            
+        saved = True
+
+    return render(request, "_admin/settings/system_params.html", 
+                                {"params": params, "saved": saved}) 

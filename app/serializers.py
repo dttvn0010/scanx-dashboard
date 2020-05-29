@@ -7,25 +7,23 @@ class OrganizationSerializer(ModelSerializer):
         fields = '__all__'
 
 class UserSerializer(ModelSerializer):
+    role = CharField(source='role.code', default="")
+
     class Meta:
         model = User
-        fields = '__all__'
-
-class PermissionSerializer(ModelSerializer):
-    class Meta:
-        model = Permission
         fields = '__all__'
 
 class DeviceSerializer(ModelSerializer):
     organizationName = CharField(source='organization.name', default="")
     addressLine1 = CharField(source='installationLocation.addressLine1', default="")
     addressLine2 = CharField(source='installationLocation.addressLine2', default="")
+    postCode = CharField(source='installationLocation.postCode', default="")
+    city = CharField(source='installationLocation.city', default="")
     registeredDate = DateTimeField(format="%d %b,%Y", required=False, read_only=True)
-
-
+    
     class Meta:
         model = Device
-        fields = ('id', 'addressLine1', 'addressLine2', 'organizationName', 'id1', 'id2', 'enabled', 'registeredDate') 
+        fields = ('id', 'addressLine1', 'addressLine2', 'postCode', 'city', 'organizationName', 'id1', 'id2', 'enabled', 'registeredDate') 
 
 class LocationSerializer(ModelSerializer):
     class Meta:
@@ -37,11 +35,13 @@ class CheckInSerializer(ModelSerializer):
     username = CharField(source='user.username', default="")
     addressLine1 = CharField(source='location.addressLine1', default="")
     addressLine2 = CharField(source='location.addressLine2', default="")
+    postCode = CharField(source='location.postCode', default="")
+    city = CharField(source='location.city', default="")
     geoLocation = CharField(source='location.geoLocation', default="")
     date = DateTimeField(format="%d/%m/%Y %H:%M:%S", required=False, read_only=True)
     class Meta:
         model = CheckIn
-        fields = ('username', 'userFullName', 'addressLine1', 'addressLine2', 'geoLocation', 'date',)
+        fields = ('username', 'userFullName', 'addressLine1', 'addressLine2', 'postCode', 'city', 'geoLocation', 'date',)
 
 class LogInSerializer(ModelSerializer):    
     userFullName = CharField(source='user.fullname', default="")

@@ -82,7 +82,7 @@
         </div>
 
         <div class="modal-body">
-          <form id="fmt3" method="POST">
+          <form id="fmt3" method="POST" onkeydown="return event.key != 'Enter';">
             {%csrf_token%}
             <input type="hidden" id="orgId">
             <div class="row">

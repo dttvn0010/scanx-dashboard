@@ -73,6 +73,7 @@ def addUser(request):
             user.nfcEnabled = form.cleaned_data['nfcEnabled']
             user.qrScanEnabled = form.cleaned_data['qrScanEnabled']
             user.sharedLocation = form.cleaned_data['sharedLocation']
+            user.role = pk=form.cleaned_data['role']
             user.save()
             return redirect('staff-user')
 
