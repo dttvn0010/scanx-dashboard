@@ -104,7 +104,7 @@ def deleteUser(request, pk):
     user.delete()
     return redirect("staff-user")
 
-USER_HEADER = ['Full Name', 'Email', 'NFC Enabled', 'QR Scan Enabled', 'Location Shared']
+USER_HEADER = ['Full Name', 'Email', 'Role', 'NFC Enabled', 'QR Scan Enabled', 'Location Shared']
 
 @login_required
 def exportUser(request):
@@ -116,7 +116,8 @@ def exportUser(request):
         writer = csv.writer(fo)
         writer.writerow(USER_HEADER)
         for item in lst:
-            writer.writerow([item.fullname, item.email, item.nfcEnabled, item.qrScanEnabled, item.sharedLocation])
+            role = item.role.code if item.role else ''
+            writer.writerow([item.fullname, item.email, role, item.nfcEnabled, item.qrScanEnabled, item.sharedLocation])
 
     csv_file = open('users.csv', 'rb')
     response = HttpResponse(content=csv_file)
@@ -144,11 +145,12 @@ def importUser(request):
             indexes[i] = int(request.POST.get(f'col_{i}', '0'))
         
         for row in records:
-            fullname, email, nfcEnabled, qrScanEnabled, sharedLocation  = getPermutation(row, indexes)
+            fullname, email, role, nfcEnabled, qrScanEnabled, sharedLocation  = getPermutation(row, indexes)
             if User.objects.filter(email=email).count() > 0 or User.objects.filter(fullname=fullname).count() > 0:
                 continue
 
             user = createUser(request, fullname, email)
+            user.role = Role.objects.get(code=role)
             user.nfcEnabled = nfcEnabled == 'True'
             user.qrScanEnabled = qrScanEnabled == 'True'
             user.sharedLocation = sharedLocation == 'True'
@@ -237,7 +239,7 @@ def updateLocation(request, pk):
 
     return render(request, 'staff/locations/form.html', {'form': form})
 
-LOCATION_HEADER = ['Address Line 1', 'Address Line 2', 'Postcode', 'Geo Location']
+LOCATION_HEADER = ['Address Line 1', 'Address Line 2', 'Postcode', 'City', 'Geo Location']
 
 @login_required
 def exportLocation(request):
@@ -249,7 +251,7 @@ def exportLocation(request):
         writer = csv.writer(fo)
         writer.writerow(LOCATION_HEADER)
         for item in lst:
-            writer.writerow([item.addressLine1, item.addressLine2, item.postCode, item.geoLocation])
+            writer.writerow([item.addressLine1, item.addressLine2, item.postCode, item.city, item.geoLocation])
 
     csv_file = open('location.csv', 'rb')
     response = HttpResponse(content=csv_file)
@@ -283,7 +285,7 @@ def importLocation(request):
             indexes[i] = int(request.POST.get(f'col_{i}', '0'))
         
         for row in records:                        
-            addressLine1, addressLine2, postCode, geoLocation = row
+            addressLine1, addressLine2, postCode, city, geoLocation = row
             
             if Location.objects.filter(postCode=postCode).count() > 0:
                 continue
@@ -292,6 +294,7 @@ def importLocation(request):
             location.addressLine1 = addressLine1
             location.addressLine2 = addressLine2
             location.postCode = postCode
+            location.city = city
             location.organization = request.user.organization
             location.geoLocation = geoLocation
             location.createdDate = datetime.now()

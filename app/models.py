@@ -19,6 +19,9 @@ class Role(models.Model):
     level = models.IntegerField()
     description = models.CharField(max_length=500, blank=True, null=True)
 
+    class Meta:
+        ordering = ["level"]
+        
     def __str__(self):
         st = self.name
 
@@ -26,6 +29,7 @@ class Role(models.Model):
             st += f'({self.description})'
         
         return st
+        
 
 class User(AbstractUser):
     class Status:
@@ -77,6 +81,7 @@ class CheckIn(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     location = models.ForeignKey(Location, on_delete=models.CASCADE)
     device = models.ForeignKey(Device, null=True, on_delete=models.SET_NULL)
+    geoLocation = models.CharField(max_length=50, null=True)
     date = models.DateTimeField()
 
 class LogIn(models.Model):

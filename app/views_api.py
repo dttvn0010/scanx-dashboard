@@ -95,18 +95,31 @@ def searchLogIn(request):
 @api_view(['POST'])
 @permission_classes((IsAuthenticated,))
 def checkIn(request):
+    print('======', request.data)
+
     code = request.data.get("code")
+    position = request.data.get("position")
+
     arr = code.split('-')
     if len(arr) != 3 or arr[0] != "SCANX":
-        return Response({'error': 'Invalid device code'})
+        return Response({
+            'success': False, 
+            'error': f'{code}: Invalid device code!'
+        })
     
     id1, id2 = arr[1:]
     device = Device.objects.filter(id1=id1).filter(id2=id2).first()
     if not device:
-        return Response({'error': 'Unknown device'})
+        return Response({
+            'success': False, 
+            'error': f'Device {id1}-{id2} does not exist in device table - please contact admin!'
+        })
 
     if not device.installationLocation:
-        return Response({'error': 'Device not registered yet'})
+        return Response({
+            'success': False, 
+            'error': f'Device {id1}-{id2} is unregistered - please contact admin!'
+        })
 
     lastCheckIn = CheckIn.objects.filter(user=request.user).order_by('-date').first()
     delayParam = Parameter.objects.get(key='SCAN_TIME_DELAY')
@@ -120,16 +133,31 @@ def checkIn(request):
         timediff = datetime.timestamp(datetime.now()) - datetime.timestamp(lastCheckIn.date)
 
         if timediff < minWaitTime * 60:
-            return Response({'error': f'Please wait a minimum of {minWaitTime} minutes before next scan'})
+            return Response({
+                'success': False, 
+                'error': f'Please wait a minimum of {minWaitTime} minutes before next scan'
+            })
         
     checkIn = CheckIn()
     checkIn.location = device.installationLocation
     checkIn.device = device
     checkIn.user = request.user
     checkIn.date = datetime.now()
+
+    if position:
+        lat = position.get("lat", "")
+        lng = position.get("lng", "")
+        checkIn.geoLocation = f"{lat},{lng}"
+        
     checkIn.save()
 
-    return Response({'device': f'{device.id1}-{device.id2}', 'location': str(device.installationLocation)})
+    deviceId = f'{device.id1}-{device.id2}'
+    location = str(device.installationLocation)
+
+    return Response({
+        'success': True, 
+        'message': f'Successfully Scanned Device: {deviceId}, location : {location}'
+    })
 
 @api_view(['GET'])
 def searchCheckIn(request):
