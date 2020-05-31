@@ -11,10 +11,10 @@ INVITE_TITLE = 'Invitation to join ScanX'
 SMTP_PORT = 465 
 SMTP_SERVER = "smtp.gmail.com"
 SENDER_EMAIL = "ScanX <contact@scanx.cloud>"
-GMAIL = "dttvn0010@gmail.com"
-GMAIL_PASS = "Ab01234567"
+GMAIL = "scanx.cloud@gmail.com"
+GMAIL_PASS = "abc@123@def"
 
-def sendMail(fro, to, subject, body):
+def sendMail2(fro, to, subject, body):
     print('===============', body)
 
     proc = subprocess.Popen(['mail',
@@ -25,9 +25,9 @@ def sendMail(fro, to, subject, body):
     proc.stdin.write(body.encode())
     proc.stdin.close()
 
-def sendMail2(fro, to, subject, body):
-    context = ssl.create_default_context()
-
+def sendMail(fro, to, subject, body):
+    print('===============', body)
+   
     msg = MIMEMultipart('alternative')
     msg['Subject'] = subject
     msg['From'] = fro
