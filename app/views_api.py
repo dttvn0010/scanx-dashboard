@@ -200,7 +200,7 @@ def searchCheckIn(request):
 
     for item in data:
         item['user'] = f'{item["userFullName"]}'
-        item['location'] = f'{item["addressLine1"]}, {item["addressLine2"]}, {item["postCode"]}, {item["city"]}'
+        item['location'] = f'{item["addressLine1"]}, {item["addressLine2"]}, {item["city"]}, {item["postCode"]}'
         
         d = datetime.strptime(item['date'], "%d/%m/%Y %H:%M:%S")
         diff = datetime.now() - d        
@@ -382,7 +382,7 @@ def searchDeviceByOrganization(request):
     data = DeviceSerializer(devices, many=True).data
 
     for item in data:
-        item['location'] = f'{item["addressLine1"]}, {item["addressLine2"]}, {item["postCode"]}, {item["city"]}'
+        item['location'] = f'{item["addressLine1"]}, {item["addressLine2"]}, {item["city"]}, {item["postCode"]}'
     
     return Response({
         "draw": draw,

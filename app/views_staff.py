@@ -251,7 +251,7 @@ def exportLocation(request):
         writer = csv.writer(fo)
         writer.writerow(LOCATION_HEADER)
         for item in lst:
-            writer.writerow([item.addressLine1, item.addressLine2, item.postCode, item.city, item.geoLocation])
+            writer.writerow([item.addressLine1, item.addressLine2, item.city, item.postCode, item.geoLocation])
 
     csv_file = open('location.csv', 'rb')
     response = HttpResponse(content=csv_file)
@@ -285,7 +285,7 @@ def importLocation(request):
             indexes[i] = int(request.POST.get(f'col_{i}', '0'))
         
         for row in records:                        
-            addressLine1, addressLine2, postCode, city, geoLocation = row
+            addressLine1, addressLine2, city, postCode, geoLocation = row
             
             if Location.objects.filter(postCode=postCode).count() > 0:
                 continue

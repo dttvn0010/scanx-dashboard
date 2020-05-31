@@ -63,7 +63,7 @@ class Location(models.Model):
     createdDate = models.DateTimeField(null=True)
 
     def __str__(self):
-        return f'{self.addressLine1}, {self.addressLine2}, {self.postCode}, {self.city}'
+        return f'{self.addressLine1}, {self.addressLine2}, {self.city}, {self.postCode}'
 
 class Device(models.Model):
     organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, blank=True, null=True)    

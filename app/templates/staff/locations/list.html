@@ -25,9 +25,10 @@
       <tr>
         <th style="width: 22%;">Address Line 1</th>
         <th style="width: 22%;">Address Line 2</th>
-        <th style="width: 22%;">Post Code</th>
-        <th style="width: 22%;">Map Coordinates</th>
-        <th style="width: 12%;"></th>
+        <th style="width: 15%;">City</th>
+        <th style="width: 15%;">Post Code</th>
+        <th style="width: 15%;">Map Coordinates</th>
+        <th style="width: 11%;"></th>
       </tr>
     </thead>
   </table>
@@ -80,6 +81,7 @@ $(document).ready(function() {
     "columns": [
       { "data": "addressLine1" },
       { "data": "addressLine2" },
+      { "data": "city" },
       { "data": "postCode" },
       { "data": "geoLocation" },      
       {
