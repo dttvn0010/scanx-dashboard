@@ -88,12 +88,12 @@ def resendMail(request, pk):
 
     org = get_object_or_404(Organization, pk=pk)
     admin = User.objects.filter(organization=org).filter(role__code=settings.ROLES['ADMIN']).first()
-    if staff and staff.status == User.Status.INVITED:
+    if admin and admin.status == User.Status.INVITED:
         hostURL = request.build_absolute_uri('/')    
         password = genPassword()
-        staff.password = make_password(password)
-        staff.save()
-        sendAdminInvitationMail(hostURL, org.name, staff.fullname, staff.email, password)
+        admin.password = make_password(password)
+        admin.save()
+        sendAdminInvitationMail(hostURL, org.name, admin.fullname, admin.email, password)
         #thr = Thread(target=sendAdminInvitationMail, args=(hostURL, org.name, staff.fullname, staff.email, password))
         #thr.start()
     
