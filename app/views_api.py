@@ -164,7 +164,8 @@ def checkIn(request):
 def getLastCheckInTime(request):
     lastCheckIn = CheckIn.objects.order_by('-date').first()
     if lastCheckIn:
-        return Response({'time': lastCheckIn.date.strftime('%d/%m/%Y %H:%M:%S')})
+        lastUpdated = lastCheckIn.date.replace(tzinfo=None)
+        return Response({'time': lastUpdated.strftime('%d/%m/%Y %H:%M:%S')})
     else:
         return Response({'time': ''})
 
