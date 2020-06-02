@@ -172,17 +172,19 @@ def getLastCheckInTime(request):
 @api_view(['GET'])
 @permission_classes((IsAuthenticated,))
 def checkForNewCheckIn(request):
-    lastUpdated = request.GET.get('last_updated')
+    lastUpdated = request.GET.get('last_updated', '')
     updated = False
-    if lastUpdated:
-        lastUpdated = datetime.strptime(lastUpdated, '%d/%m/%Y %H:%M:%S')
-        lastCheckIn = CheckIn.objects.order_by('-date').first()
-        if lastCheckIn:
-            lastCheckInDate = CheckInSerializer(lastCheckIn).data['date']
-            lastCheckInDate = datetime.strptime(lastCheckInDate, '%d/%m/%Y %H:%M:%S')
-            updated = lastCheckInDate > lastUpdated
 
-    return Response({'updated': updated})
+    if lastUpdated != '':
+        lastUpdatedTime = datetime.strptime(lastUpdated, '%d/%m/%Y %H:%M:%S')
+        lastCheckIn = CheckIn.objects.order_by('-date').first()
+
+        if lastCheckIn:
+            lastUpdated = lastCheckInDate = CheckInSerializer(lastCheckIn).data['date']
+            lastCheckInDate = datetime.strptime(lastCheckInDate, '%d/%m/%Y %H:%M:%S')
+            updated = lastCheckInDate > lastUpdatedTime
+
+    return Response({'updated': updated, 'lastUpdated': lastUpdated})
 
 @api_view(['GET'])
 def searchCheckIn(request):
