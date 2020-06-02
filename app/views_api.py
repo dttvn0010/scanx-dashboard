@@ -164,7 +164,7 @@ def checkIn(request):
 def getLastCheckInTime(request):
     lastCheckIn = CheckIn.objects.order_by('-date').first()
     if lastCheckIn:
-        lastUpdated = lastCheckIn.date.replace(tzinfo='Europe/London')
+        lastUpdated = lastCheckIn.date.replace(tzinfo=timezone(settings.TIME_ZONE))
         return Response({'time': lastUpdated.strftime('%d/%m/%Y %H:%M:%S')})
     else:
         return Response({'time': ''})
@@ -178,7 +178,7 @@ def checkForNewCheckIn(request):
         lastUpdated = datetime.strptime(lastUpdated, '%d/%m/%Y %H:%M:%S');
         lastCheckIn = CheckIn.objects.order_by('-date').first()
         if lastCheckIn:
-            updated = lastCheckIn.date.replace(tzinfo='Europe/London') > lastUpdated
+            updated = lastCheckIn.date.replace(tzinfo=timezone(settings.TIME_ZONE)) > lastUpdated
 
     return Response({'updated': updated})
 
