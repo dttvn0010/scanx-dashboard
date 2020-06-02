@@ -15,34 +15,66 @@
 
 <script>
   var map;
+  var markers = [];
+
+  function removeMarkers() {
+    for (var i = 0; i < markers.length; i++) {
+      markers[i].setMap(null);
+    }
+  }
+
+  function addMarker(item) {
+    var marker =  new google.maps.Marker({ 
+        position: item.geoLocation, map: map, 
+        title: `${item.user}` 
+      });
+    
+    var infowindow = new google.maps.InfoWindow({
+      content: 
+      `<div>
+        <div class="d-flex justify-content-center"><div class="flex-column">${item.user}</div></div>
+        <div class="mt-2 d-flex"><div class="flex-column">${item.date} (${item.datediff} ago)</div></div>
+      </div>`
+    });
+
+    marker.addListener('click', function() {
+      infowindow.open(map, marker);
+    });
+    markers.push(marker);
+  }
+  
   async function initMap() {
-    var response = await fetch('/api/checkin/search?start=0&length=10');
+    var response = await fetch('/api/checkin/search?start=0&length=20');
     var result = await response.json();
     var items = result.data;
 
     var position = items.length > 0? items[0].geoLocation : { lat: 52.479865, lng: -1.911067 };
 
     map = new google.maps.Map(document.getElementById('map'), { zoom: 16, center: position });
-    items.forEach(item => {
-        var marker =  new google.maps.Marker({ 
-            position: item.geoLocation, map: map, 
-            title: `${item.user}` 
-          });
-        
-        var infowindow = new google.maps.InfoWindow({
-          content: 
-          `<div>
-            <div class="d-flex justify-content-center"><div class="flex-column">${item.user}</div></div>
-            <div class="mt-2 d-flex"><div class="flex-column">${item.date} (${item.datediff} ago)</div></div>
-          </div>`
-        });
-
-        marker.addListener('click', function() {
-          infowindow.open(map, marker);
-        });
-      }
-    );
+    items.forEach(item => addMarker(item));
   }
+
+  $(document).ready(function() {
+    var lastUpdated = "";
+    
+    $.get('/api/checkin/last_updated', (data, status) => {
+      lastUpdated = data.time;    
+    });
+
+    setInterval(function(){
+      var url = '/api/checkin/check_for_update?last_updated=' + lastUpdated;
+      $.get(url, async function(data, status){
+        if(data.updated) {
+          var response = await fetch('/api/checkin/search?start=0&length=20');
+          var result = await response.json();
+          var items = result.data;
+
+          removeMarkers();
+          items.forEach(item => addMarker(item));
+        }
+      });
+    }, 3000);
+  });
 </script>
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBR8gU4Te36NCYlc2ZdynsOWQOS03lzWKc&callback=initMap"></script>
 {% endblock %}
