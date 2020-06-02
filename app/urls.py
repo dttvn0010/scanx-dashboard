@@ -69,6 +69,8 @@ urlpatterns = [
 
     path('api/checkin', views_api.checkIn),
     path('api/checkin/search', views_api.searchCheckIn),
+    path('api/checkin/last_updated', views_api.getLastCheckInTime),
+    path('api/checkin/check_for_update', views_api.checkForNewCheckIn),
     
     path('api/organization/search',  views_api.searchOrganization),
     path('api/organization/delete/<int:pk>', views_api.deleteOrganization),

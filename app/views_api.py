@@ -160,6 +160,28 @@ def checkIn(request):
     })
 
 @api_view(['GET'])
+@permission_classes((IsAuthenticated,))
+def getLastCheckInTime(request):
+    lastCheckIn = CheckIn.objects.order_by('-date').first()
+    if lastCheckIn:
+        return Response({'time': lastCheckIn.date.strftime('%d/%m/%Y %H:%M:%S')})
+    else:
+        return Response({'time': ''})
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticated,))
+def checkForNewCheckIn(request):
+    lastUpdated = request.GET.get('last_updated')
+    updated = False
+    if lastUpdated:
+        lastUpdated = datetime.strptime(lastUpdated, '%d/%m/%Y %H:%M:%S');
+        lastCheckIn = CheckIn.objects.order_by('-date').first()
+        if lastCheckIn:
+            updated = lastCheckIn.date.replace(tzinfo=None) > lastUpdated
+
+    return Response({'updated': updated})
+
+@api_view(['GET'])
 def searchCheckIn(request):
     draw = request.query_params.get('draw', 1)    
     keyword = request.query_params.get('search[value]', '')    

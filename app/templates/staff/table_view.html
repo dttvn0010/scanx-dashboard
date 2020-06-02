@@ -25,6 +25,7 @@
 
 <script>
 $(document).ready(function() {
+  var lastUpdated = "";
   $('#table').DataTable({
     "ordering": false,
     "processing": true,
@@ -35,7 +36,20 @@ $(document).ready(function() {
       { render: function (data, type, row) { return `${row.date} (${row.datediff} ago)` }},
       { "data": "user" }
     ],
-  })
+  });
+
+  $.get('/api/checkin/last_updated', (data, status) => {
+    lastUpdated = data.time;    
+  });
+
+  setInterval(function(){
+    var url = '/api/checkin/check_for_update?last_updated=' + lastUpdated;
+    $.get(url, function(data, status){
+      if(data.updated) {
+        location.href = "";
+      }
+    });
+  }, 3000);
 });
 </script>
 {% endblock %}
