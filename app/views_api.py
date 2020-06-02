@@ -175,10 +175,12 @@ def checkForNewCheckIn(request):
     lastUpdated = request.GET.get('last_updated')
     updated = False
     if lastUpdated:
-        lastUpdated = datetime.strptime(lastUpdated, '%d/%m/%Y %H:%M:%S');
+        lastUpdated = datetime.strptime(lastUpdated, '%d/%m/%Y %H:%M:%S')
         lastCheckIn = CheckIn.objects.order_by('-date').first()
         if lastCheckIn:
-            updated = lastCheckIn.date.replace(tzinfo=None) > lastUpdated
+            lastCheckInDate = CheckInSerializer(lastCheckIn).data['date']
+            lastCheckInDate = datetime.strptime(lastCheckInDate, '%d/%m/%Y %H:%M:%S')
+            updated = lastCheckInDate > lastUpdated
 
     return Response({'updated': updated})
 
