@@ -10,7 +10,7 @@ INVITE_TITLE = 'Invitation to join ScanX'
 
 SMTP_PORT = 465 
 SMTP_SERVER = "smtp.gmail.com"
-SENDER_EMAIL = "ScanX <contact@scanx.cloud>"
+SENDER_EMAIL = "ScanX <scanx.cloud@gmail.com>" #"ScanX <contact@scanx.cloud>"
 GMAIL = "scanx.cloud@gmail.com"
 GMAIL_PASS = "abc@123@def"
 
@@ -25,29 +25,6 @@ def sendMail2(fro, to, subject, body):
     proc.stdin.write(body.encode())
     proc.stdin.close()
 
-port = 465  # For SSL
-smtp_server = "smtp.gmail.com"
-sender_email = "scanx.cloud@gmail.com"
-receiver_email = "duongthanhtungvn01@hotmail.com"
-password = 'abc@123@def'
-
-def sendMail3(fro, to, subject, body):
-    message = """        
-       Sample Email sent by Python.
-       """
-
-    msg = MIMEText(message)
-    msg['Subject'] = 'Mail subject'
-    msg['From'] = 'from'
-    msg['To'] = 'to'
-
-
-    context = ssl.create_default_context()
-
-    with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
-        server.login(sender_email, password)
-        server.sendmail(sender_email, receiver_email, msg.as_string())
-    
 def sendMail(fro, to, subject, body):
     print('===============', body)
    
