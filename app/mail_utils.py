@@ -28,10 +28,10 @@ def sendMail2(fro, to, subject, body):
 def sendMail(fro, to, subject, body):
     print('===============', body)
    
-    msg = MIMEMultipart('alternative')
+    msg = MIMEText(body) #MIMEMultipart('alternative')
     msg['Subject'] = subject
     msg['From'] = fro
-    msg.attach(MIMEText(body, 'html'))
+    #msg.attach(MIMEText(body, 'html'))
     
     context = ssl.create_default_context()
 
