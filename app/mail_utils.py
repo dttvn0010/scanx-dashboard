@@ -25,13 +25,36 @@ def sendMail2(fro, to, subject, body):
     proc.stdin.write(body.encode())
     proc.stdin.close()
 
+port = 465  # For SSL
+smtp_server = "smtp.gmail.com"
+sender_email = "scanx.cloud@gmail.com"
+receiver_email = "duongthanhtungvn01@hotmail.com"
+password = 'abc@123@def'
+
 def sendMail(fro, to, subject, body):
+    message = """        
+       Sample Email sent by Python.
+       """
+
+    msg = MIMEText(message)
+    msg['Subject'] = 'Mail subject'
+    msg['From'] = 'from'
+    msg['To'] = 'to'
+
+
+    context = ssl.create_default_context()
+
+    with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
+    server.login(sender_email, password)
+    server.sendmail(sender_email, receiver_email, msg.as_string())
+    
+def sendMail3(fro, to, subject, body):
     print('===============', body)
    
-    msg = MIMEText(body) #MIMEMultipart('alternative')
+    msg = MIMEMultipart('alternative')
     msg['Subject'] = subject
     msg['From'] = fro
-    #msg.attach(MIMEText(body, 'html'))
+    msg.attach(MIMEText(body, 'html'))
     
     context = ssl.create_default_context()
 
