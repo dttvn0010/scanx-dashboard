@@ -31,7 +31,7 @@ sender_email = "scanx.cloud@gmail.com"
 receiver_email = "duongthanhtungvn01@hotmail.com"
 password = 'abc@123@def'
 
-def sendMail(fro, to, subject, body):
+def sendMail3(fro, to, subject, body):
     message = """        
        Sample Email sent by Python.
        """
@@ -48,7 +48,7 @@ def sendMail(fro, to, subject, body):
         server.login(sender_email, password)
         server.sendmail(sender_email, receiver_email, msg.as_string())
     
-def sendMail3(fro, to, subject, body):
+def sendMail(fro, to, subject, body):
     print('===============', body)
    
     msg = MIMEMultipart('alternative')
