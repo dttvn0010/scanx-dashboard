@@ -1,7 +1,7 @@
 from django.urls import path
 from . import views, views_admin, views_staff, views_user, views_api
 
-urlpatterns = [
+urlpatterns = [    
     path('', views.home, name='home'),
     path('accounts/signup', views.signup),
     path('complete_registration', views.completeRegistration),
@@ -59,7 +59,10 @@ urlpatterns = [
     path('staff/devices/delete/<int:pk>', views_staff.deleteDevice),    
     
     path('staff/report/check_in', views_staff.reportCheckIn),
+    path('staff/report/check_in/export_pdf', views_staff.reportCheckInExportPdf),
+    
     path('staff/report/log_in', views_staff.reportLogIn),
+    path('staff/report/log_in/export_pdf', views_staff.reportLogInExportPdf),
 
     # API
     path('api/test', views_api.test),

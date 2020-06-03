@@ -1,0 +1,98 @@
+<title>ScanX Report</title>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+<style>
+  @page {
+    size: auto;
+    margin: 5mm 10mm 10mm 10mm
+  }  
+</style>
+
+<body onload="window.print()">
+  <div class="container">
+    <div class="text-center mt-3">
+      <h2>ScanX Log-in Report</h2>
+    </div>
+    <br>
+    <div>      
+      <div class="row">
+        <div class="col-2">
+          <label>Organization:</label>
+        </div>
+        <div class="col-10">
+          <label><b>{{request.user.organization.name}}</b></label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-2">
+          <label>Reported by:</label>
+        </div>
+        <div class="col-10">
+          <label><b>{{request.user.fullname}}</b></label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-2">
+          <label>Reported at:</label>
+        </div>
+        <div class="col-10">
+          <label><b>{{date|date:"d/m/Y H:i:s"}}</b></label>
+        </div>
+      </div>
+
+      {% if reportedUser %}
+      <div class="row">
+        <div class="col-2">
+          <label>Check-in User:</label>
+        </div>
+        <div class="col-10">
+          <label><b>{{reportedUser.fullname}}</b></label>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if startDate %}
+      <div class="row">
+        <div class="col-2">
+          <label>From Date:</label>
+        </div>
+        <div class="col-10">
+          <label><b>{{startDate}}</b></label>
+        </div>
+      </div>
+      {% endif %}
+
+      {% if endDate %}
+      <div class="row">
+        <div class="col-2">
+          <label>To Date:</label>
+        </div>
+        <div class="col-10">
+          <label><b>{{endDate}}</b></label>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <table class="table mt-4">
+      <thead>
+        <tr>
+          <th style="width: 50%;">Date/Time</th>
+          <th style="width: 50%;">User</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for logIn in logIns %}
+        <tr>
+          <td>{{logIn.date|date:"d/m/Y H:i:s"}}</td>        
+          <td>{{logIn.user.fullname}}</td>
+        </tr>
+      {% endfor %}
+      {% if not logIns %}
+      <tr>
+        <td colspan="2">No record found.</td>
+      </tr>
+      {% endif %}
+      </tbody>
+    </table>
+  </div>
+</body>

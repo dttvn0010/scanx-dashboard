@@ -3,7 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password
 
 import csv
-from datetime import datetime
+import json
+from datetime import datetime, timedelta
 from threading import Thread
 
 from .models import *
@@ -372,6 +373,27 @@ def deleteDevice(request, pk):
 
 #================================= Report  ====================================================================
 
+def getCheckInReport(organization, userId, locationId, startDate, endDate):
+    checkIns = CheckIn.objects.filter(user__organization=organization)
+
+    if userId:
+        checkIns = checkIns.filter(user__id=int(userId))
+
+    if locationId:
+        checkIns = checkIns.filter(location__id=int(locationId))
+
+    if startDate:
+        startDate = datetime.strptime(startDate, '%d/%m/%Y')
+        checkIns = checkIns.filter(date__gte=startDate)
+
+    if endDate:
+        endDate = datetime.strptime(endDate, '%d/%m/%Y') + timedelta(days=1)
+        checkIns = checkIns.filter(date__lt=endDate)                        
+
+    checkIns = checkIns.order_by('-date')
+
+    return checkIns
+
 @login_required
 def reportCheckIn(request):
     if not request.user.organization:
@@ -386,6 +408,7 @@ def reportCheckIn(request):
 
     users = User.objects.filter(organization=request.user.organization)
     locations = Location.objects.filter(organization=request.user.organization)
+    checkIns = getCheckInReport(request.user.organization, userId, locationId, startDate, endDate)
 
     return render(request, 'staff/reports/check_in.html', 
         {
@@ -395,8 +418,50 @@ def reportCheckIn(request):
             'userId': userId,
             'locationId': locationId,
             'startDate': startDate,
-            'endDate': endDate
+            'endDate': endDate,
+            'checkIns': checkIns
         })
+
+@login_required
+def reportCheckInExportPdf(request):
+    query_params = request.GET
+    userId = query_params.get('userId', '')
+    locationId = query_params.get('locationId', '')
+    startDate = query_params.get('startDate', '')
+    endDate = query_params.get('endDate', '')
+
+    reportedUser = User.objects.get(pk=userId) if userId else None
+    reportedLocation = Location.objects.get(pk=locationId) if locationId else None
+
+    checkIns = getCheckInReport(request.user.organization, userId, locationId, startDate, endDate)
+    resp = render(request, 'staff/reports/check_in_pdf.html', 
+                {
+                    'checkIns': checkIns, 
+                    'date': datetime.now(),
+                    'startDate': startDate,
+                    'endDate': endDate,
+                    'reportedUser': reportedUser,
+                    'reportedLocation': reportedLocation
+                })
+    content = resp.content.decode()
+
+    return HttpResponse(json.dumps({'html': content}), content_type='application/json')
+
+def getLogInReport(organization, userId, startDate, endDate):
+    logIns = LogIn.objects.filter(user__organization=organization)
+
+    if userId:
+        logIns = logIns.filter(user__id=int(userId))
+
+    if startDate:
+        startDate = datetime.strptime(startDate, '%d/%m/%Y')
+        logIns = logIns.filter(date__gte=startDate)
+
+    if endDate:
+        endDate = datetime.strptime(endDate, '%d/%m/%Y') + timedelta(days=1)
+        logIns = logIns.filter(date__lt=endDate)                        
+
+    return logIns.order_by('-date')
 
 @login_required
 def reportLogIn(request):
@@ -410,11 +475,36 @@ def reportLogIn(request):
     endDate = query_params.get('endDate', '')
 
     users = User.objects.filter(organization=request.user.organization)
+    logIns = getLogInReport(request.user.organization, userId, startDate, endDate)
+
     return render(request, 'staff/reports/log_in.html', 
         {
             'users': users,
             'reported': reported,
             'userId': userId,
             'startDate': startDate,
-            'endDate': endDate
+            'endDate': endDate,
+            'logIns': logIns
         })    
+
+@login_required
+def reportLogInExportPdf(request):        
+    query_params = request.GET
+    userId = query_params.get('userId', '')
+    startDate = query_params.get('startDate', '')
+    endDate = query_params.get('endDate', '')
+
+    reportedUser = User.objects.get(pk=userId) if userId else None
+    logIns = getLogInReport(request.user.organization, userId, startDate, endDate)
+
+    resp =  render(request, 'staff/reports/log_in_pdf.html', {
+                'logIns': logIns,
+                'date': datetime.now(),
+                'startDate': startDate,
+                'endDate': endDate,
+                'reportedUser': reportedUser
+            })
+
+    content = resp.content.decode()
+
+    return HttpResponse(json.dumps({'html': content}), content_type='application/json')
