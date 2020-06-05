@@ -122,7 +122,7 @@ def checkIn(request):
         })
 
     lastCheckIn = CheckIn.objects.filter(user=request.user).order_by('-date').first()
-    delayParam = Parameter.objects.get(key='SCAN_TIME_DELAY')
+    delayParam = Parameter.objects.filter(key='SCAN_TIME_DELAY').first()
     
     if lastCheckIn and delayParam and delayParam.value:
         minWaitTime = float(delayParam.value)
@@ -197,7 +197,7 @@ def searchCheckIn(request):
     
     mapView = request.query_params.get("mapView")
     if mapView:
-        flushTimeParam = Parameter.objects.get(key='MAP_VIEW_FLUSH_TIME')
+        flushTimeParam = Parameter.objects.filter(key='MAP_VIEW_FLUSH_TIME').first()
         if flushTimeParam and flushTimeParam.value:
             flushTime = float(flushTimeParam.value)
             startDate = datetime.now() - timedelta(seconds=3600*flushTime)
