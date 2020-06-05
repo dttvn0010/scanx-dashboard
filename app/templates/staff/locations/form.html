@@ -39,17 +39,17 @@
 <script>
 var map;
 var marker;
+var ref_position = { lat: 52.479865, lng: -1.911067 };
 
-function getPosition() {
-  var position = { lat: 52.479865, lng: -1.911067 };
+function getPosition() {  
   var geoLocation = $('#id_geoLocation').val();
 
   if(geoLocation && geoLocation.indexOf(',') >0) {
     var arr = geoLocation.split(',');
-    position = { lat: parseFloat(arr[0]), lng: parseFloat(arr[1]) };
+    return { lat: parseFloat(arr[0]), lng: parseFloat(arr[1]) };
   }
 
-  return position;
+  return null;
 }
 
 function setMarker(position, update) {  
@@ -60,11 +60,7 @@ function setMarker(position, update) {
   if(update) map.setCenter(position);
 }
 
-function initMap() {  
-  var position = getPosition();
-  map = new google.maps.Map(document.getElementById('map'), { zoom: 16, center: position });
-  setMarker(position);
-
+function initMapEvent() {
   google.maps.event.addListener(map, 'click', function(e) {
       var position = e.latLng;
       var lat = position.lat().toFixed(6);
@@ -73,6 +69,24 @@ function initMap() {
       setMarker(position);
       setTimeout(() => $('#locationModal').modal('hide'), 500);
   });
+}
+
+function initMap() {  
+  var position = getPosition();
+  if(position) {
+    map = new google.maps.Map(document.getElementById('map'), { zoom: 16, center: position });
+    setMarker(position);
+    initMapEvent();
+  }else {
+    map = new google.maps.Map(document.getElementById('map'), { zoom: 16, center: ref_position });
+    initMapEvent();
+    
+    if(navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(x => {
+        map.setCenter({lat: x.coords.latitude, lng: x.coords.longitude});
+      });
+    }
+  }  
 }
 
 function openLocationModal() {

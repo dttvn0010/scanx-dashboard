@@ -194,7 +194,18 @@ def searchCheckIn(request):
     locationId = request.query_params.get("locationId")
     startDate = request.query_params.get("startDate")
     endDate = request.query_params.get("endDate")
-
+    
+    mapView = request.query_params.get("mapView")
+    if mapView:
+        flushTimeParam = Parameter.objects.get(key='MAP_VIEW_FLUSH_TIME')
+        if flushTimeParam and flushTimeParam.value:
+            flushTime = float(flushTimeParam.value)
+            startDate = datetime.now() - timedelta(seconds=3600*flushTime)
+            endDate = None
+    else:
+        startDate = datetime.strptime(startDate, '%d/%m/%Y') if startDate else None
+        endDate = datetime.strptime(endDate, '%d/%m/%Y') + timedelta(days=1) if endDate else None
+        
     start = int(request.query_params.get('start', 0))
     length = int(request.query_params.get('length', 0))
     
@@ -212,14 +223,12 @@ def searchCheckIn(request):
     if locationId:
         checkIns = checkIns.filter(location__id=int(locationId))
 
-    if startDate:
-        startDate = datetime.strptime(startDate, '%d/%m/%Y')
+    if startDate:        
         checkIns = checkIns.filter(date__gte=startDate)
 
-    if endDate:
-        endDate = datetime.strptime(endDate, '%d/%m/%Y') + timedelta(days=1)
-        checkIns = checkIns.filter(date__lt=endDate)                        
-
+    if endDate:        
+        checkIns = checkIns.filter(date__lt=endDate)
+        
     checkIns = checkIns.order_by('-date')
     recordsFiltered = checkIns.count()
     checkIns = checkIns[start:start+length]
