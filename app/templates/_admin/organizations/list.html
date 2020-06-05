@@ -13,10 +13,10 @@
       <a href='/_admin/organizations/add' class="btn btn-secondary">Add Organization</a>
       <button class="btn btn-secondary mr-2" onclick="showImportModal()">
         <i class="fas fa-upload"></i>Import
-      </button>      
+      </button>
       <a href='/_admin/organizations/export' class="btn btn-secondary mr-2">
         <i class="fas fa-download"></i>Export
-      </a>      
+      </a>
     </div>
   </div>
 
@@ -33,6 +33,75 @@
       </tr>
     </thead>
   </table>
+
+  <div class="modal fade" id="viewDetailsModal">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Organization Details</h5>
+          <button type="button" class="close" data-dismiss="modal">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div class="container">
+            <div class="row">
+              <div class="col">
+                <label>Organization Name:</label>
+                <label><b><span id="org_name"></span></b></label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <label>Number of Users:</label>
+                <label><b><span id="org_user_count"></span></b></label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <label>Admin Name:</label>
+                <label><b><span id="org_admin_name"></span></b></label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <label>Admin Email:</label>
+                <label><b><span id="org_admin_email"></span></b></label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <label>Number of Registered Devices:</label>
+                <label><b><span id="org_device_count"></span></b></label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <label>NFC Enabled:</label>
+                <label><b><span id="org_nfc_enabled"></span></b></label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <label>QR Scan Enabled:</label>
+                <label><b><span id="org_qr_scan_enabled"></span></b></label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col">
+                <label>Status:</label>
+                <label><b><span id="org_status"></span></b></label>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <div class="modal fade" id="uploadModal">
     <div class="modal-dialog modal-lg">
@@ -52,10 +121,10 @@
                 <label>CSV file:</label>
               </div>
               <div class="col-5">
-                <input type="file" accept=".csv" class="form-control-file" 
-                  id="csv_file" name="csv_file" onchange="previewImport()">
+                <input type="file" accept=".csv" class="form-control-file" id="csv_file" name="csv_file"
+                  onchange="previewImport()">
               </div>
-            </div>            
+            </div>
           </form>
 
           <form id="fmt2" style="display: none;" method="POST" action="/_admin/organizations/import">
@@ -66,7 +135,7 @@
               Import
             </button>
           </form>
-        </div>       
+        </div>
       </div>
     </div>
   </div>
@@ -92,119 +161,133 @@
               <div class="col"><input class="form-control" type="password" id="password" name="password"></div>
             </div>
             <div class="row mt-2">
-              <div class="col"> 
-                <label  id="errorLabel" style="color: red;"></label>
+              <div class="col">
+                <label id="errorLabel" style="color: red;"></label>
               </div>
-            </div>            
+            </div>
             <button type="button" onclick="deleteOrganization()" class="mt-3 btn btn-danger">Delete</button>
-         </form>
-        </div>       
+          </form>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-$(document).ready(function() {
-  $('#table').DataTable({
-    "ordering": false,
-    "processing": true,
-    "serverSide": true,
-    "ajax": "/api/organization/search",
-    "columns": [
-      { "data": "name" },
-      { "data": "userCount" },
-      { "data": "admin.name" },
-      { "data": "admin.email" },
-      { "data": "deviceCount" }, 
-      { "data": "status", "render": function(data, type, row) {
-          return row.status == 1? "Active": "Pending"
-        } 
-      },     
-      {
-        render: function (data, type, row) {
-          var html =  `<a title="Edit" href="/_admin/organizations/update/${row['id']}"><i class="fas fa-edit"></i></a>&nbsp;&nbsp;`
-                     + `<a title="Delete" href="#" onclick="openDeleteConfirmation(${row['id']})" ><i class="fas fa-trash" style="color:red"></i></a>`;
-
-          if(row.status == 0) {
-            html += `&nbsp;&nbsp;<a title="Resend invitation email" href="#" onclick="resendMail(${row['id']})" ><i class="fas fa-envelope"></i></a>`;
+  $(document).ready(function () {
+    $('#table').DataTable({
+      "ordering": false,
+      "processing": true,
+      "serverSide": true,
+      "ajax": "/api/organization/search",
+      "columns": [
+        { "data": "name" },
+        { "data": "userCount" },
+        { "data": "admin.name" },
+        { "data": "admin.email" },
+        { "data": "deviceCount" },
+        {
+          "data": "status", "render": function (data, type, row) {
+            return row.status == 1 ? "Active" : "Pending"
           }
-          
-          return html;          
+        },
+        {
+          render: function (data, type, row) {
+            var html = `<a title="View details" href="#" onclick="viewInfo(${row['id']})"><i class="fas fa-eye"></i></a>&nbsp;&nbsp;` +
+              `<a title="Edit" href="/_admin/organizations/update/${row['id']}"><i class="fas fa-edit"></i></a>&nbsp;&nbsp;` +
+              `<a title="Delete" href="#" onclick="openDeleteConfirmation(${row['id']})" ><i class="fas fa-trash" style="color:red"></i></a>`;
+
+            if (row.status == 0) {
+              html += `&nbsp;&nbsp;<a title="Resend invitation email" href="#" onclick="resendMail(${row['id']})" ><i class="fas fa-envelope"></i></a>`;
+            }
+
+            return html;
+          }
         }
-      }
-    ],
-  })
-});
-
-function openDeleteConfirmation(id) {
-  $('#password').val('');
-  $('#orgId').val(id);
-  $("#deleteConfirmModal").modal();
-  return;
-}
-
-async function deleteOrganization() {
-  $("#errorLabel").html('');
-  var formData = new FormData(document.getElementById("fmt3"));
-  var response = await fetch("/api/organization/delete/" + $('#orgId').val(), {
-    body: formData,
-    method: "POST"
+      ],
+    })
   });
-  var result = await response.json();
-  if(result.success) {
-    location.href = "/_admin";
-  }else {
-    $("#errorLabel").html(result.error || "Error occurred");
+  async function viewInfo(id) {
+    var resp = await fetch("/api/organization/details/" + id);
+    var org = await resp.json();
+    $("#org_name").html(org.name);
+    $("#org_user_count").html(org.userCount);
+    $("#org_admin_name").html(org.admin.name);
+    $("#org_admin_email").html(org.admin.email);
+    $("#org_device_count").html(org.deviceCount);
+    $("#org_nfc_enabled").html(org.nfcEnabled? "Yes": "No");
+    $("#org_qr_scan_enabled").html(org.qrScanEnabled? "Yes": "No");
+    $("#org_status").html(org.status == 1? "Active" : "Pending");
+    $("#viewDetailsModal").modal();
   }
-}
 
-async function resendMail(id) {
-  if (confirm('Resend an invitation email to this organization?')) {
-    location.href = "/_admin/organizations/resend_mail/" + id;
+  function openDeleteConfirmation(id) {
+    $('#password').val('');
+    $('#orgId').val(id);
+    $("#deleteConfirmModal").modal();
   }
-}
 
-function showImportModal() {
-  $("#csv_file").val("");
-  $("#fmt").show();
-  $("#fmt2").hide();
-  $("#uploadModal").modal();
-}
+  async function deleteOrganization() {
+    $("#errorLabel").html('');
+    var formData = new FormData(document.getElementById("fmt3"));
+    var response = await fetch("/api/organization/delete/" + $('#orgId').val(), {
+      body: formData,
+      method: "POST"
+    });
+    var result = await response.json();
+    if (result.success) {
+      location.href = "/_admin";
+    } else {
+      $("#errorLabel").html(result.error || "Error occurred");
+    }
+  }
 
-function createOptionsPanel(header, csvHeader) {
-  return header.map((column, i) => 
-    (
-      `<div class="row mt-3">
+  async function resendMail(id) {
+    if (confirm('Resend an invitation email to this organization?')) {
+      location.href = "/_admin/organizations/resend_mail/" + id;
+    }
+  }
+
+  function showImportModal() {
+    $("#csv_file").val("");
+    $("#fmt").show();
+    $("#fmt2").hide();
+    $("#uploadModal").modal();
+  }
+
+  function createOptionsPanel(header, csvHeader) {
+    return header.map((column, i) =>
+      (
+        `<div class="row mt-3">
         <div class="col-3">
           <label>${header[i]}</label>
         </div>
         <div class="col-5">
           <select name="col_${i}" class="form-control">` +
-              csvHeader.map((col, j) => 
-                (
-                  `<option value="${j}" ${i==j?'selected':''}>
+        csvHeader.map((col, j) =>
+          (
+            `<option value="${j}" ${i == j ? 'selected' : ''}>
                     ${csvHeader[j]}
                   </option>`
-                )
-              ).join('') +
-          `</select>
+          )
+        ).join('') +
+        `</select>
         </div>
-      </div>`  
-    )
-  ).join('');  
-}
+      </div>`
+      )
+    ).join('');
+  }
 
-async function previewImport() {
-  var formData = new FormData(document.getElementById("fmt"));
-  var response = await fetch("/_admin/organizations/import_preview", {
-    body: formData,
-    method: "POST"
-  });
-  var result = await response.json();
-  $("#fmt2Body").html(createOptionsPanel(result.header, result.csvHeader));
-  $("#fmt").hide();
-  $("#fmt2").show();
-}
+  async function previewImport() {
+    var formData = new FormData(document.getElementById("fmt"));
+    var response = await fetch("/_admin/organizations/import_preview", {
+      body: formData,
+      method: "POST"
+    });
+    var result = await response.json();
+    $("#fmt2Body").html(createOptionsPanel(result.header, result.csvHeader));
+    $("#fmt").hide();
+    $("#fmt2").show();
+  }
 </script>
 {% endblock %}

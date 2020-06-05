@@ -294,6 +294,18 @@ def searchOrganization(request):
         "data": data
     })
 
+@api_view(['GET'])
+def viewOrganizationDetails(request, pk):    
+    org = Organization.objects.get(pk=pk)
+    data = OrganizationSerializer(org).data
+    staff = User.objects.filter(organization=org).filter(role__code=settings.ROLES['ADMIN']).first()
+    data['admin'] = {'name': staff.fullname if staff else "", 'email': staff.email if staff else ""}
+    data['userCount'] = User.objects.filter(organization=org).count()
+    data['deviceCount'] = Device.objects.filter(organization=org).count()
+    data['status'] = staff.status if staff else User.Status.INVITED
+    
+    return Response(data)
+
 @api_view(['POST'])
 def deleteOrganization(request, pk):    
     try:
@@ -336,6 +348,12 @@ def searchUser(request):
         "recordsFiltered": recordsFiltered,
         "data": data
     })
+
+@api_view(['GET'])
+def viewUserDetails(request, pk):    
+    user = User.objects.get(pk=pk)
+    data = UserSerializer(user).data
+    return Response(data)
 
 @api_view(['GET'])
 def deleteUser(request, pk):    

@@ -7,7 +7,7 @@ class OrganizationSerializer(ModelSerializer):
         fields = '__all__'
 
 class UserSerializer(ModelSerializer):
-    role = CharField(source='role.code', default="")
+    role = CharField(source='role.name', default="")
 
     class Meta:
         model = User
