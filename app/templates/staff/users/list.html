@@ -167,7 +167,7 @@ $(document).ready(function() {
       {
         render: function (data, type, row) {  
           var html = `<a title="View details" href="#" onclick="viewInfo(${row['id']})"><i class="fas fa-eye"></i></a>&nbsp;&nbsp;`;
-          if(row.role == 'ADMIN'){
+          if(row.roleCode == 'ADMIN'){
             html += `<a><i class="fas fa-lock"></i></a>&nbsp&nbsp;`;
           }else {
             html += `<a title="Edit" href="/staff/users/update/${row['id']}"><i class="fas fa-edit"></i></a>&nbsp;&nbsp;`
