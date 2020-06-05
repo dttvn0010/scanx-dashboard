@@ -176,7 +176,7 @@ $(document).ready(function() {
           
           if(row.status == 0) {
             html += `&nbsp;&nbsp;<a title="Resend invitation email" href="#" onclick="resendMail(${row['id']})" ><i class="fas fa-envelope"></i></a>`;
-          }else if(row.role != 'ADMIN') {
+          }else if(row.roleCode != 'ADMIN') {
             if(row.is_active) {
               html += `&nbsp;&nbsp;<a title="Deactivate this user" href="#" onclick="lockUser(${row['id']})" ><i class="fas fa-ban"></i></a>`;
             }else {

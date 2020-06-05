@@ -8,6 +8,7 @@ class OrganizationSerializer(ModelSerializer):
 
 class UserSerializer(ModelSerializer):
     role = CharField(source='role.name', default="")
+    roleCode = CharField(source='role.code', default="")
 
     class Meta:
         model = User
