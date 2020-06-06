@@ -29,6 +29,7 @@ def sendMail(to, subject, body):
     msg = MIMEMultipart('alternative')
     msg['Subject'] = subject
     msg['From'] = SENDER
+    msg['To'] = to
     msg.attach(MIMEText(body, 'html'))
     
     context = ssl.create_default_context()
