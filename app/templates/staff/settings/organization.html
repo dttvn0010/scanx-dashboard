@@ -1,0 +1,20 @@
+{% extends "../base.html" %}
+
+{% block sidebar %}
+{% with page=6 group=2 %}
+{{ block.super }}
+{% endwith %}
+{% endblock %}
+
+{% block content %}
+<div class="content p-3">
+  {%if saved%}
+    <span class="badge badge-success mb-3">Successfully saved!</span>
+  {%endif%}
+  <form id="fmt" method="POST" novalidate> 
+    {% csrf_token %}
+    <table class="table table-form mt-2">{{ form }}</table>
+    <button class="btn btn-primary" type="submit">Save</button>
+  </form>
+</div>
+{% endblock %}
