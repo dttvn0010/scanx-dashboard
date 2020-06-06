@@ -49,7 +49,7 @@ def createUser(request, fullname, email):
     return user
 
 
-# ========================================== User ======================================================
+# ========================================== Users======================================================
 
 @login_required
 def listUser(request):
@@ -198,7 +198,7 @@ def unlockUser(request, pk):
     user.save()
     return redirect('staff-user')    
 
-#================================= Location  ====================================================================
+#================================= Locations  ====================================================================
 @login_required
 def listLocation(request):
     if not request.user.organization:
@@ -305,7 +305,7 @@ def importLocation(request):
     
     return redirect('staff-location')
 
-#================================= Device  ====================================================================
+#================================= Devices  ====================================================================
 
 
 @login_required
@@ -360,18 +360,7 @@ def updateDevice(request, pk):
 
     return render(request, 'staff/devices/form.html', {'form': form})
 
-@login_required
-def deleteDevice(request, pk):
-    if not request.user.organization:
-        return redirect('login')
-
-    device = get_object_or_404(Device, pk=pk)
-    device.organization = None
-    device.installationLocation = None
-    device.save()
-    return redirect("staff-device")    
-
-#================================= Report  ====================================================================
+#================================= Reports  ====================================================================
 
 def getCheckInReport(organization, userId, locationId, startDate, endDate):
     checkIns = CheckIn.objects.filter(user__organization=organization)
@@ -508,3 +497,22 @@ def reportLogInExportPdf(request):
     content = resp.content.decode()
 
     return HttpResponse(json.dumps({'html': content}), content_type='application/json')
+
+#================================= Settings  ====================================================================
+
+def configureOranization(request):
+    org = request.user.organization
+    initial = {'name': org.name, 'nfcEnabled': org.nfcEnabled, 'qrScanEnabled': org.qrScanEnabled}
+    form = OrganizationChangeForm(initial=initial)
+    saved = False
+    
+    if request.method == 'POST':
+        form = OrganizationChangeForm(request.POST)
+        if form.is_valid():
+            org.name = form.cleaned_data.get("name")
+            org.nfcEnabled = form.cleaned_data.get("nfcEnabled")
+            org.qrScanEnabled = form.cleaned_data.get("qrScanEnabled")
+            org.save()
+            saved = True
+
+    return render(request, 'staff/settings/organization.html', {'form': form, 'saved': saved})

@@ -64,3 +64,9 @@ class DeviceChangeForm(forms.Form):
         self.fields['installationLocation'].queryset = Location.objects.filter(organization=organization)
 
     installationLocation = forms.ModelChoiceField(queryset=Location.objects.all())
+
+
+class OrganizationChangeForm(forms.Form):
+    name = forms.CharField(label="Organization Name")
+    nfcEnabled = forms.BooleanField(label='NFC Enabled', required=False)
+    qrScanEnabled = forms.BooleanField(label='QR Scanning Enabled', required=False)

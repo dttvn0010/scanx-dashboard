@@ -1,91 +1,82 @@
 {% extends "../base.html" %}
 
 {% block sidebar %}
-{% with page=4 %}
+{% with page=5 group=1 %}
 {{ block.super }}
 {% endwith %}
 {% endblock %}
 
 
 {% block content %}
-<div class="content">
-  <ul class="nav nav-tabs mb-4">
-    <li class="nav-item">
-      <a href="/staff/report/check_in" class="nav-link">Check In</a>
-    </li>
-    <li class="nav-item">
-      <a href="/staff/report/log_in" class="nav-link active">Log In</a>
-    </li>
-  </ul>
-  <div class="pr-3 pl-3 pt-2 pb-2">
-    <form>
-      <input type="hidden" name="reported" value="1">
-      <div class="row">
-        <div class="col">
-          <label><b>Show LogIn by:</b></label>
-        </div>
-      </div>    
-      <div class="row mt-2">
-        <div class="col-3">
-          <label>User:</label>
-          <select name="userId" class="form-control">
-            <option value="">All User</option>
-            {% for u in users %}
-              <option value="{{u.id}}" {% if userId|add:0 == u.id %}selected{%endif%}>{{u.fullname}}</option>
-            {% endfor %}
-          </select>
-        </div>
-        <div class="col-3">
-          <label>From date:</label>
-          <input name="startDate" value="{{startDate|default:''}}" class="form-control date" placeholder="Select a date">
-        </div>
-        <div class="col-3">
-          <label>To date:</label>
-          <input name="endDate" value="{{endDate|default:''}}" class="form-control date" placeholder="Select a date">
-        </div>
+<div class="content p-3">
+  <form>
+    <input type="hidden" name="reported" value="1">
+    <div class="row">
+      <div class="col">
+        <label><b>Show LogIn by:</b></label>
       </div>
-      <div class="row mt-3">
-        <div class="col">
-          <button type="submit" class="btn btn-primary">Get Report</button>
-          {%if reported %}
-          <button type="button" onclick="exportPDF()" class="btn btn-secondary">Export PDF</button>
-          {% endif %}
-        </div>
+    </div>    
+    <div class="row mt-2">
+      <div class="col-3">
+        <label>User:</label>
+        <select name="userId" class="form-control">
+          <option value="">All User</option>
+          {% for u in users %}
+            <option value="{{u.id}}" {% if userId|add:0 == u.id %}selected{%endif%}>{{u.fullname}}</option>
+          {% endfor %}
+        </select>
       </div>
-    </form>
+      <div class="col-3">
+        <label>From date:</label>
+        <input name="startDate" value="{{startDate|default:''}}" class="form-control date" placeholder="Select a date">
+      </div>
+      <div class="col-3">
+        <label>To date:</label>
+        <input name="endDate" value="{{endDate|default:''}}" class="form-control date" placeholder="Select a date">
+      </div>
+    </div>
+    <div class="row mt-3">
+      <div class="col">
+        <button type="submit" class="btn btn-primary">Get Report</button>
+        {%if reported %}
+        <button type="button" onclick="exportPDF()" class="btn btn-secondary">Export PDF</button>
+        {% endif %}
+      </div>
+    </div>
+  </form>
 
-    {% if reported %}
-    <table class="table">
-      <thead>
-        <tr>
-          <th style="width: 50%;">Date/Time</th>
-          <th style="width: 50%;">User</th>
-        </tr>
-      </thead>     
-      <tbody>
-      {% for logIn in logIns %}
+  {% if reported %}
+  <table class="table">
+    <thead>
       <tr>
-        <td>{{logIn.date|date:"d/m/Y H:i:s"}}</td>        
-        <td>{{logIn.user.fullname}}</td>
+        <th style="width: 50%;">Date/Time</th>
+        <th style="width: 50%;">User</th>
       </tr>
-      {% endfor %}
-      {% if not logIns %}
-        <tr>
-          <td colspan="2">No record found.</td>
-        </tr>
-      {% endif %}
-      </tbody>
-    </table>
-    {%endif%}
-  </div>
+    </thead>     
+    <tbody>
+    {% for logIn in logIns %}
+    <tr>
+      <td>{{logIn.date|date:"d/m/Y H:i:s"}}</td>        
+      <td>{{logIn.user.fullname}}</td>
+    </tr>
+    {% endfor %}
+    {% if not logIns %}
+      <tr>
+        <td colspan="2">No record found.</td>
+      </tr>
+    {% endif %}
+    </tbody>
+  </table>
+  {%endif%}
 </div>
+
 <script>
   $(document).ready(function() {
     $('.date').datetimepicker({format: 'DD/MM/yyyy'});    
   });
 
   async function exportPDF() {
-    var url = "/staff/report/log_in/export_pdf"
+    var url = "/staff/reports/log_in/export_pdf"
               + "?userId={{userId}}"
               + "&startDate={{startDate|default:''}}"
               + "&endDate={{endDate|default:''}}";

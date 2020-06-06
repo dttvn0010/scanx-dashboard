@@ -56,13 +56,14 @@ urlpatterns = [
     path('staff/devices', views_staff.listDevice, name='staff-device'),
     path('staff/devices/add', views_staff.addDevice),
     path('staff/devices/update/<int:pk>', views_staff.updateDevice,),    
-    path('staff/devices/delete/<int:pk>', views_staff.deleteDevice),    
+        
+    path('staff/reports/check_in', views_staff.reportCheckIn),
+    path('staff/reports/check_in/export_pdf', views_staff.reportCheckInExportPdf),
     
-    path('staff/report/check_in', views_staff.reportCheckIn),
-    path('staff/report/check_in/export_pdf', views_staff.reportCheckInExportPdf),
-    
-    path('staff/report/log_in', views_staff.reportLogIn),
-    path('staff/report/log_in/export_pdf', views_staff.reportLogInExportPdf),
+    path('staff/reports/log_in', views_staff.reportLogIn),
+    path('staff/reports/log_in/export_pdf', views_staff.reportLogInExportPdf),
+
+    path('staff/settings/organization', views_staff.configureOranization),
 
     # API
     path('api/test', views_api.test),
@@ -87,6 +88,7 @@ urlpatterns = [
     path('api/device/registered/search', views_api.searchRegisteredDevice),
     path('api/device/search_by_org', views_api.searchDeviceByOrganization),
     path('api/device/delete/<int:pk>', views_api.deleteDevice),    
+    path('api/device/delete_from_org/<int:pk>', views_api.deleteDeviceFromOrg),    
 
     path('api/location/search', views_api.searchLocation),
     path('api/location/delete/<int:pk>', views_api.deleteLocation),

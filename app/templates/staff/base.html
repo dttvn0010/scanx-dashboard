@@ -40,7 +40,7 @@
 <body id="page-top">
   <div id="wrapper">
     {% block sidebar %}
-    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark">
+    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark" id="accordionSidebar">
       <a class="sidebar-brand d-flex align-items-center" href="/">
         <div class="sidebar-brand-text">ScanX</div>
       </a>
@@ -75,9 +75,16 @@
                     
         <hr class="sidebar-divider my-0">
 
-        <li class="nav-item {% if page == 4 %} active {%endif%}">
-          <a class="nav-link" href="/staff/report/check_in">
-            <span>Reports</span></a>
+        <li class="nav-item">
+          <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapse1" aria-expanded="true">
+            <span>Reports</span>
+          </a>
+          <div id="collapse1" class="collapse {% if group == 1%}show{%endif%}" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+              <a class="collapse-item {% if page == 4 %} active {%endif%}" href="/staff/reports/check_in">Check-In</a>
+              <a class="collapse-item {% if page == 5 %} active {%endif%}" href="/staff/reports/log_in">Log-In</a>
+            </div>
+          </div>
         </li>
 
         <hr class="sidebar-divider my-0">
@@ -90,8 +97,14 @@
         <hr class="sidebar-divider my-0">
 
         <li class="nav-item">
-          <a class="nav-link" href="#">
-            <span>Settings</span></a>
+          <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapse2" aria-expanded="true">
+            <span>Settings</span>
+          </a>
+          <div id="collapse2" class="collapse {% if group == 2%}show{%endif%}" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+              <a class="collapse-item {% if page == 6 %} active {%endif%}" href="/staff/settings/organization">Organization</a>
+            </div>
+          </div>
         </li>
 
         <hr class="sidebar-divider my-0">

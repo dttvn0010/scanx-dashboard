@@ -19,10 +19,17 @@ def test(request):
 @api_view(['GET'])
 @permission_classes((IsAuthenticated,))
 def getUserConfig(request):
+    nfcEnabled = qrScanEnabled = sharedLocation = False
+
+    if request.user and request.user.organization:
+        nfcEnabled = request.user.nfcEnabled and request.user.organization.nfcEnabled
+        qrScanEnabled = request.user.qrScanEnabled and request.user.organization.qrScanEnabled
+        sharedLocation = request.user.sharedLocation
+
     return Response({ 
-        'nfcEnabled': request.user.nfcEnabled,
-        'qrScanEnabled': request.user.qrScanEnabled,
-        'sharedLocation': request.user.sharedLocation
+        'nfcEnabled': nfcEnabled,
+        'qrScanEnabled': qrScanEnabled,
+        'sharedLocation': sharedLocation
     })
 
 # ================================================ LogIn ========================================================
@@ -310,7 +317,6 @@ def viewOrganizationDetails(request, pk):
 def deleteOrganization(request, pk):    
     try:
         password = request.data.get('password', '')
-        print('pass=', password)
 
         if request.user.check_password(password):
             organization = Organization.objects.get(pk=pk)  
@@ -355,14 +361,21 @@ def viewUserDetails(request, pk):
     data = UserSerializer(user).data
     return Response(data)
 
-@api_view(['GET'])
-def deleteUser(request, pk):    
+@api_view(['POST'])
+def deleteUser(request, pk):   
     try:
-        user = User.objects.get(pk=pk)    
-        user.delete()
-        return Response({'success': True})    
-    except:
-        return Response({'success': False, 'message': 'Cannot delete this user because some records depend on it'})
+        password = request.data.get('password', '')
+
+        if request.user.check_password(password):
+            user = User.objects.get(pk=pk)    
+            user.delete() 
+            return Response({'success': True})    
+        else:
+            return Response({'success': False, 'error': 'Wrong password'})    
+
+    except Exception as e:
+        traceback.print_exc()
+        return Response({'success': False, 'error': str(e)})
 
 # =================================================== Device ======================================================
 
@@ -388,15 +401,39 @@ def searchUnregisteredDevice(request):
         "data": data
     })
 
-@api_view(['GET'])
-def deleteDevice(request, pk):    
+@api_view(['POST'])
+def deleteDevice(request, pk):
     try:
-        device = Device.objects.get(pk=pk)    
-        device.delete()
-        return Response({'success': True})    
-    except:
-        return Response({'success': False, 'message': 'Cannot delete this device because some records depend on it'})
+        password = request.data.get('password', '')
 
+        if request.user.check_password(password):
+            device = Device.objects.get(pk=pk)    
+            device.delete()  
+            return Response({'success': True})    
+        else:
+            return Response({'success': False, 'error': 'Wrong password'})    
+
+    except Exception as e:
+        traceback.print_exc()
+        return Response({'success': False, 'error': str(e)})
+
+@api_view(['POST'])
+def deleteDeviceFromOrg(request, pk):
+    try:
+        password = request.data.get('password', '')
+
+        if request.user.check_password(password):
+            device = Device.objects.get(pk=pk)
+            device.organization = None
+            device.installationLocation = None
+            device.save()
+            return Response({'success': True})    
+        else:
+            return Response({'success': False, 'error': 'Wrong password'})    
+
+    except Exception as e:
+        traceback.print_exc()
+        return Response({'success': False, 'error': str(e)})
 
 @api_view(['GET'])
 def searchRegisteredDevice(request):
@@ -437,6 +474,8 @@ def searchDeviceByOrganization(request):
 
     for item in data:
         item['location'] = f'{item["addressLine1"]}, {item["addressLine2"]}, {item["city"]}, {item["postCode"]}'
+        if item['location'].replace(',','').strip() == '':
+            item['location'] = ''
     
     return Response({
         "draw": draw,
@@ -470,11 +509,19 @@ def searchLocation(request):
         "data": data
     })     
 
-@api_view(['GET'])
+@api_view(['POST'])
 def deleteLocation(request, pk):
     try:
-        location = Location.objects.get(pk=pk)
-        location.delete()
-        return Response({'success': True})
-    except:
-        return Response({'success': False, 'message': 'Cannot delete this location because some records depend on it'})
+        password = request.data.get('password', '')
+
+        if request.user.check_password(password):
+            location = Location.objects.get(pk=pk)
+            location.delete()
+            return Response({'success': True})    
+        else:
+            return Response({'success': False, 'error': 'Wrong password'})    
+
+    except Exception as e:
+        traceback.print_exc()
+        return Response({'success': False, 'error': str(e)})
+

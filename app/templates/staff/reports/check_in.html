@@ -1,98 +1,89 @@
 {% extends "../base.html" %}
 
 {% block sidebar %}
-{% with page=4 %}
+{% with page=4 group=1 %}
 {{ block.super }}
 {% endwith %}
 {% endblock %}
 
 
 {% block content %}
-<div class="content">
-  <ul class="nav nav-tabs mb-4">
-    <li class="nav-item">
-      <a href="/staff/report/check_in" class="nav-link active">Check In</a>
-    </li>
-    <li class="nav-item">
-      <a href="/staff/report/log_in" class="nav-link">Log In</a>
-    </li>
-  </ul>
-  <div class="pr-3 pl-3 pt-2 pb-2">
-    <form>
-      <input type="hidden" name="reported" value="1">
-      <div class="row">
-        <div class="col">
-          <label><b>Show Scan by:</b></label>
-        </div>
-      </div>    
-      <div class="row mt-2">
-        <div class="col-3">
-          <label>User:</label>
-          <select name="userId" class="form-control">
-            <option value="">All User</option>
-            {% for u in users %}
-              <option value="{{u.id}}" {% if userId|add:0 == u.id %}selected{%endif%}>{{u.fullname}}</option>
-            {% endfor %}
-          </select>
-        </div>
-        <div class="col-3">
-          <label>Location:</label>
-          <select name="locationId" class="form-control">
-            <option value="">All Location</option>
-            {% for l in locations %}
-              <option value="{{l.id}}" {% if locationId|add:0 == l.id %}selected{%endif%}>{{l}}</option>
-            {% endfor %}
-          </select>
-        </div>
-        <div class="col-3">
-          <label>From date:</label>
-          <input name="startDate" value="{{startDate|default:''}}" class="form-control date" placeholder="Select a date">
-        </div>
-        <div class="col-3">
-          <label>To date:</label>
-          <input name="endDate" value="{{endDate|default:''}}" class="form-control date" placeholder="Select a date">
-        </div>
+<div class="content p-3">
+  <form>
+    <input type="hidden" name="reported" value="1">
+    <div class="row">
+      <div class="col">
+        <label><b>Show Scan by:</b></label>
       </div>
-      <div class="row mt-3">
-        <div class="col">
-          <button type="submit" class="btn btn-primary">Get Report</button>
-          {%if reported %}
-          <button type="button" onclick="exportPDF()" class="btn btn-secondary">Export PDF</button>
-          {% endif %}
-        </div>
+    </div>    
+    <div class="row mt-2">
+      <div class="col-3">
+        <label>User:</label>
+        <select name="userId" class="form-control">
+          <option value="">All User</option>
+          {% for u in users %}
+            <option value="{{u.id}}" {% if userId|add:0 == u.id %}selected{%endif%}>{{u.fullname}}</option>
+          {% endfor %}
+        </select>
       </div>
-    </form>
+      <div class="col-3">
+        <label>Location:</label>
+        <select name="locationId" class="form-control">
+          <option value="">All Location</option>
+          {% for l in locations %}
+            <option value="{{l.id}}" {% if locationId|add:0 == l.id %}selected{%endif%}>{{l}}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-3">
+        <label>From date:</label>
+        <input name="startDate" value="{{startDate|default:''}}" class="form-control date" placeholder="Select a date">
+      </div>
+      <div class="col-3">
+        <label>To date:</label>
+        <input name="endDate" value="{{endDate|default:''}}" class="form-control date" placeholder="Select a date">
+      </div>
+    </div>
+    <div class="row mt-3">
+      <div class="col">
+        <button type="submit" class="btn btn-primary">Get Report</button>
+        {%if reported %}
+        <button type="button" onclick="exportPDF()" class="btn btn-secondary">Export PDF</button>
+        {% endif %}
+      </div>
+    </div>
+  </form>
 
-    {% if reported %}
-    <table class="table">
-      <thead>
-        <tr>
-          <th style="width: 40%;">Location</th>
-          <th style="width: 40%;">Date/Time</th>
-          <th style="width: 20%;">User</th>
-        </tr>
-      </thead>
-      {% for checkIn in checkIns %}
-        <tr>
-          <td>{{checkIn.location}}</td>
-          <td>{{checkIn.date|date:"d/m/Y H:i:s"}}</td>
-          <td>{{checkIn.user.fullname}}</td>
-        </tr>
-      {% endfor %}
-      {% if not checkIns %}
+  {% if reported %}
+  <table class="table">
+    <thead>
       <tr>
-        <td colspan="3">No record found.</td>
+        <th style="width: 40%;">Location</th>
+        <th style="width: 40%;">Date/Time</th>
+        <th style="width: 20%;">User</th>
       </tr>
-      {% endif %}
-    </table>
-    {%endif%}
-  </div>
+    </thead>
+    {% for checkIn in checkIns %}
+      <tr>
+        <td>{{checkIn.location}}</td>
+        <td>{{checkIn.date|date:"d/m/Y H:i:s"}}</td>
+        <td>{{checkIn.user.fullname}}</td>
+      </tr>
+    {% endfor %}
+    {% if not checkIns %}
+    <tr>
+      <td colspan="3">No record found.</td>
+    </tr>
+    {% endif %}
+  </table>
+  {%endif%}
 </div>
+
 
 <script>
   $('.date').datetimepicker({format: 'DD/MM/yyyy'});
   async function exportPDF() {
-    var url = "/staff/report/check_in/export_pdf"
+    var url = "/staff/reports/check_in/export_pdf"
               + "?userId={{userId}}"
               + "&locationId={{locationId}}"
               + "&startDate={{startDate|default:''}}"
