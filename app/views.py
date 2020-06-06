@@ -38,6 +38,9 @@ def home(request):
         else:
             return HttpResponseRedirect("/users")
 
+def privacy(request):
+    return render(request, 'privacy.html')
+    
 @login_required
 def completeRegistration(request):
     form = RegistrationForm(initial={
