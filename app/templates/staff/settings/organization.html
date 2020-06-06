@@ -9,12 +9,17 @@
 {% block content %}
 <div class="content p-3">
   {%if saved%}
-    <span class="badge badge-success mb-3">Successfully saved!</span>
+    <span id="message" class="badge badge-success mb-3">Successfully saved!</span>
   {%endif%}
   <form id="fmt" method="POST" novalidate> 
     {% csrf_token %}
     <table class="table table-form mt-2">{{ form }}</table>
-    <button class="btn btn-primary" type="submit">Save</button>
+    <button class="btn btn-primary" type="submit" onclick="save()">Save</button>
   </form>
 </div>
+<script>
+function save() {
+  $("#message").hide();
+}
+</script>
 {% endblock %}
