@@ -222,6 +222,7 @@
   }
 
   function openDeleteConfirmation(id) {
+    $("#errorLabel").html('');
     $('#password').val('');
     $('#orgId').val(id);
     $("#deleteConfirmModal").modal();

@@ -127,6 +127,7 @@ $(document).ready(function() {
 });
 
 function openDeleteConfirmation(id) {
+    $("#errorLabel").html('');
     $('#password').val('');
     $('#deviceId').val(id);
     $("#deleteConfirmModal").modal();

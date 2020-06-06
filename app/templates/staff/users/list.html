@@ -237,6 +237,7 @@ async function viewInfo(id) {
 }
 
 function openDeleteConfirmation(id) {
+    $("#errorLabel").html('');
     $('#password').val('');
     $('#userId').val(id);
     $("#deleteConfirmModal").modal();
