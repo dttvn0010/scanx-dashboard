@@ -123,6 +123,9 @@ def checkIn(request):
 
     arr = code.split('-')
     if len(arr) != 3 or arr[0] != "SCANX":
+        pos = code.find('en')
+        if pos >= 0:
+            code = code[pos+2:]
         return Response({
             'success': False, 
             'error': f'{code}: Invalid device code!'
