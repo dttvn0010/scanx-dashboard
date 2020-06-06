@@ -9,34 +9,33 @@ INVITE_TITLE = 'Invitation to join ScanX'
 
 SMTP_PORT = 465 
 SMTP_SERVER = "smtp.gmail.com"
-SENDER_EMAIL = "ScanX <scanx.cloud@gmail.com>" #"ScanX <contact@scanx.cloud>"
+SENDER = "ScanX <scanx.cloud@gmail.com>"
 GMAIL = "scanx.cloud@gmail.com"
 GMAIL_PASS = "abc@123@def"
 
-def sendMail2(fro, to, subject, body):
+def sendMail2(to, subject, body):
     print('===============', body)
 
     proc = subprocess.Popen(['mail',
                  '-s', f'{subject}\nContent-Type: text/html', 
-                 '-a', f'From: {fro}',
+                 '-a', f'From: {SENDER}',
                  to],
              stdin=subprocess.PIPE)
     proc.stdin.write(body.encode())
     proc.stdin.close()
 
-def sendMail(fro, to, subject, body):
-    print('===============', body)
+def sendMail(to, subject, body):
    
     msg = MIMEMultipart('alternative')
     msg['Subject'] = subject
-    msg['From'] = fro
+    msg['From'] = SENDER
     msg.attach(MIMEText(body, 'html'))
     
     context = ssl.create_default_context()
 
     with smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT, context=context) as server:
         server.login(GMAIL, GMAIL_PASS)
-        server.sendmail(fro, to, msg.as_string())
+        server.sendmail(GMAIL, to, msg.as_string())
 
 def sendAdminInvitationMail(organization, fullname, email, password):
     try:
@@ -48,7 +47,7 @@ def sendAdminInvitationMail(organization, fullname, email, password):
         html = html.replace('${User.FULL_NAME}', fullname)
         html = html.replace('${User.PASSWORD}', password)
 
-        sendMail(SENDER_EMAIL, email, INVITE_TITLE, html)
+        sendMail(email, INVITE_TITLE, html)
     except:
         traceback.print_exc()
 
@@ -62,6 +61,6 @@ def sendInvitationMail(organization, fullname, email, password):
         html = html.replace('${User.FULL_NAME}', fullname)
         html = html.replace('${User.PASSWORD}', password)
 
-        sendMail(SENDER_EMAIL, email, INVITE_TITLE, html)
+        sendMail(email, INVITE_TITLE, html)
     except:
         traceback.print_exc()
