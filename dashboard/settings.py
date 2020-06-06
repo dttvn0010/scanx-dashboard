@@ -163,3 +163,8 @@ ROLES = {
     'STAFF': 'STAFF',
     'USER': 'USER'
 }
+
+HOST_URL = "https://scanx.cloud"
+MOBILE_NO_LOG_IN = True
+MOBILE_USERNAME = 'dttvn0010@gmail.com'
+MOBILE_PASSWORD = 'abcd@1234'

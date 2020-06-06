@@ -29,9 +29,8 @@ def createTenantAdmin(request, organization, adminName, adminEmail):
     user.role = Role.objects.get(code=settings.ROLES['ADMIN'])
     user.save()
 
-    hostURL = request.build_absolute_uri('/')    
-    sendAdminInvitationMail(hostURL, organization.name, adminName, adminEmail, password)
-    #thr = Thread(target=sendAdminInvitationMail, args=(hostURL, organization.name, adminName, adminEmail, password))
+    sendAdminInvitationMail(organization.name, adminName, adminEmail, password)
+    #thr = Thread(target=sendAdminInvitationMail, args=(organization.name, adminName, adminEmail, password))
     #thr.start()
 
 # ========================================== Organization ======================================================
@@ -89,12 +88,11 @@ def resendMail(request, pk):
     org = get_object_or_404(Organization, pk=pk)
     admin = User.objects.filter(organization=org).filter(role__code=settings.ROLES['ADMIN']).first()
     if admin and admin.status == User.Status.INVITED:
-        hostURL = request.build_absolute_uri('/')    
         password = genPassword()
         admin.password = make_password(password)
         admin.save()
-        sendAdminInvitationMail(hostURL, org.name, admin.fullname, admin.email, password)
-        #thr = Thread(target=sendAdminInvitationMail, args=(hostURL, org.name, staff.fullname, staff.email, password))
+        sendAdminInvitationMail(org.name, admin.fullname, admin.email, password)
+        #thr = Thread(target=sendAdminInvitationMail, args=(org.name, staff.fullname, staff.email, password))
         #thr.start()
     
     return redirect('admin-home')

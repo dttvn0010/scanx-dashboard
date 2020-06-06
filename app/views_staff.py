@@ -41,9 +41,8 @@ def createUser(request, fullname, email):
     user.organization = request.user.organization
     user.save()
     
-    hostURL = request.build_absolute_uri('/')        
-    sendInvitationMail(hostURL, user.organization.name, fullname, email, password)
-    #thr = Thread(target=sendInvitationMail, args=(hostURL, user.organization.name, fullname, email, password))
+    sendInvitationMail(user.organization.name, fullname, email, password)
+    #thr = Thread(target=sendInvitationMail, args=(user.organization.name, fullname, email, password))
     #thr.start()
 
     return user
@@ -168,13 +167,12 @@ def resendMail(request, pk):
 
     user = get_object_or_404(User, pk=pk)
     if user.organization and user.status == User.Status.INVITED:
-        hostURL = request.build_absolute_uri('/')    
         password = genPassword()
         user.password = make_password(password)
         user.save()
-        #thr = Thread(target=sendInvitationMail, args=(hostURL, user.organization.name, user.fullname, user.email, password))
+        #thr = Thread(target=sendInvitationMail, args=(user.organization.name, user.fullname, user.email, password))
         #thr.start()
-        sendInvitationMail(hostURL, user.organization.name, user.fullname, user.email, password)
+        sendInvitationMail(user.organization.name, user.fullname, user.email, password)
     
     return redirect('staff-user')
 

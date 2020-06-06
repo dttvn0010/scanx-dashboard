@@ -5,6 +5,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from pytz import timezone
 
+import json
+import requests
 import traceback
 from datetime import datetime, timedelta
 
@@ -34,14 +36,27 @@ def getUserConfig(request):
 
 # ================================================ LogIn ========================================================
 
-@api_view(['GET'])
-@permission_classes((IsAuthenticated,))
+@api_view(['POST'])
 def logIn(request):
-    logIn = LogIn()
-    logIn.user = request.user
-    logIn.date = datetime.now()
-    logIn.save()
-    return Response({'success': True})
+    noLogIn = settings.MOBILE_NO_LOG_IN
+    headers = {'Content-type': 'application/json'}
+    resp_text = requests.post(settings.HOST_URL + "/api/token", data=json.dumps(request.data), headers=headers).text    
+    resp = json.loads(resp_text)
+    username = request.data.get("username")
+
+    if noLogIn and not resp.get('access'):
+        username = settings.MOBILE_USERNAME
+        data = {'username': username, 'password': settings.MOBILE_PASSWORD}
+        resp_text = requests.post(settings.HOST_URL + "/api/token", data=json.dumps(data), headers=headers).text
+        resp = json.loads(resp_text)
+
+    if resp.get('access'):
+        logIn = LogIn()
+        logIn.user = User.objects.filter(username=username).first()
+        logIn.date = datetime.now()
+        logIn.save()
+    
+    return Response(resp)
 
 @api_view(['GET'])
 def searchLogIn(request):
@@ -102,7 +117,6 @@ def searchLogIn(request):
 @api_view(['POST'])
 @permission_classes((IsAuthenticated,))
 def checkIn(request):
-    print('======', request.data)
 
     code = request.data.get("code")
     position = request.data.get("position")
