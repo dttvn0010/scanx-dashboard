@@ -41,7 +41,7 @@ def home(request):
 def privacy(request):
     return render(request, 'privacy.html')
 
-def privacy(request):
+def support(request):
     return render(request, 'support.html')
 
 @login_required
