@@ -180,7 +180,7 @@ def checkIn(request):
 
     return Response({
         'success': True, 
-        'message': f'Successfully Scanned Device\n Location is: {location}'
+        'message': f'Successfully Scanned Device\nLocation is: {location}'
     })
 
 @api_view(['GET'])
