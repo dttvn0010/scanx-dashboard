@@ -31,7 +31,7 @@ def getUserConfig(request):
     return Response({ 
         'nfcEnabled': nfcEnabled,
         'qrScanEnabled': qrScanEnabled,
-        'sharedLocation': sharedLocation
+        'sharedLocation': False,# sharedLocation
     })
 
 # ================================================ LogIn ========================================================
@@ -128,7 +128,7 @@ def checkIn(request):
             code = code[pos+2:]
         return Response({
             'success': False, 
-            'error': f'{code}: Invalid device code!'
+            'error': 'Invalid device code!'
         })
     
     id1, id2 = arr[1:]
@@ -136,13 +136,13 @@ def checkIn(request):
     if not device:
         return Response({
             'success': False, 
-            'error': f'Device {id1}-{id2} does not exist in device table - please contact admin!'
+            'error': f'Device does not exist in device table - please contact admin!'
         })
 
     if not device.installationLocation:
         return Response({
             'success': False, 
-            'error': f'Device {id1}-{id2} is unregistered - please contact admin!'
+            'error': f'Device is unregistered - please contact admin!'
         })
 
     lastCheckIn = CheckIn.objects.filter(user=request.user).order_by('-date').first()
@@ -180,7 +180,7 @@ def checkIn(request):
 
     return Response({
         'success': True, 
-        'message': f'Successfully Scanned Device: {deviceId}, location : {location}'
+        'message': f'Successfully Scanned Device, Location is: {location}'
     })
 
 @api_view(['GET'])
