@@ -151,6 +151,7 @@ def importOrganization(request):
 
             org = Organization()
             org.name = name
+            org.adminUsername = adminEmail
             org.nfcEnabled = nfcEnabled == 'True'
             org.qrScanEnabled = qrScanEnabled == 'True'
             org.active = active == 'True'
