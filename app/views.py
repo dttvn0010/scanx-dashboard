@@ -26,6 +26,33 @@ def logInHook(sender, user, request, **kwargs):
 
 user_logged_in.connect(logInHook)
 
+def initialSetup(request):
+    email = request.GET.get('email')
+    user = User.objects.filter(username=email).first() if email else None
+    if not user or user.status != User.Status.INVITED:
+        return redirect('home')
+
+    form = InitialSetupForm(initial={
+            'fullname': user.fullname
+        })
+
+    if request.method == 'POST':
+        form = InitialSetupForm(request.POST, request.FILES, initial={'username': user.username})
+        if form.is_valid():
+            user.fullname = form.cleaned_data['fullname']
+            user.password = make_password(form.cleaned_data['password'])
+            user.status = User.Status.REGISTERED
+            user.profilePicture = form.cleaned_data['profilePicture']
+            user.save()
+
+            user = authenticate(username=user.username,
+                                    password=form.cleaned_data['password'])
+            login(request, user)
+
+            return HttpResponseRedirect("/")
+
+    return render(request, "registration/initial_setup.html", {'form': form})
+
 @login_required
 def home(request):
     if request.user.is_superuser:
@@ -44,36 +71,6 @@ def privacy(request):
 def support(request):
     return render(request, 'support.html')
 
-@login_required
-def completeRegistration(request):
-    form = RegistrationForm(initial={
-            'fullname': request.user.fullname, 
-            'organization': request.user.organization.name
-        })
-
-    if request.method == 'POST':
-        form = RegistrationForm(request.POST, request.FILES)
-        if form.is_valid():
-            user = request.user
-            user.fullname = form.cleaned_data['fullname']
-            user.password = make_password(form.cleaned_data['password'])
-            user.status = User.Status.REGISTERED
-            user.profilePicture = form.cleaned_data['profilePicture']
-            user.save()
-
-            if False:
-                org = user.organization
-                org.name = form.cleaned_data['organization']
-                org.save()
-
-            user = authenticate(username=user.username,
-                                    password=form.cleaned_data['password'])
-            login(request, user)
-
-            return HttpResponseRedirect("/")
-
-    return render(request, "registration/complete.html", {'form': form})
-
 def signup(request):
    form = MyUserCreationForm()
    
@@ -87,8 +84,6 @@ def signup(request):
             return redirect('home')
 
    return render(request, 'registration/signup.html', { 'form':  form})
-
-
 
 def updateAccount(request):
     form = UpdateAccountForm(initial={

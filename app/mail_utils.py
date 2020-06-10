@@ -43,7 +43,7 @@ def sendAdminInvitationMail(organization, fullname, email, password):
         with open(settings.ADMIN_MAIL_TEMPLATE_PATH, encoding="utf-8") as fi:
             ADMIN_INVITE_TEMPLATE = fi.read()
 
-        html = ADMIN_INVITE_TEMPLATE.replace('${Link.ACCEPT_INVITATION}', settings.HOST_URL)
+        html = ADMIN_INVITE_TEMPLATE.replace('${Link.ACCEPT_INVITATION}', settings.INVITE_URL + f'?email={email}')
         html = html.replace('${User.ORGANIZATION}', organization)
         html = html.replace('${User.FULL_NAME}', fullname)
         html = html.replace('${User.PASSWORD}', password)
@@ -57,7 +57,7 @@ def sendInvitationMail(organization, fullname, email, password):
         with open(settings.MAIL_TEMPLATE_PATH, encoding="utf-8") as fi:
             INVITE_TEMPLATE = fi.read()
 
-        html = INVITE_TEMPLATE.replace('${Link.ACCEPT_INVITATION}', settings.HOST_URL)
+        html = INVITE_TEMPLATE.replace('${Link.ACCEPT_INVITATION}', settings.INVITE_URL + f'?email={email}')
         html = html.replace('${User.ORGANIZATION}', organization)
         html = html.replace('${User.FULL_NAME}', fullname)
         html = html.replace('${User.PASSWORD}', password)

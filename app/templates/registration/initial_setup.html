@@ -25,7 +25,7 @@
 </style>
 
 <div class="signup-form">
-  <h4>Complete Registration</h4>
+  <h4>User Registration: Initial Setup</h4>
   <br>
   <form method="POST" enctype="multipart/form-data">{% csrf_token %}
     <div class="form-group">
@@ -34,15 +34,11 @@
       {{ form.fullname.errors }}
     </div>
 
-    {%if False %}
-      <div class="form-group">
-        <label>Your Organization name:</label>
-        <input name="organization" type="text" class="form-control" value="{{form.organization.value}}" />
-        {{ form.organization.errors }}
-      </div>
-    {%else%}
-      <input name="organization" type="hidden" value="{{form.organization.value}}">
-    {% endif %}
+    <div class="form-group">
+      <label>Enter temporary password (sent with your email):</label>
+      <input name="tempPassword" type="password" class="form-control" />
+      {{ form.tempPassword.errors }}
+    </div>
 
     <div class="form-group">
       <label>Enter a new Password:</label>
@@ -57,7 +53,7 @@
     </div>
 
     <div class="form-group">
-      <label>Choose a profile picture:</label>
+      <label>Choose a profile image (20MB max):</label>
       <input type="file" id="profilePicture" name="profilePicture" accept="image/*" class="form-control-file" />
       <img style="display: none;" class="mt-2" width="128" height="128" id="profilePicturePreview" alt="" />
       {{ form.profilePicture.errors }}

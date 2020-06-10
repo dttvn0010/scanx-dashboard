@@ -165,6 +165,7 @@ ROLES = {
 }
 
 HOST_URL = "https://scanx.cloud"
+INVITE_URL = HOST_URL + "/accounts/initial_setup"
 MOBILE_NO_LOG_IN = True
 MOBILE_USERNAME = 'dttvn0010@gmail.com'
 MOBILE_PASSWORD = 'abcd@1234'

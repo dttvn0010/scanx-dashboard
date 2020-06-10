@@ -14,17 +14,27 @@ class MyUserChangeForm(UserChangeForm):
         model = User
         fields = ('username', 'fullname', 'email', 'organization')
 
-class RegistrationForm(forms.Form):
-    fullname = forms.CharField(max_length=30, label='Your name')
-    organization = forms.CharField(max_length=200, label='Your organization name')
-    password = forms.CharField(max_length=30, widget=forms.PasswordInput, label='Enter a new password')
-    password2 = forms.CharField(max_length=30, widget=forms.PasswordInput, label='Confirmed Password')
-    profilePicture = forms.ImageField(label="Choose a profile picture", required=False)
+class InitialSetupForm(forms.Form):
+    fullname = forms.CharField(max_length=30)
+    tempPassword = forms.CharField(max_length=30)
+    password = forms.CharField(max_length=30)
+    password2 = forms.CharField(max_length=30)
+    profilePicture = forms.ImageField(required=False)
+
+    def clean_tempPassword(self):
+        tempPassword = self.cleaned_data.get('tempPassword', '')
+        user = User.objects.filter(username=self.initial.get('username')).first()
+        ok = user and user.check_password('temp_' + tempPassword)
+        
+        if not ok:
+            raise forms.ValidationError('Incorrect temporary password')
+
+        return tempPassword
 
     def clean_password(self):
         password = self.cleaned_data.get('password', '')
         if len(password) < 8:
-            raise forms.ValidationError('Password too short')
+            raise forms.ValidationError('Password is too short')
 
         if password.isdigit():
             raise forms.ValidationError('Password cannot be all digits')

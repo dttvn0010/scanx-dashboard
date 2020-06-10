@@ -28,12 +28,12 @@ def mapView(request):
 
     return render(request, "staff/map_view.html")
 
-def createUser(request, fullname, email):
+def createTempUser(request, fullname, email):
     if email == "":
         return 
 
     password = genPassword()
-    user = User.objects.create_user(username=email, password=password)
+    user = User.objects.create_user(username=email, password='temp_' + password)
     user.fullname = fullname
     user.email = email
     user.status = User.Status.INVITED
@@ -42,8 +42,6 @@ def createUser(request, fullname, email):
     user.save()
     
     sendInvitationMail(user.organization.name, fullname, email, password)
-    #thr = Thread(target=sendInvitationMail, args=(user.organization.name, fullname, email, password))
-    #thr.start()
 
     return user
 
@@ -51,7 +49,7 @@ def createUser(request, fullname, email):
 # ========================================== Users======================================================
 
 @login_required
-def listUser(request):
+def listUsers(request):
     if not request.user.organization:
         return redirect('login')
 
@@ -69,7 +67,7 @@ def addUser(request):
         if form.is_valid():
             email = form.cleaned_data['email']
             fullname = form.cleaned_data['fullname']            
-            user = createUser(request,  fullname, email)
+            user = createTempUser(request,  fullname, email)
             user.nfcEnabled = form.cleaned_data['nfcEnabled']
             user.qrScanEnabled = form.cleaned_data['qrScanEnabled']
             user.sharedLocation = form.cleaned_data['sharedLocation']
@@ -149,7 +147,7 @@ def importUser(request):
             if User.objects.filter(email=email).count() > 0 or User.objects.filter(fullname=fullname).count() > 0:
                 continue
 
-            user = createUser(request, fullname, email)
+            user = createTempUser(request, fullname, email)
             user.role = Role.objects.get(code=role)
             user.nfcEnabled = nfcEnabled == 'True'
             user.qrScanEnabled = qrScanEnabled == 'True'
@@ -168,10 +166,8 @@ def resendMail(request, pk):
     user = get_object_or_404(User, pk=pk)
     if user.organization and user.status == User.Status.INVITED:
         password = genPassword()
-        user.password = make_password(password)
+        user.password = make_password('temp_' + password)
         user.save()
-        #thr = Thread(target=sendInvitationMail, args=(user.organization.name, user.fullname, user.email, password))
-        #thr.start()
         sendInvitationMail(user.organization.name, user.fullname, user.email, password)
     
     return redirect('staff-user')
@@ -198,7 +194,7 @@ def unlockUser(request, pk):
 
 #================================= Locations  ====================================================================
 @login_required
-def listLocation(request):
+def listLocations(request):
     if not request.user.organization:
         return redirect('login')
 
@@ -307,7 +303,7 @@ def importLocation(request):
 
 
 @login_required
-def listDevice(request):
+def listDevices(request):
     if not request.user.organization:
         return redirect('login')
 

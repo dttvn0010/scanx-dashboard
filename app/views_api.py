@@ -31,7 +31,7 @@ def getUserConfig(request):
     return Response({ 
         'nfcEnabled': nfcEnabled,
         'qrScanEnabled': qrScanEnabled,
-        'sharedLocation': False,# sharedLocation
+        'sharedLocation': sharedLocation and (request.user.username != settings.MOBILE_USERNAME)
     })
 
 # ================================================ LogIn ========================================================
@@ -305,11 +305,11 @@ def searchOrganization(request):
     data = OrganizationSerializer(organizations, many=True).data
 
     for i, org in enumerate(organizations):
-        staff = User.objects.filter(organization=org).filter(role__code=settings.ROLES['ADMIN']).first()
-        data[i]['admin'] = {'name': staff.fullname if staff else "", 'email': staff.email if staff else ""}
+        tenantAdmin = User.objects.filter(username=org.adminUsername).first()
+        data[i]['admin'] = {'name': tenantAdmin.fullname if tenantAdmin else "", 'email': tenantAdmin.email if tenantAdmin else ""}
         data[i]['userCount'] = User.objects.filter(organization=org).count()
         data[i]['deviceCount'] = Device.objects.filter(organization=org).count()
-        data[i]['status'] = staff.status if staff else User.Status.INVITED
+        data[i]['status'] = tenantAdmin.status if tenantAdmin else User.Status.INVITED
     
     return Response({
         "draw": draw,
@@ -322,11 +322,11 @@ def searchOrganization(request):
 def viewOrganizationDetails(request, pk):    
     org = Organization.objects.get(pk=pk)
     data = OrganizationSerializer(org).data
-    staff = User.objects.filter(organization=org).filter(role__code=settings.ROLES['ADMIN']).first()
-    data['admin'] = {'name': staff.fullname if staff else "", 'email': staff.email if staff else ""}
+    tenantAdmin = User.objects.filter(username=org.adminUsername).first()
+    data['admin'] = {'name': tenantAdmin.fullname if tenantAdmin else "", 'email': tenantAdmin.email if tenantAdmin else ""}
     data['userCount'] = User.objects.filter(organization=org).count()
     data['deviceCount'] = Device.objects.filter(organization=org).count()
-    data['status'] = staff.status if staff else User.Status.INVITED
+    data['status'] = tenantAdmin.status if tenantAdmin else User.Status.INVITED
     
     return Response(data)
 
@@ -354,22 +354,36 @@ def searchUser(request):
     keyword = request.query_params.get('search[value]', '')
     start = int(request.query_params.get('start', 0))
     length = int(request.query_params.get('length', 0))
+
+    if request.query_params.get("organizationId"):
+        organization = Organization.objects.get(pk=request.query_params.get("organizationId"))
+    else:
+        organization=request.user.organization
     
-    users = User.objects.filter(organization=request.user.organization)
+    users = User.objects.filter(organization=organization)
     recordsTotal = users.count()
 
     users = users.filter(Q(fullname__contains=keyword) | Q(email__contains=keyword))
-    users = users.order_by('role__level', '-createdDate')
+    users = users.order_by('role__level', 'createdDate')
     
     recordsFiltered = users.count()
     users = users[start:start+length]
     data = UserSerializer(users, many=True).data
+    tenantAdminName = organization.adminUsername if organization else None
+
+    for i, user in enumerate(users):
+        locked = user.role and user.role.code == 'ADMIN'
+
+        if request.user.username == tenantAdminName  and user.username != tenantAdminName:
+            locked = False
+
+        data[i]['locked'] = locked
         
     return Response({
         "draw": draw,
         "recordsTotal": recordsTotal,
         "recordsFiltered": recordsFiltered,
-        "data": data
+        "data": data,
     })
 
 @api_view(['GET'])

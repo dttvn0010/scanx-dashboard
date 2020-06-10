@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 
 class Organization(models.Model):
     name = models.CharField(verbose_name='Company Name', max_length=200, unique=True)
+    adminUsername = models.CharField(max_length=150, null=True)
     description = models.CharField(max_length=500, blank=True, null=True)
     dateTimeFormat = models.CharField(max_length=30, blank=True, null=True)
     nfcEnabled = models.BooleanField(verbose_name='NFC Enabled', default=False)
