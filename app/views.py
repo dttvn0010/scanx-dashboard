@@ -59,7 +59,7 @@ def home(request):
         return HttpResponseRedirect("/_admin")
     else:
         if(request.user.status == User.Status.INVITED):
-            return HttpResponseRedirect("/accounts/initial_setup")
+            return HttpResponseRedirect("/accounts/login")
         elif request.user.role and request.user.role.code in [settings.ROLES['ADMIN'], settings.ROLES['STAFF']]:
             return HttpResponseRedirect("/staff")
         else:
