@@ -12056,7 +12056,7 @@ footer.sticky-footer {
 
 footer.sticky-footer .copyright {
   line-height: 1;
-  font-size: 0.8rem;
+  font-size: 1.0rem;
 }
 
 body.sidebar-toggled footer.sticky-footer {

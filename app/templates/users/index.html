@@ -24,7 +24,7 @@
 <body id="page-top">
   <div id="wrapper">
 
-    <div id="content-wrapper">
+    <div id="content-wrapper" class="d-flex flex-column">
       <div id="content">
         <nav class="navbar navbar-expand navbar-light topbar shadow">
           <ul class="navbar-nav">
@@ -37,13 +37,13 @@
               <span class="align-self-center">Last Login: {{ user.last_login|date:"d/m/Y H:i:s" }}</span>
             </li>
             <li class="nav-item dropdown no-arrow d-flex">
-              <span class="mr-2 align-self-center">{{ user.fullname|default:'' }}</span>              
+              <span class="mr-2 align-self-center">{{ user.fullname|default:'' }}</span>
               <a class="p-0 nav-link dropdown-toggle" href="#" data-toggle="dropdown" aria-haspopup="true"
                 aria-expanded="false">
                 {% if user.profilePicture %}
-                  <img class="img-profile rounded-circle" src="/{{ user.profilePicture.url }}">
+                <img class="img-profile rounded-circle" src="/{{ user.profilePicture.url }}">
                 {%else%}
-                  <img class="img-profile rounded-circle" src="/static/img/user.png">
+                <img class="img-profile rounded-circle" src="/static/img/user.png">
                 {%endif%}
               </a>
               <div class="dropdown-menu dropdown-menu-right">
@@ -57,40 +57,45 @@
                   Logout
                 </a>
               </div>
-            </li>            
+            </li>
           </ul>
         </nav>
 
         {%block content %}
-        <div style="min-height: 800px;">
-          <div class="container mt-3 text-center">
-            <div class="row">
-              <div class="col">
-                <h1>Welcome to ScanX!</h1>
-                Please use the below links download the mobile app
-              </div>
+        <div class="container mt-3 mb-3 text-center">
+          <div class="row">
+            <div class="col">
+              <h1>Welcome to ScanX!</h1>
+              Please use the below links download the mobile app
             </div>
-            <div class="row mt-3">
-              <div class="col-6 text-center">
-                <h4>iOS</h4>
-                <br>
-                <img class="mb-3" style="max-width:300px;" src="/static/img/ios_app.png">
-                <br>
-                <a href="https://i.diawi.com/HdKTQG">https://i.diawi.com/HdKTQG</a>
-              </div>
-              <div class="col-6 text-center">
-                <h4>Android</h4>
-                <br>
-                <img class="mb-3" style="max-width:300px;" src="/static/img/android_app.png">
-                <br>
-                <a href="https://i.diawi.com/4C8BU5">https://i.diawi.com/4C8BU5</a>
-              </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-6 text-center">
+              <h4>iOS</h4>
+              <br>
+              <img class="mb-3" style="max-width:300px;" src="/static/img/ios_app.png">
+              <br>
+              <a href="https://i.diawi.com/HdKTQG">https://i.diawi.com/HdKTQG</a>
+            </div>
+            <div class="col-6 text-center">
+              <h4>Android</h4>
+              <br>
+              <img class="mb-3" style="max-width:300px;" src="/static/img/android_app.png">
+              <br>
+              <a href="https://i.diawi.com/4C8BU5">https://i.diawi.com/4C8BU5</a>
             </div>
           </div>
         </div>
         {%endblock%}
 
       </div> <!-- End of Main Content -->
+      <footer class="sticky-footer bg-white">
+        <div class="container my-auto">
+          <div class="copyright text-center my-auto">
+            <span>Copyright &copy; ScanX 2020. All rights reserved.</span>
+          </div>
+        </div>
+      </footer>
     </div> <!-- End of Content Wrapper -->
   </div> <!-- End of Page Wrapper -->
   <script src="/static/js/sb-admin-2.js"></script>
