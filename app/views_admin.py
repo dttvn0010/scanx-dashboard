@@ -20,7 +20,7 @@ def createTenantAdmin(request, organization, adminName, adminEmail):
         return 
 
     password = genPassword()
-    user = User.objects.create_user(username=adminEmail, password=password)
+    user = User.objects.create_user(username=adminEmail, password='temp_' + password)
     user.fullname = adminName
     user.email = adminEmail
     user.status = User.Status.INVITED
