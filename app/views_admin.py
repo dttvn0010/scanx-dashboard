@@ -59,6 +59,7 @@ def addOrganization(request):
         if form.is_valid():
             org = form.save(commit=False)
             org.createdDate = datetime.now()
+            org.adminUsername = form.cleaned_data['adminEmail']
             org.save()
 
             adminEmail = form.cleaned_data['adminEmail']
