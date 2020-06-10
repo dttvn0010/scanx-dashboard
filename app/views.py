@@ -1,4 +1,6 @@
 import os
+import sys
+
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate
@@ -6,6 +8,7 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.signals import user_logged_in
 from django.conf import settings
+from django.core.files.uploadedfile import InMemoryUploadedFile
 
 from datetime import datetime
 import string
@@ -13,6 +16,8 @@ import random
 import csv
 import json
 from threading import Thread
+from io import BytesIO
+from PIL import Image
 
 from .models import *
 from .forms import *
@@ -42,7 +47,11 @@ def initialSetup(request):
             user.fullname = form.cleaned_data['fullname']
             user.password = make_password(form.cleaned_data['password'])
             user.status = User.Status.REGISTERED
-            user.profilePicture = form.cleaned_data['profilePicture']
+            
+            profilePicture = form.cleaned_data.get('profilePicture')
+            if profilePicture and profilePicture.name != '' :
+                user.profilePicture = resizeProfileImage(profilePicture)
+
             user.save()
 
             user = authenticate(username=user.username,
@@ -85,6 +94,19 @@ def signup(request):
 
    return render(request, 'registration/signup.html', { 'form':  form})
 
+def resizeProfileImage(imgField):
+    imageFile = BytesIO(imgField.read())
+    image = Image.open(imageFile)
+    w, h = image.size
+    sz = min(w, h, 300)
+    
+    image = image.resize((sz, sz), Image.ANTIALIAS)
+
+    output = BytesIO()
+    image.save(output, 'JPEG', quality=90)
+    fileName = f"{imgField.name.split('.')[0]}.jpg"
+    return InMemoryUploadedFile(output,'ImageField', fileName , 'image/jpeg', sys.getsizeof(output), None)
+    
 def updateAccount(request):
     form = UpdateAccountForm(initial={
             'fullname': request.user.fullname, 
@@ -98,8 +120,9 @@ def updateAccount(request):
             user.username = form.cleaned_data['email']
             user.email = form.cleaned_data['email']
             user.fullname = form.cleaned_data['fullname']
-            if form.cleaned_data['profilePicture']:
-                user.profilePicture = form.cleaned_data['profilePicture']
+            profilePicture = form.cleaned_data.get('profilePicture')
+            if profilePicture and profilePicture.name != '' :
+                user.profilePicture = resizeProfileImage(profilePicture)
             user.save()
             
             return HttpResponseRedirect("/")
