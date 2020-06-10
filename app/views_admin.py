@@ -91,7 +91,7 @@ def resendMail(request, pk):
         return redirect('login')
 
     org = get_object_or_404(Organization, pk=pk)
-    tenantAdmin = User.objects.filter(username=org.adminUsername).fist()
+    tenantAdmin = User.objects.filter(username=org.adminUsername).first()
     if tenantAdmin and tenantAdmin.status == User.Status.INVITED:
         password = genPassword()
         tenantAdmin.password = make_password('temp_' + password)
