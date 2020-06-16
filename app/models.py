@@ -57,7 +57,7 @@ class User(AbstractUser):
 class Location(models.Model):
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE,  blank=True, null=True)
     addressLine1 = models.CharField(verbose_name="Address Line 1", max_length=100)
-    addressLine2 = models.CharField(verbose_name="Address Line 2", max_length=100)    
+    addressLine2 = models.CharField(verbose_name="Address Line 2", max_length=100, blank=True, null=True)    
     city = models.CharField(verbose_name='City', max_length=50)
     postCode = models.CharField(verbose_name="Post Code", max_length=10)
     geoLocation = models.CharField(verbose_name="Map Coordinates", max_length=30, null=True)
