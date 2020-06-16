@@ -23,6 +23,7 @@ def createTenantAdmin(request, organization, adminName, adminEmail):
     user = User.objects.create_user(username=adminEmail, password='temp_' + password)
     user.fullname = adminName
     user.email = adminEmail
+    user.nfcEnabled = user.qrScanEnabled = user.sharedLocation = True
     user.status = User.Status.INVITED
     user.createdDate = datetime.now()
     user.organization = organization
@@ -60,6 +61,7 @@ def addOrganization(request):
             org = form.save(commit=False)
             org.createdDate = datetime.now()
             org.adminUsername = form.cleaned_data['adminEmail']
+            org.nfcEnabled = org.qrScanEnabled = True
             org.save()
 
             adminEmail = form.cleaned_data['adminEmail']

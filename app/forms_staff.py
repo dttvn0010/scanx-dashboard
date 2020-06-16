@@ -29,6 +29,15 @@ class UserChangeForm(forms.ModelForm):
     qrScanEnabled = forms.BooleanField(label='QR Scanning Enabled', required=False)
     sharedLocation = forms.BooleanField(label='Geo Location Enabled', required=False)
 
+class UserAdminChangeForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ( 'nfcEnabled', 'qrScanEnabled', 'sharedLocation')
+
+    nfcEnabled = forms.BooleanField(label='NFC Enabled', required=False)
+    qrScanEnabled = forms.BooleanField(label='QR Scanning Enabled', required=False)
+    sharedLocation = forms.BooleanField(label='Geo Location Enabled', required=False)    
+
 class LocationForm(forms.ModelForm):
     class Meta:
         model = Location

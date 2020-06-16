@@ -67,6 +67,7 @@ urlpatterns = [
     path('staff/reports/log_in/export_pdf', views_staff.reportLogInExportPdf),
 
     path('staff/settings/organization', views_staff.configureOranization),
+    path('staff/app_info', views_staff.appInfo),
 
     # API
     path('api/test', views_api.test),

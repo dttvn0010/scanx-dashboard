@@ -83,10 +83,13 @@ def updateUser(request, pk):
         return redirect('login')
 
     user = get_object_or_404(User, pk=pk)
-    form = UserChangeForm(instance=user)
+    form = UserChangeForm(instance=user) if user.role.code != 'ADMIN' else UserAdminChangeForm(instance=user)
 
     if request.method == 'POST':
-        form = UserChangeForm(request.POST, instance=user)
+        form = UserChangeForm(request.POST, instance=user) \
+                if user.role.code != 'ADMIN' \
+                else UserAdminChangeForm(request.POST, instance=user)
+
         if form.is_valid():
             form.save()
             return redirect('staff-user')
@@ -510,3 +513,6 @@ def configureOranization(request):
             saved = True
 
     return render(request, 'staff/settings/organization.html', {'form': form, 'saved': saved})
+
+def appInfo(request):
+    return render(request, 'staff/app_link.html')    

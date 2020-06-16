@@ -42,7 +42,7 @@
     {% block sidebar %}
     <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark" id="accordionSidebar">
       <a class="sidebar-brand d-flex align-items-center" href="/">
-        <div class="sidebar-brand-text">ScanX</div>
+        <span><img style="width: 80px; height: 80px;" src="/static/img/scanX.png"></span>
       </a>
 
       <hr class="sidebar-divider my-0">
@@ -112,6 +112,13 @@
         <li class="nav-item">
           <a class="nav-link" href="#">
             <span>Logs</span></a>
+        </li>
+
+        <hr class="sidebar-divider my-0">
+
+        <li class="nav-item {% if page == 7 %} active {%endif%}">
+          <a class="nav-link" href="/staff/app_info">
+            <span>App Info</span></a>
         </li>
 
         <hr class="sidebar-divider my-0">
