@@ -83,12 +83,17 @@ def updateUser(request, pk):
         return redirect('login')
 
     user = get_object_or_404(User, pk=pk)
-    form = UserChangeForm(instance=user) if user.role.code != 'ADMIN' else UserAdminChangeForm(instance=user)
+    
+    if user.role.code != 'ADMIN' and user.username = request.user.username:
+        form = UserAdminChangeForm(instance=user)
+    else
+        form = UserChangeForm(instance=user)
 
     if request.method == 'POST':
-        form = UserChangeForm(request.POST, instance=user) \
-                if user.role.code != 'ADMIN' \
-                else UserAdminChangeForm(request.POST, instance=user)
+        if user.role.code != 'ADMIN' and user.username = request.user.username:
+            form = UserAdminChangeForm(request.POST, instance=user)
+        else:
+            form = UserChangeForm(request.POST, instance=user)
 
         if form.is_valid():
             form.save()
