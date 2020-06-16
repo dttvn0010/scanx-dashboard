@@ -61,7 +61,6 @@ def addOrganization(request):
             org = form.save(commit=False)
             org.createdDate = datetime.now()
             org.adminUsername = form.cleaned_data['adminEmail']
-            org.nfcEnabled = org.qrScanEnabled = True
             org.save()
 
             adminEmail = form.cleaned_data['adminEmail']
