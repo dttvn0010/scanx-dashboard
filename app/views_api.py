@@ -185,6 +185,42 @@ def checkIn(request):
 
 @api_view(['GET'])
 @permission_classes((IsAuthenticated,))
+def getCheckInHistory(request):
+    startDate = request.query_params.get("startDate")
+    endDate = request.query_params.get("endDate")
+    
+    startDate = datetime.strptime(startDate, '%d/%m/%Y') if startDate else None
+    endDate = datetime.strptime(endDate, '%d/%m/%Y') + timedelta(days=1) if endDate else None
+
+    start = int(request.query_params.get('start', 0))
+    length = int(request.query_params.get('length', 0))
+    
+    checkIns = CheckIn.objects.filter(user__id=request.user.id)
+
+    if startDate:        
+        checkIns = checkIns.filter(date__gte=startDate)
+
+    if endDate:        
+        checkIns = checkIns.filter(date__lt=endDate)
+        
+    checkIns = checkIns.order_by('-date')
+    checkIns = checkIns[start:start+length]
+    
+    data = []
+
+    for item in checkIns:
+        data.append({
+            'location': str(item.location),
+            'date': item.date.strftime('%d/%m/%Y %H:%M:%S') if item.date else '',
+            'geoLocation': item.geoLocation
+        })
+
+    return Response({
+        "data": data
+    })
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticated,))
 def getLastCheckInTime(request):
     lastCheckIn = CheckIn.objects.order_by('-date').first()
     if lastCheckIn:

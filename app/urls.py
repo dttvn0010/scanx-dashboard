@@ -76,6 +76,7 @@ urlpatterns = [
     path('api/get_user_config', views_api.getUserConfig),
 
     path('api/checkin', views_api.checkIn),
+    path('api/checkin/get_history', views_api.getCheckInHistory),
     path('api/checkin/search', views_api.searchCheckIn),
     path('api/checkin/last_updated', views_api.getLastCheckInTime),
     path('api/checkin/check_for_update', views_api.checkForNewCheckIn),
