@@ -22,19 +22,22 @@
     <div class="col-6 offset-3">
       <form class="update-account-form" method="POST" enctype="multipart/form-data">{% csrf_token %}
         <div class="form-group">
-          <label><b>Email:</b></label>
+          <label><b>Email * :</b></label>
           <input name="email" type="text" class="form-control" value="{{form.email.value}}" />
           {{ form.email.errors }}
         </div>
   
         <div class="form-group">
-          <label><b>Full Name:</b></label>
+          <label><b>Full Name * :</b></label>
           <input name="fullname" type="text" class="form-control" value="{{form.fullname.value|default:''}}" />
           {{ form.fullname.errors }}
         </div>
 
         <div class="form-group">
-          <label><b>Profile picture:</b></label>
+          <label>
+            <b>Profile picture:</b>
+            <br>(<small>JPG/PNG/GIF file with maximum size of 25Mb</small>)
+          </label>
           <input type="file" id="profilePicture" name="profilePicture" accept="image/*" class="mt-2 form-control-file" />
           <div class="row justify-content-center" >
             {%if user.profilePicture %}

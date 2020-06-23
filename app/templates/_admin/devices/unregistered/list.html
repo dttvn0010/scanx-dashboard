@@ -8,28 +8,38 @@
 
 {% block content %}
 <div class="content p-3">
-  <div class="row mb-4">
-    <div class="col-8">
-      <a href='/_admin/devices/unregistered/add' class="btn btn-secondary">Add Devices</a>
-      <button class="btn btn-secondary mr-2" onclick="showImportModal()">
-        <i class="fas fa-upload"></i>Import
-      </button>      
-      <a href='/_admin/devices/unregistered/export' class="btn btn-secondary mr-2">
-        <i class="fas fa-download"></i>Export
-      </a>      
+  <div class="card shadow mb-4">
+    <div class="card-header py-3">
+      <h6 class="m-0 font-weight-bold text-primary">List of Unregistered devices</h6>
+    </div>
+    <div class="card-body"> 
+      <div class="row mb-4">
+        <div class="col-8">
+          <a href='/_admin/devices/unregistered/add' class="btn btn-sm btn-primary mr-1">
+            <i class="fas fa-plus text-white-50"></i> Add Devices
+          </a>
+          <button class="btn btn-sm btn-primary mr-1" onclick="showImportModal()">
+            <i class="fas fa-upload text-white-50"></i> Import
+          </button>      
+          <a href='/_admin/devices/unregistered/export' class="btn btn-sm btn-primary mr-1">
+            <i class="fas fa-download text-white-50"></i> Export
+          </a>      
+        </div>
+      </div>
+      <div class="table-responsive">
+        <table id="table" class="table table-bordered" width="100%" cellspacing="0">
+          <thead>
+            <tr>
+              <th style="width: 10%;">Enabled</th>
+              <th style="width: 40%;">ID #1</th>
+              <th style="width: 40%;">ID #2</th>
+              <th style="width: 10%;"></th>
+            </tr>
+          </thead>
+        </table>
+      </div>
     </div>
   </div>
-
-  <table id="table" class="display mt-2">
-    <thead>
-      <tr>
-        <th style="width: 10%;">Enabled</th>
-        <th style="width: 40%;">ID #1</th>
-        <th style="width: 40%;">ID #2</th>
-        <th style="width: 10%;"></th>
-      </tr>
-    </thead>
-  </table>
 
   <div class="modal fade" id="uploadModal">
     <div class="modal-dialog modal-lg">
@@ -59,8 +69,8 @@
             {%csrf_token%}
             <label>Select the CSV column you want to use the data from for each field.</label>
             <div id="fmt2Body"></div>
-            <button type="submit" class="mt-3 btn btn-secondary">
-              Import
+            <button type="submit" class="mt-3 btn btn-sm btn-primary">
+              <i class="fas fa-upload text-white-50"></i> Import
             </button>
           </form>
         </div>       
@@ -93,7 +103,7 @@
                 <label id="errorLabel" style="color: red;"></label>
               </div>
             </div>
-            <button type="button" onclick="deleteDevice()" class="mt-3 btn btn-danger">Delete</button>
+            <button type="button" onclick="deleteDevice()" class="mt-3 btn btn-sm btn-danger">Delete</button>
           </form>
         </div>
       </div>
@@ -107,6 +117,9 @@ $(document).ready(function() {
     "ordering": false,
     "processing": true,
     "serverSide": true,
+    "language": {
+      "processing": "<div class='spinner-border'></div>"
+    },
     "ajax": "/api/device/unregistered/search",
     "columns": [
       { "data": "enabled",

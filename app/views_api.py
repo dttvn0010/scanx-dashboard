@@ -234,17 +234,26 @@ def getLastCheckInTime(request):
 def checkForNewCheckIn(request):
     lastUpdated = request.GET.get('last_updated', '')
     updated = False
+    newCheckIn = None
 
     if lastUpdated != '':
         lastUpdatedTime = datetime.strptime(lastUpdated, '%d/%m/%Y %H:%M:%S')
         lastCheckIn = CheckIn.objects.order_by('-date').first()
 
         if lastCheckIn:
-            lastUpdated = lastCheckInDate = CheckInSerializer(lastCheckIn).data['date']
+            newCheckIn = CheckInSerializer(lastCheckIn).data
+            lastUpdated = lastCheckInDate = newCheckIn['date']
             lastCheckInDate = datetime.strptime(lastCheckInDate, '%d/%m/%Y %H:%M:%S')
             updated = lastCheckInDate > lastUpdatedTime
 
-    return Response({'updated': updated, 'lastUpdated': lastUpdated})
+            newCheckIn['user'] = newCheckIn["userFullName"]
+            arr = newCheckIn['geoLocation'].split(',')
+            if len(arr) == 2:
+                lat = float(arr[0])
+                lng = float(arr[1])
+                newCheckIn['geoLocation'] = {'lat': lat, 'lng': lng}
+
+    return Response({'updated': updated, 'lastUpdated': lastUpdated, 'newCheckIn': newCheckIn})
 
 @api_view(['GET'])
 def searchCheckIn(request):

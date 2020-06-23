@@ -8,20 +8,35 @@
 
 {% block content %}
 <div class="content p-3">
-  <form id="fmt" method="POST" novalidate> 
-    {% csrf_token %}
-    {% if edit_user %}
-    <h5>
-      User: {{ edit_user.username }}
-      {% if edit_user.fullname %}
-        ({{edit_user.fullname}})
-      {%endif%}
-    </h5>
-    {%endif%}
-    <table class="table table-form mt-2">{{ form }}</table>
-    <button id="btn_save" onclick="save()" class="btn btn-primary" type="button">Save</button>
-    <a class="btn btn-secondary" href='/staff/users'>Back</a>
-  </form>
+  <div class="card shadow mb-4">
+    <div class="card-header py-3">
+      <h6 class="m-0 font-weight-bold text-primary">User Details</h6>
+    </div>
+    <div class="card-body">
+      <form id="fmt" method="POST" novalidate> 
+        {% csrf_token %}        
+        <table class="table table-form mb-2">
+          {% if edit_user %}
+            <tr>
+              <th>Full Name:</th>
+              <td>{{ edit_user.fullname }}</td>              
+            </tr>
+            <tr>
+              <th>Email address:</th>
+              <td>{{edit_user.email}}</td>              
+            </tr>         
+          {%endif%}
+          {{ form }}
+        </table>
+        <a class="btn btn-sm btn-secondary mr-1" href='/staff/users'>
+          <i class="fas fa-arrow-left text-white-50"></i> Back
+        </a>
+        <button class="btn btn-sm btn-primary" id="btn_save" onclick="save()" type="button">
+          <i class="fas fa-save text-white-50"></i> Save
+        </button>        
+      </form>
+    </div>
+  </div>
 </div>
 <script>
   function save() {

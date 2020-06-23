@@ -8,14 +8,23 @@
 
 {% block content %}
 <div class="content p-3">
-  {%if saved%}
-    <span id="message" class="badge badge-success mb-3">Successfully saved!</span>
-  {%endif%}
-  <form id="fmt" method="POST" novalidate> 
-    {% csrf_token %}
-    <table class="table table-form mt-2">{{ form }}</table>
-    <button class="btn btn-primary" type="submit" onclick="save()">Save</button>
-  </form>
+  <div class="card shadow mb-4">
+    <div class="card-header py-3">
+      <h6 class="m-0 font-weight-bold text-primary">Organization Info</h6>
+    </div>
+    <div class="card-body">
+      {%if saved%}
+        <span id="message" class="badge badge-success mb-3">Successfully saved!</span>
+      {%endif%}
+      <form id="fmt" method="POST" novalidate> 
+        {% csrf_token %}
+        <table class="table table-form mt-2">{{ form }}</table>
+        <button class="btn btn-sm btn-primary" type="submit" onclick="save()">
+          <i class="fas fa-save text-white-50"></i> Save
+        </button>
+      </form>
+    </div>
+  </div>
 </div>
 <script>
 function save() {

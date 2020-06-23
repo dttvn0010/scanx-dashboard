@@ -115,7 +115,7 @@ def exportOrganization(request):
         writer = csv.writer(fo)
         writer.writerow(ORG_HEADER)
         for item in lst:
-            tenantAdmin = User.objects.filter(username=org.adminUsername).first()
+            tenantAdmin = User.objects.filter(username=item.adminUsername).first()
             adminName = tenantAdmin.fullname if tenantAdmin else ''
             adminEmail = tenantAdmin.email if tenantAdmin else ''
             writer.writerow([item.name, adminName, adminEmail, item.nfcEnabled, item.qrScanEnabled, item.active])

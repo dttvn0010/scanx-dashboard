@@ -6,8 +6,8 @@ class UserCreateForm(forms.ModelForm):
         model = User
         fields = ('fullname', 'email', 'nfcEnabled', 'qrScanEnabled', 'sharedLocation', 'role')
 
-    fullname = forms.CharField(max_length=30, label="Full Name")
-    email = forms.EmailField(max_length=50, label="Email address")
+    fullname = forms.CharField(max_length=30, label="Full Name * ")
+    email = forms.EmailField(max_length=50, label="Email address * ")
     nfcEnabled = forms.BooleanField(label='NFC Enabled', required=False)
     qrScanEnabled = forms.BooleanField(label='QR Scanning Enabled', required=False)
     sharedLocation = forms.BooleanField(label='Geo Location Enabled', required=False)
@@ -49,9 +49,9 @@ class DeviceCreateForm(forms.Form):
         super().__init__(*args, **kwargs)  
         self.fields['installationLocation'].queryset = Location.objects.filter(organization=organization)
 
-    id1 = forms.CharField()
-    id2 = forms.CharField()
-    installationLocation = forms.ModelChoiceField(label="Installation Location", queryset=Location.objects.all())
+    id1 = forms.CharField(label="Id1 * ")
+    id2 = forms.CharField(label="Id2 * ")
+    installationLocation = forms.ModelChoiceField(label="Installation Location * ", queryset=Location.objects.all())
 
     def clean(self):
         id1 = self.cleaned_data.get('id1')
@@ -72,10 +72,11 @@ class DeviceChangeForm(forms.Form):
         super().__init__(*args, **kwargs)  
         self.fields['installationLocation'].queryset = Location.objects.filter(organization=organization)
 
-    installationLocation = forms.ModelChoiceField(queryset=Location.objects.all())
+    installationLocation = forms.ModelChoiceField(label="Installation Location * ",
+                                queryset=Location.objects.all())
 
 
 class OrganizationChangeForm(forms.Form):
-    name = forms.CharField(label="Organization Name")
+    name = forms.CharField(label="Organization Name * ")
     nfcEnabled = forms.BooleanField(label='NFC Enabled', required=False)
     qrScanEnabled = forms.BooleanField(label='QR Scanning Enabled', required=False)

@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 class Organization(models.Model):
-    name = models.CharField(verbose_name='Company Name', max_length=200, unique=True)
+    name = models.CharField(verbose_name='Company Name * ', max_length=200, unique=True)
     adminUsername = models.CharField(max_length=150, null=True)
     description = models.CharField(max_length=500, blank=True, null=True)
     dateTimeFormat = models.CharField(max_length=30, blank=True, null=True)
@@ -38,8 +38,8 @@ class User(AbstractUser):
         REGISTERED = 1
 
     organization = models.ForeignKey(Organization, blank=True, null=True, on_delete=models.CASCADE)
-    fullname = models.CharField(verbose_name="Full Name", max_length=50, blank=True, null=True)
-    role = models.ForeignKey(Role, null=True, on_delete=models.SET_NULL)
+    fullname = models.CharField(verbose_name="Full Name * ", max_length=50, blank=True, null=True)
+    role = models.ForeignKey(Role, verbose_name="Role * ", null=True, on_delete=models.SET_NULL)
     nfcEnabled = models.BooleanField(verbose_name='NFC Enabled', blank=True, null=True)
     qrScanEnabled = models.BooleanField(verbose_name='QR Scanning Enabled', blank=True, null=True)
     sharedLocation = models.BooleanField(verbose_name='Geo Location Enabled', blank=True, null=True)
@@ -56,11 +56,11 @@ class User(AbstractUser):
     
 class Location(models.Model):
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE,  blank=True, null=True)
-    addressLine1 = models.CharField(verbose_name="Address Line 1", max_length=100)
+    addressLine1 = models.CharField(verbose_name="Address Line 1 * ", max_length=100)
     addressLine2 = models.CharField(verbose_name="Address Line 2", max_length=100, blank=True, null=True)    
-    city = models.CharField(verbose_name='City', max_length=50)
-    postCode = models.CharField(verbose_name="Post Code", max_length=10)
-    geoLocation = models.CharField(verbose_name="Map Coordinates", max_length=30, null=True)
+    city = models.CharField(verbose_name="City * ", max_length=50)
+    postCode = models.CharField(verbose_name="Post Code * ", max_length=10)
+    geoLocation = models.CharField(verbose_name="Map Coordinates * ", max_length=30, null=True)
     createdDate = models.DateTimeField(null=True)
 
     def __str__(self):
@@ -69,8 +69,8 @@ class Location(models.Model):
 class Device(models.Model):
     organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, blank=True, null=True)    
     installationLocation = models.ForeignKey(Location, on_delete=models.SET_NULL, blank=True, null=True)
-    id1 = models.CharField(max_length=30)
-    id2 = models.CharField(max_length=30)
+    id1 = models.CharField(max_length=30, verbose_name="Id1 * ")
+    id2 = models.CharField(max_length=30, verbose_name="Id2 * ")
     enabled = models.BooleanField()
     registeredDate = models.DateTimeField(blank=True, null=True)
     createdDate = models.DateTimeField(null=True)

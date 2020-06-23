@@ -1,131 +1,136 @@
-<meta charset="utf-8">
-<title>ScanX Cloud Dashboard</title>
-<link rel="/static/img/apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=XBb4w6pr3a">
-<link rel="icon" type="image/png" sizes="32x32" href="/static/img/favicon-32x32.png?v=XBb4w6pr3a">
-<link rel="icon" type="image/png" sizes="16x16" href="/static/img/favicon-16x16.png?v=XBb4w6pr3a">
-<link rel="manifest" href="/static/img/site.webmanifest?v=XBb4w6pr3a">
-<link rel="mask-icon" href="/static/img/safari-pinned-tab.svg?v=XBb4w6pr3a" color="#5bbad5">
-<link rel="shortcut icon" href="/static/img/favicon.ico?v=XBb4w6pr3a">
-<meta name="apple-mobile-web-app-title" content="ScanX">
-<meta name="application-name" content="ScanX">
-<meta name="msapplication-TileColor" content="#da532c">
-<meta name="msapplication-TileImage" content="/static/img/mstile-144x144.png?v=XBb4w6pr3a">
-<meta name="theme-color" content="#000000">
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>ScanX Cloud Dashboard</title>
+    <link rel="/static/img/apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=XBb4w6pr3a">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/img/favicon-32x32.png?v=XBb4w6pr3a">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/img/favicon-16x16.png?v=XBb4w6pr3a">
+    <link rel="manifest" href="/static/img/site.webmanifest?v=XBb4w6pr3a">
+    <link rel="mask-icon" href="/static/img/safari-pinned-tab.svg?v=XBb4w6pr3a" color="#5bbad5">
+    <link rel="shortcut icon" href="/static/img/favicon.ico?v=XBb4w6pr3a">
+    <meta name="apple-mobile-web-app-title" content="ScanX">
+    <meta name="application-name" content="ScanX">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="msapplication-TileImage" content="/static/img/mstile-144x144.png?v=XBb4w6pr3a">
+    <meta name="theme-color" content="#000000">
 
-<link href="/static/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-<link
-  href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
-  rel="stylesheet">
+    <link href="/static/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+    <link href="/static/vendor/sb-admin/sb-admin-2.css" rel="stylesheet">
+    <link href="/static/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+    <link href="/static/css/main.css" rel="stylesheet">
 
-<link rel="stylesheet" href="/static/css/jquery.dataTables.css">
-<link href="/static/css/sb-admin-2.css" rel="stylesheet">
-<link href="/static/fonts/webfonts/balsamiqsans.css" rel="stylesheet" type="text/css">
-<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-<script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
-
+    <script src="/static/vendor/jquery/jquery.min.js"></script>
+    <script src="/static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/vendor/jquery-easing/jquery.easing.min.js"></script>
+    <script src="/static/vendor/sb-admin/sb-admin-2.js"></script>
+    <script src="/static/vendor/datatables/jquery.dataTables.min.js"></script>
+    <script src="/static/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+    <script src="/static/js/main.js"></script>
+  </head>
 {% load tz %}
 
-<body id="page-top">
-  <div id="wrapper">
-    {% block sidebar %}
-    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark" id="accordionSidebar">
-      <a class="sidebar-brand d-flex align-items-center" href="#">
-        <div class="sidebar-brand-text">ScanX</div>
-      </a>
-
-      <hr class="sidebar-divider">
-
-      <li class="nav-item {% if page == 1 %} active {%endif%}">
-        <a class="nav-link" href="/_admin">
-          <span>Organizations</span></a>
-      </li>
-
-      <hr class="sidebar-divider">
-
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapse2" aria-expanded="true">
-          <span>Devices</span>
+  <body id="page-top">
+    <div id="wrapper">
+      {% block sidebar %}
+      <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark" id="accordionSidebar">
+        <a class="sidebar-brand d-flex align-items-center" href="#">
+          <div class="sidebar-brand-text">ScanX</div>
         </a>
-        <div id="collapse2" class="collapse {% if group == 2%}show{%endif%}" data-parent="#accordionSidebar">
-          <div class="bg-white py-2 collapse-inner rounded">
-            <a class="collapse-item {% if page == 2 %} active {%endif%}" href="/_admin/devices/unregistered">Unregistered Devices</a>
-            <a class="collapse-item {% if page == 3 %} active {%endif%}" href="/_admin/devices/registered">Registered Devices</a>
+
+        <hr class="sidebar-divider">
+
+        <li class="nav-item {% if page == 1 %} active {%endif%}">
+          <a class="nav-link" href="/_admin">
+            <span>Organizations</span></a>
+        </li>
+
+        <hr class="sidebar-divider">
+
+        <li class="nav-item">
+          <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapse2" aria-expanded="true">
+            <span>Devices</span>
+          </a>
+          <div id="collapse2" class="collapse {% if group == 2%}show{%endif%}" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+              <a class="collapse-item {% if page == 2 %} active {%endif%}" href="/_admin/devices/unregistered">Unregistered Devices</a>
+              <a class="collapse-item {% if page == 3 %} active {%endif%}" href="/_admin/devices/registered">Registered Devices</a>
+            </div>
           </div>
-        </div>
-      </li>
+        </li>
 
-      <hr class="sidebar-divider">
+        <hr class="sidebar-divider">
 
-      <li class="nav-item">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapse3" aria-expanded="true">
-          <span>Settings</span>
-        </a>
-        <div id="collapse3" class="collapse {% if group == 3%}show{%endif%}" data-parent="#accordionSidebar">
-          <div class="bg-white py-2 collapse-inner rounded">
-            <a class="collapse-item {% if page == 4 %} active {%endif%}" href="/_admin/settings/admin_mail_template">Admin Mail template</a>
-            <a class="collapse-item {% if page == 5 %} active {%endif%}" href="/_admin/settings/mail_template">Mail template</a>
-            <a class="collapse-item {% if page == 6 %} active {%endif%}" href="/_admin/settings/system_params">System parameters</a>
+        <li class="nav-item">
+          <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapse3" aria-expanded="true">
+            <span>Settings</span>
+          </a>
+          <div id="collapse3" class="collapse {% if group == 3%}show{%endif%}" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+              <a class="collapse-item {% if page == 4 %} active {%endif%}" href="/_admin/settings/admin_mail_template">Admin Mail template</a>
+              <a class="collapse-item {% if page == 5 %} active {%endif%}" href="/_admin/settings/mail_template">Mail template</a>
+              <a class="collapse-item {% if page == 6 %} active {%endif%}" href="/_admin/settings/system_params">System parameters</a>
+            </div>
           </div>
+        </li>
+
+        <hr class="sidebar-divider">
+
+        <!-- Sidebar Toggler (Sidebar) -->
+        <div class="text-center d-none d-md-inline">
+          <button class="rounded-circle border-0" id="sidebarToggle"></button>
         </div>
-      </li>
 
-      <hr class="sidebar-divider">
+      </ul>
+      {% endblock %}
 
-      <!-- Sidebar Toggler (Sidebar) -->
-      <div class="text-center d-none d-md-inline">
-        <button class="rounded-circle border-0" id="sidebarToggle"></button>
-      </div>
-
-    </ul>
-    {% endblock %}
-
-    <div id="content-wrapper"  class="d-flex flex-column">
-      <div id="content">
-        <nav class="navbar navbar-expand navbar-light topbar shadow">
-          <ul class="navbar-nav ml-auto">
-            <li class="nav-item d-flex mr-4">
-              <span class="align-self-center">Last Login: {{ user.last_login|date:"d/m/Y H:i:s" }}</span>
-            </li>
-            <li class="nav-item dropdown no-arrow d-flex">
-              <span class="mr-2 align-self-center">{{ user.fullname|default:'' }}</span>              
-              <a class="p-0 nav-link dropdown-toggle" href="#" data-toggle="dropdown" aria-haspopup="true"
-                aria-expanded="false">
-                {% if user.profilePicture %}
-                  <img class="img-profile rounded-circle" src="/{{ user.profilePicture.url }}">
-                {%else%}
-                  <img class="img-profile rounded-circle" src="/static/img/user.png">
-                {%endif%}
-              </a>
-              <div class="dropdown-menu dropdown-menu-right">
-                <a class="dropdown-item" href="/profile/update">
-                  <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                  Profile
+      <div id="content-wrapper"  class="d-flex flex-column">
+        <div id="content">
+          <nav class="navbar navbar-expand navbar-light topbar shadow">
+            <ul class="navbar-nav ml-auto">
+              <li class="nav-item d-flex mr-4">
+                <span class="align-self-center">Last Login: {{ user.last_login|date:"d/m/Y H:i:s" }}</span>
+              </li>
+              <li class="nav-item dropdown no-arrow d-flex">
+                <span class="mr-2 align-self-center">{{ user.fullname|default:'' }}</span>              
+                <a class="p-0 nav-link dropdown-toggle" href="#" data-toggle="dropdown" aria-haspopup="true"
+                  aria-expanded="false">
+                  {% if user.profilePicture %}
+                    <img class="img-profile rounded-circle" src="/{{ user.profilePicture.url }}">
+                  {%else%}
+                    <img class="img-profile rounded-circle" src="/static/img/user.png">
+                  {%endif%}
                 </a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="/accounts/logout">
-                  <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                  Logout
-                </a>
-              </div>
-            </li>
-          </ul>
-        </nav>
+                <div class="dropdown-menu dropdown-menu-right">
+                  <a class="dropdown-item" href="/profile/update">
+                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                    Profile
+                  </a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item" href="/accounts/logout">
+                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                    Logout
+                  </a>
+                </div>
+              </li>
+            </ul>
+          </nav>
 
-        {%block content %}
-        {%endblock%}
+          {%block content %}
+          {%endblock%}
 
-      </div> <!-- End of Main Content -->
-      <footer class="sticky-footer bg-white">
-        <div class="container my-auto">
-          <div class="copyright text-center my-auto">
-            <span>Copyright &copy; ScanX 2020. All rights reserved.</span>
+        </div> <!-- End of Main Content -->
+        <footer class="sticky-footer bg-white">
+          <div class="container my-auto">
+            <div class="copyright text-center my-auto">
+              <span>Copyright &copy; ScanX 3.0 2020. All rights reserved.</span>
+              <br><br>
+              Server time: {% now "d/m/Y H:i:s" %}
+            </div>
           </div>
-        </div>
-      </footer>
-    </div> <!-- End of Content Wrapper -->
-  </div> <!-- End of Page Wrapper -->
-  <script src="/static/js/main.js"></script>
-  <script src="/static/js/sb-admin-2.js"></script>
-</body>
+        </footer>
+      </div> <!-- End of Content Wrapper -->
+    </div> <!-- End of Page Wrapper -->
+
+  </body>
+</html>

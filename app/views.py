@@ -18,6 +18,7 @@ import json
 from threading import Thread
 from io import BytesIO
 from PIL import Image
+import numpy as np
 
 from .models import *
 from .forms import *
@@ -98,9 +99,15 @@ def resizeProfileImage(imgField):
     imageFile = BytesIO(imgField.read())
     image = Image.open(imageFile)
     w, h = image.size
-    sz = min(w, h, 300)
+    sz = min(w, h, settings.PROFILE_IMAGE_SIZE)
+
+    image_data = np.array(image)
+    image_data = image_data[:,:,:3]
+
+    if h > w:
+        image_data = image_data[:w]
     
-    image = image.resize((sz, sz), Image.ANTIALIAS)
+    image = Image.fromarray(image_data).resize((sz, sz), Image.ANTIALIAS)
 
     output = BytesIO()
     image.save(output, 'JPEG', quality=90)

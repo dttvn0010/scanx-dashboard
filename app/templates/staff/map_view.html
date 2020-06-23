@@ -1,7 +1,7 @@
 {% extends "./base.html" %}
 
 {% block content %}
-<div class="content d-flex flex-column" style="height: 90%;">
+<div class="content d-flex flex-column">
   <ul class="nav nav-tabs">
     <li class="nav-item">
       <a href="/staff" class="nav-link">Table view</a>
@@ -10,7 +10,7 @@
       <a href="/staff/map_view" class="nav-link active">Map view</a>
     </li>
   </ul>
-  <div id="map" class="flex-column" style="flex:1; width: 100%;"></div>
+  <div id="map" class="flex-column" style="flex:1; width: 100%;min-height: 500px;"></div>
   <audio id="dingAudio">
     <source src="/static/audio/ding.mp3" type="audio/mpeg">
   </audio>
@@ -73,14 +73,9 @@
       $.get(url, async function(data, status){
         if(data.updated) {
           lastUpdated = data.lastUpdated;
+          newCheckIn = data.newCheckIn;
           document.getElementById("dingAudio").play();
-
-          var response = await fetch('/api/checkin/search?start=0&length=20&mapView=1');
-          var result = await response.json();
-          var items = result.data;
-
-          removeMarkers();
-          items.forEach(item => addMarker(item));
+          addMarker(newCheckIn);
         }
       });
     }, 3000);

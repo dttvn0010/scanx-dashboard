@@ -12,8 +12,8 @@
 <meta name="msapplication-TileImage" content="/static/img/mstile-144x144.png?v=XBb4w6pr3a">
 <meta name="theme-color" content="#000000">
 
-<link href="/static/css/sb-admin-2.css" rel="stylesheet">
-<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+<link href="/static/vendor/sb-admin/sb-admin-2.css" rel="stylesheet">
+<script src="/static/vendor/jquery/jquery.min.js"></script>
 <script src="/static/js/main.js"></script>
 <style>
   .signup-form {
@@ -53,7 +53,10 @@
     </div>
 
     <div class="form-group">
-      <label>Choose a profile image (20MB max):</label>
+      <label>
+        Choose a profile picture:
+        <br>(<small>JPG/PNG/GIF file with maximum size of 25Mb</small>)        
+      </label>
       <input type="file" id="profilePicture" name="profilePicture" accept="image/*" class="form-control-file" />
       <img style="display: none;" class="mt-2" width="128" height="128" id="profilePicturePreview" alt="" />
       {{ form.profilePicture.errors }}

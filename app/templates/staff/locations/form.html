@@ -8,15 +8,27 @@
 
 {% block content %}
 <div class="content p-3">
-  <form method="POST" novalidate> 
-    {% csrf_token %}
-    <table class="table table-form">
-      {{ form }}
-    </table>
-
-    <button class="btn btn-primary" type="submit">Save</button>
-    <a class="btn btn-secondary" href='/staff/locations'>Back</a>
-  </form>
+  <div class="card shadow mb-4">
+    <div class="card-header py-3">
+      <h6 class="m-0 font-weight-bold text-primary">Location Details</h6>
+    </div>
+    <div class="card-body">
+      <form method="POST" novalidate> 
+        {% csrf_token %}
+        <table class="table table-form mb-2">
+          {{ form }}
+        </table>
+    
+        <a class="btn btn-sm btn-secondary mr-1" href='/staff/locations'>
+          <i class="fas fa-arrow-left text-white-50"></i> Back
+        </a>
+        
+        <button class="btn btn-sm btn-primary" type="submit">
+          <i class="fas fa-save text-white-50"></i> Save
+        </button>
+      </form>
+    </div>
+  </div>
 
   <div class="modal fade" id="locationModal">
     <div class="modal-dialog modal-lg">

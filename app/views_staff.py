@@ -360,7 +360,7 @@ def updateDevice(request, pk):
             device.save()
             return redirect('staff-device')
 
-    return render(request, 'staff/devices/form.html', {'form': form})
+    return render(request, 'staff/devices/form.html', {'form': form, 'edit_device': device})
 
 #================================= Reports  ====================================================================
 
