@@ -1,4 +1,5 @@
 {% extends "../base.html" %}
+{% load i18n %}
 
 {% block sidebar %}
 {% with group=1 page=1 %}
@@ -11,7 +12,7 @@
   <div class="card shadow mb-4">
     <div class="card-header py-3">
       <h6 class="m-0 font-weight-bold text-primary">        
-        List of Users from {{organization.name}}
+        {% trans "list.of.users.from" %} {{organization.name}}
       </h6>
     </div>
     <div class="card-body">
@@ -19,16 +20,16 @@
         <table id="table" class="table table-bordered" width="100%" cellspacing="0">
           <thead>
             <tr>
-              <th style="width: 30%;">Full Name</th>
-              <th style="width: 30%;">Email</th>
-              <th style="width: 20%;">Role</th>
-              <th style="width: 20%;">Status</th>        
+              <th style="width: 30%;">{% trans "fullname" %}</th>
+              <th style="width: 30%;">{% trans "email" %}</th>
+              <th style="width: 20%;">{% trans "role" %}</th>
+              <th style="width: 20%;">{% trans "status" %}</th>        
             </tr>
           </thead>
         </table>
       </div>
       <a href="/_admin" class="mt-2 btn btn-sm btn-secondary">
-        <i class="fas fa-arrow-left text-white-50"></i> Back
+        <i class="fas fa-arrow-left text-white-50"></i> {% trans "back" %}
       </a>
     </div>
   </div>  
@@ -44,7 +45,7 @@
         "processing": "<div class='spinner-border'></div>"
       },
       "ajax": {
-        "url": "/api/user/search",
+        "url": "/api/users/search",
         "data": function(data) {
           data.organizationId = '{{organization.id}}';
         }
@@ -65,8 +66,8 @@
         { "data": "email" },
         { "data": "role"},
         { "data": "status", "render": function(data, type, row) {
-            if(data == 0) return "Pending";
-            return row.is_active? "Active": "Inactive";
+            if(data == 0) return '{% trans "pending" %}';
+            return row.is_active? '{% trans "active" %}': '{% trans "inactive" %}';
           } 
         }   
       ],

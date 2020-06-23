@@ -1,0 +1,428 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-06-24 02:26+0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: .\app\forms.py:31
+msgid "incorrect.temporary.password"
+msgstr "Incorrect temporary password"
+
+#: .\app\forms.py:38 .\app\forms.py:82
+msgid "password.too.short"
+msgstr "Password is too short"
+
+#: .\app\forms.py:41 .\app\forms.py:85
+msgid "password.cannot.be.all.digits"
+msgstr "Password cannot be all digits"
+
+#: .\app\forms.py:50 .\app\forms.py:94
+msgid "confirmed.password.not.match"
+msgstr "Confirmed password does not match"
+
+#: .\app\forms.py:75
+msgid "incorrect.password"
+msgstr "Incorrect Password"
+
+#: .\app\forms_admin.py:10 .\app\templates\_admin\organizations\details.html:29
+#: .\app\templates\_admin\organizations\list.html:36 .\app\views_admin.py:127
+msgid "admin.name"
+msgstr "Admin Name"
+
+#: .\app\forms_admin.py:11 .\app\templates\_admin\organizations\details.html:33
+#: .\app\templates\_admin\organizations\list.html:37 .\app\views_admin.py:127
+msgid "admin.email"
+msgstr "Admin Email"
+
+# Super admin dashboard
+# Sidebar and, Header, footer
+#: .\app\models.py:6 .\app\templates\_admin\organizations\list.html:34
+msgid "company.name"
+msgstr "Company Name"
+
+#: .\app\models.py:10 .\app\templates\_admin\organizations\details.html:41
+#: .\app\views_admin.py:127
+msgid "nfc.enabled"
+msgstr "NFC Enabled"
+
+#: .\app\models.py:11 .\app\templates\_admin\organizations\details.html:47
+#: .\app\views_admin.py:127
+msgid "qr.scanning.enabled"
+msgstr "QR Scanning Enabled"
+
+#: .\app\models.py:12 .\app\templates\_admin\organizations\details.html:55
+#: .\app\templates\_admin\organizations\details.html:89
+#: .\app\templates\_admin\organizations\list.html:138
+#: .\app\templates\_admin\organizations\list_users.html:70
+#: .\app\views_admin.py:127
+msgid "active"
+msgstr "Active"
+
+#: .\app\models.py:73 .\app\templates\_admin\devices\registered\list.html:22
+#: .\app\templates\_admin\devices\unregistered\list.html:35
+#: .\app\templates\_admin\organizations\details.html:141
+#: .\app\views_admin.py:243
+msgid "id1"
+msgstr "ID #1"
+
+#: .\app\models.py:74 .\app\templates\_admin\devices\registered\list.html:23
+#: .\app\templates\_admin\devices\unregistered\list.html:36
+#: .\app\templates\_admin\organizations\details.html:142
+#: .\app\views_admin.py:243
+msgid "id2"
+msgstr "ID #2"
+
+#: .\app\templates\_admin\base.html:7 .\app\templates\profile\base.html:3
+msgid "scanx.cloud.dashboard"
+msgstr "ScanX Cloud Dashboard"
+
+#: .\app\templates\_admin\base.html:44
+msgid "organizations"
+msgstr "Organizations"
+
+#: .\app\templates\_admin\base.html:51
+#: .\app\templates\_admin\organizations\list.html:38
+msgid "devices"
+msgstr "Devices"
+
+#: .\app\templates\_admin\base.html:56
+msgid "unregistered.devices"
+msgstr "Unregistered Devices"
+
+#: .\app\templates\_admin\base.html:59
+msgid "registered.devices"
+msgstr "Registered Devices"
+
+#: .\app\templates\_admin\base.html:69
+msgid "settings"
+msgstr "Settings"
+
+#: .\app\templates\_admin\base.html:74
+#: .\app\templates\_admin\settings\admin_mail_template.html:14
+msgid "admin.mail.template"
+msgstr "Admin Mail Template"
+
+#: .\app\templates\_admin\base.html:77
+#: .\app\templates\_admin\settings\mail_template.html:14
+msgid "mail.template"
+msgstr "Mail Template"
+
+#: .\app\templates\_admin\base.html:80
+#: .\app\templates\_admin\settings\system_params.html:14
+msgid "system.parameters"
+msgstr "System Parameters"
+
+#: .\app\templates\_admin\base.html:102 .\app\templates\profile\base.html:38
+msgid "last.login"
+msgstr "Last Login"
+
+#: .\app\templates\_admin\base.html:119 .\app\templates\profile\base.html:54
+msgid "profile"
+msgstr "Profile"
+
+#: .\app\templates\_admin\base.html:124 .\app\templates\profile\base.html:59
+msgid "logout"
+msgstr "Logout"
+
+#: .\app\templates\_admin\base.html:138 .\app\templates\profile\base.html:71
+msgid "copyright"
+msgstr "Copyright &copy; ScanX 3.0 2020. All rights reserved."
+
+#: .\app\templates\_admin\base.html:140 .\app\templates\profile\base.html:73
+msgid "server.time"
+msgstr "Server time"
+
+#: .\app\templates\_admin\devices\registered\list.html:14
+msgid "list.of.registered.devices"
+msgstr "List of Registered Devices"
+
+#: .\app\templates\_admin\devices\registered\list.html:21
+#: .\app\templates\_admin\devices\unregistered\list.html:34
+msgid "enabled"
+msgstr "Enabled"
+
+#: .\app\templates\_admin\devices\registered\list.html:24
+msgid "registered.by"
+msgstr "Registered By"
+
+#: .\app\templates\_admin\devices\registered\list.html:25
+msgid "registered.date"
+msgstr "Registered Date"
+
+#: .\app\templates\_admin\devices\registered\list.html:38
+#: .\app\templates\_admin\devices\unregistered\list.html:86
+msgid "delete.this.device"
+msgstr "Delete this Device"
+
+#: .\app\templates\_admin\devices\registered\list.html:49
+#: .\app\templates\_admin\devices\unregistered\list.html:97
+#: .\app\templates\_admin\organizations\list.html:100
+msgid "prompt.password"
+msgstr "Please enter your password to confirm:"
+
+#: .\app\templates\_admin\devices\registered\list.html:59
+#: .\app\templates\_admin\devices\registered\list.html:88
+#: .\app\templates\_admin\devices\unregistered\list.html:107
+#: .\app\templates\_admin\devices\unregistered\list.html:136
+#: .\app\templates\_admin\organizations\list.html:111
+#: .\app\templates\_admin\organizations\list.html:146
+msgid "delete"
+msgstr "Delete"
+
+#: .\app\templates\_admin\devices\registered\list.html:113
+#: .\app\templates\_admin\devices\unregistered\list.html:161
+msgid "error.occured"
+msgstr "Error Occured"
+
+#: .\app\templates\_admin\devices\unregistered\list.html:14
+msgid "list.of.unregistered.devices"
+msgstr "List of Unregistered Devices"
+
+#: .\app\templates\_admin\devices\unregistered\list.html:20
+msgid "add.device"
+msgstr "Add Device"
+
+#: .\app\templates\_admin\devices\unregistered\list.html:23
+#: .\app\templates\_admin\devices\unregistered\list.html:74
+#: .\app\templates\_admin\organizations\list.html:23
+#: .\app\templates\_admin\organizations\list.html:77
+msgid "import"
+msgstr "Import"
+
+#: .\app\templates\_admin\devices\unregistered\list.html:26
+#: .\app\templates\_admin\organizations\list.html:26
+msgid "export"
+msgstr "Export"
+
+#: .\app\templates\_admin\devices\unregistered\list.html:49
+msgid "import.devices"
+msgstr "Import Devices"
+
+#: .\app\templates\_admin\devices\unregistered\list.html:60
+#: .\app\templates\_admin\organizations\list.html:63
+msgid "csv.file"
+msgstr "CSV file:"
+
+#: .\app\templates\_admin\devices\unregistered\list.html:71
+#: .\app\templates\_admin\organizations\list.html:74
+msgid "csv.select.columns"
+msgstr "Select the CSV column you want to use the data from for each field."
+
+#: .\app\templates\_admin\devices\unregistered\list.html:135
+#: .\app\templates\_admin\organizations\list.html:145
+msgid "edit"
+msgstr "Edit"
+
+#: .\app\templates\_admin\organizations\details.html:14
+msgid "organization.summary"
+msgstr "Organization Summary"
+
+#: .\app\templates\_admin\organizations\details.html:21
+msgid "organization.name"
+msgstr "Organization Name"
+
+#: .\app\templates\_admin\organizations\details.html:25
+msgid "number.of.users"
+msgstr "Number of Users"
+
+#: .\app\templates\_admin\organizations\details.html:37
+msgid "number.of.registered.devices"
+msgstr "Number of Registered Devices"
+
+#: .\app\templates\_admin\organizations\details.html:43
+#: .\app\templates\_admin\organizations\details.html:49
+msgid "yes"
+msgstr "Yes"
+
+#: .\app\templates\_admin\organizations\details.html:43
+#: .\app\templates\_admin\organizations\details.html:49
+msgid "no"
+msgstr "No"
+
+#: .\app\templates\_admin\organizations\details.html:53
+#: .\app\templates\_admin\organizations\details.html:76
+#: .\app\templates\_admin\organizations\list.html:39
+#: .\app\templates\_admin\organizations\list_users.html:26
+msgid "status"
+msgstr "Status"
+
+#: .\app\templates\_admin\organizations\details.html:55
+#: .\app\templates\_admin\organizations\details.html:87
+#: .\app\templates\_admin\organizations\list.html:138
+#: .\app\templates\_admin\organizations\list_users.html:69
+msgid "pending"
+msgstr "Pending"
+
+#: .\app\templates\_admin\organizations\details.html:66
+msgid "list.of.users"
+msgstr "List of Users"
+
+#: .\app\templates\_admin\organizations\details.html:73
+#: .\app\templates\_admin\organizations\list_users.html:23
+#: .\app\templates\profile\update_account.html:32
+msgid "fullname"
+msgstr "Full Name"
+
+#: .\app\templates\_admin\organizations\details.html:74
+#: .\app\templates\_admin\organizations\list_users.html:24
+#: .\app\templates\profile\update_account.html:26
+msgid "email"
+msgstr "Email"
+
+#: .\app\templates\_admin\organizations\details.html:75
+#: .\app\templates\_admin\organizations\list_users.html:25
+msgid "role"
+msgstr "Role"
+
+#: .\app\templates\_admin\organizations\details.html:91
+#: .\app\templates\_admin\organizations\list_users.html:70
+msgid "inactive"
+msgstr "Inactive"
+
+#: .\app\templates\_admin\organizations\details.html:104
+msgid "list.of.locations"
+msgstr "List of Locations"
+
+#: .\app\templates\_admin\organizations\details.html:111
+msgid "addressLine1"
+msgstr "Address Line 1"
+
+#: .\app\templates\_admin\organizations\details.html:112
+msgid "addressLine2"
+msgstr "Address Line 2"
+
+#: .\app\templates\_admin\organizations\details.html:113
+msgid "city"
+msgstr "City"
+
+#: .\app\templates\_admin\organizations\details.html:114
+msgid "postCode"
+msgstr "Post Code"
+
+#: .\app\templates\_admin\organizations\details.html:134
+msgid "list.of.devices"
+msgstr "List of Devices"
+
+#: .\app\templates\_admin\organizations\details.html:143
+msgid "location"
+msgstr "Location"
+
+#: .\app\templates\_admin\organizations\details.html:161
+#: .\app\templates\_admin\organizations\form.html:22
+#: .\app\templates\_admin\organizations\list_users.html:32
+msgid "back"
+msgstr "Back"
+
+#: .\app\templates\_admin\organizations\form.html:14
+msgid "organization.details"
+msgstr "Organization Details"
+
+#: .\app\templates\_admin\organizations\form.html:26
+#: .\app\templates\_admin\settings\admin_mail_template.html:24
+#: .\app\templates\_admin\settings\mail_template.html:24
+#: .\app\templates\_admin\settings\system_params.html:38
+#: .\app\templates\profile\update_account.html:56
+msgid "save"
+msgstr "Save"
+
+# Organization list
+#: .\app\templates\_admin\organizations\list.html:14
+msgid "list.of.organizations"
+msgstr "List of Organizations"
+
+#: .\app\templates\_admin\organizations\list.html:20
+msgid "add.organization"
+msgstr "Add Organization"
+
+#: .\app\templates\_admin\organizations\list.html:35
+msgid "users"
+msgstr "Users"
+
+#: .\app\templates\_admin\organizations\list.html:52
+msgid "import.organizations"
+msgstr "Import Organizations"
+
+#: .\app\templates\_admin\organizations\list.html:89
+msgid "delete.this.organization"
+msgstr "Delete this Organization"
+
+#: .\app\templates\_admin\organizations\list.html:143
+msgid "view.details"
+msgstr "View details"
+
+#: .\app\templates\_admin\organizations\list.html:144
+msgid "view.users"
+msgstr "View users"
+
+#: .\app\templates\_admin\organizations\list.html:149
+msgid "resend.mail"
+msgstr "Resend invitation email"
+
+#: .\app\templates\_admin\organizations\list.html:182
+msgid "confirm.resend.mail"
+msgstr "Resend an invitation email to this organization?"
+
+#: .\app\templates\_admin\organizations\list_users.html:15
+msgid "list.of.users.from"
+msgstr "List of Users from"
+
+#: .\app\templates\_admin\settings\admin_mail_template.html:18
+msgid "admin.mail.template.successfully.saved"
+msgstr "Admin Mail Template successfully saved"
+
+#: .\app\templates\_admin\settings\mail_template.html:18
+msgid "mail.template.successfully.saved"
+msgstr "Mail Template successfully saved"
+
+#: .\app\templates\_admin\settings\system_params.html:18
+msgid "system.parameters.successfully.saved"
+msgstr "System Parameters successfully saved"
+
+#: .\app\templates\profile\change_password.html:16
+#: .\app\templates\profile\update_account.html:16
+msgid "update.account"
+msgstr "Update Account"
+
+#: .\app\templates\profile\change_password.html:19
+#: .\app\templates\profile\change_password.html:45
+#: .\app\templates\profile\update_account.html:19
+msgid "change.password"
+msgstr "Change Password"
+
+#: .\app\templates\profile\change_password.html:26
+msgid "current.password"
+msgstr "Current Password"
+
+#: .\app\templates\profile\change_password.html:32
+msgid "new.password"
+msgstr "New Password"
+
+#: .\app\templates\profile\change_password.html:38
+msgid "confirmed.password"
+msgstr "Confirmed Password"
+
+#: .\app\templates\profile\update_account.html:39
+msgid "profile.picture"
+msgstr "Profile Picture"
+
+#: .\app\templates\profile\update_account.html:40
+msgid "profile.picture.legend"
+msgstr "JPG/PNG/GIF file with maximum size of 25Mb"
+
+#: .\app\views_admin.py:127
+msgid "name"
+msgstr "Name"

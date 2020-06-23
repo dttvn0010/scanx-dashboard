@@ -122,7 +122,7 @@ $(document).ready(function() {
     "language": {
       "processing": "<div class='spinner-border'></div>"
     },
-    "ajax": "/api/location/search",
+    "ajax": "/api/locations/search",
     "columns": [
       { "data": "addressLine1" },
       { "data": "addressLine2" },
@@ -149,7 +149,7 @@ function openDeleteConfirmation(id) {
 async function deleteLocation() {
   $("#errorLabel").html('');
   var formData = new FormData(document.getElementById("fmt3"));
-  var response = await fetch("/api/location/delete/" + $('#locationId').val(), {
+  var response = await fetch("/api/locations/delete/" + $('#locationId').val(), {
     body: formData,
     method: "POST"
   });

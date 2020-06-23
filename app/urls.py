@@ -17,6 +17,7 @@ urlpatterns = [
     path('_admin/organizations/add', views_admin.addOrganization),
     path('_admin/organizations/update/<int:pk>', views_admin.updateOrganization),    
     path('_admin/organizations/user_list/<int:pk>', views_admin.listOrganizationUsers),
+    path('_admin/organizations/details/<int:pk>', views_admin.viewOrganizationDetails),
     path('_admin/organizations/export', views_admin.exportOrganization),
     path('_admin/organizations/import_preview', views_admin.importOrganizationPreview),
     path('_admin/organizations/import', views_admin.importOrganization),
@@ -81,21 +82,20 @@ urlpatterns = [
     path('api/checkin/last_updated', views_api.getLastCheckInTime),
     path('api/checkin/check_for_update', views_api.checkForNewCheckIn),
     
-    path('api/organization/search',  views_api.searchOrganization),
-    path('api/organization/details/<int:pk>', views_api.viewOrganizationDetails),
-    path('api/organization/delete/<int:pk>', views_api.deleteOrganization),
+    path('api/organizations/search',  views_api.searchOrganization),
+    path('api/organizations/delete/<int:pk>', views_api.deleteOrganization),
 
-    path('api/user/search', views_api.searchUser),
-    path('api/user/details/<int:pk>', views_api.viewUserDetails),
-    path('api/user/delete/<int:pk>', views_api.deleteUser),
+    path('api/users/search', views_api.searchUser),
+    path('api/users/details/<int:pk>', views_api.viewUserDetails),
+    path('api/users/delete/<int:pk>', views_api.deleteUser),
 
-    path('api/device/unregistered/search', views_api.searchUnregisteredDevice),    
-    path('api/device/registered/search', views_api.searchRegisteredDevice),
-    path('api/device/search_by_org', views_api.searchDeviceByOrganization),
-    path('api/device/delete/<int:pk>', views_api.deleteDevice),    
-    path('api/device/delete_from_org/<int:pk>', views_api.deleteDeviceFromOrg),    
+    path('api/devices/unregistered/search', views_api.searchUnregisteredDevice),    
+    path('api/devices/registered/search', views_api.searchRegisteredDevice),
+    path('api/devices/search_by_org', views_api.searchDeviceByOrganization),
+    path('api/devices/delete/<int:pk>', views_api.deleteDevice),    
+    path('api/devices/delete_from_org/<int:pk>', views_api.deleteDeviceFromOrg),    
 
-    path('api/location/search', views_api.searchLocation),
-    path('api/location/delete/<int:pk>', views_api.deleteLocation),
+    path('api/locations/search', views_api.searchLocation),
+    path('api/locations/delete/<int:pk>', views_api.deleteLocation),
     
 ]

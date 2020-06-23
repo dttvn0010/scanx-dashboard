@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from .models import *
+from django.utils.translation import gettext_lazy as _
 
 class MyUserCreationForm(UserCreationForm):
 
@@ -27,17 +28,17 @@ class InitialSetupForm(forms.Form):
         ok = user and user.check_password('temp_' + tempPassword)
         
         if not ok:
-            raise forms.ValidationError('Incorrect temporary password')
+            raise forms.ValidationError(_('incorrect.temporary.password'))
 
         return tempPassword
 
     def clean_password(self):
         password = self.cleaned_data.get('password', '')
         if len(password) < 8:
-            raise forms.ValidationError('Password is too short')
+            raise forms.ValidationError(_('password.too.short'))
 
         if password.isdigit():
-            raise forms.ValidationError('Password cannot be all digits')
+            raise forms.ValidationError(_('password.cannot.be.all.digits'))
 
         return password
 
@@ -46,7 +47,7 @@ class InitialSetupForm(forms.Form):
         password2 = self.cleaned_data.get('password2')
 
         if password != password2:
-            raise forms.ValidationError('Confirmed password does not match')
+            raise forms.ValidationError(_('confirmed.password.not.match'))
 
         return password2
 
@@ -58,7 +59,7 @@ class UpdateAccountForm(forms.Form):
     def clean_email(self):
         email = self.cleaned_data.get('email')
         if email != self.initial.get('email') and User.objects.filter(email=email):
-            raise forms.ValidationError('User with email "%s" already exists' % (email))
+            raise forms.ValidationError('_("User with email") "%s" _("already exists")' % (email))
 
         return email
 
@@ -71,17 +72,17 @@ class ChangePasswordForm(forms.Form):
         current_pass = self.cleaned_data.get('current_pass', '')
         
         if not self.initial['user'].check_password(current_pass):
-            raise forms.ValidationError('Incorrect password')
+            raise forms.ValidationError(_('incorrect.password'))
         
         return current_pass
 
     def clean_password(self):
         password = self.cleaned_data.get('password', '')
         if len(password) < 8:
-            raise forms.ValidationError('Password too short')
+            raise forms.ValidationError(_('password.too.short'))
 
         if password.isdigit():
-            raise forms.ValidationError('Password cannot be all digits')
+            raise forms.ValidationError(_('password.cannot.be.all.digits'))
 
         return password
 
@@ -90,7 +91,7 @@ class ChangePasswordForm(forms.Form):
         password2 = self.cleaned_data.get('password2')
 
         if password != password2:
-            raise forms.ValidationError('Confirmed password does not match')
+            raise forms.ValidationError(_('confirmed.password.not.match'))
 
         return password2    
 

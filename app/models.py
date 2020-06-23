@@ -1,14 +1,15 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.utils.translation import gettext_lazy as _
 
 class Organization(models.Model):
-    name = models.CharField(verbose_name='Company Name * ', max_length=200, unique=True)
+    name = models.CharField(verbose_name=_('company.name') + ' * ', max_length=200, unique=True)
     adminUsername = models.CharField(max_length=150, null=True)
     description = models.CharField(max_length=500, blank=True, null=True)
     dateTimeFormat = models.CharField(max_length=30, blank=True, null=True)
-    nfcEnabled = models.BooleanField(verbose_name='NFC Enabled', default=False)
-    qrScanEnabled = models.BooleanField(verbose_name='QR Scanning Enabled', default=False)    
-    active = models.BooleanField(default=False)
+    nfcEnabled = models.BooleanField(verbose_name=_('nfc.enabled'), default=False)
+    qrScanEnabled = models.BooleanField(verbose_name=_('qr.scanning.enabled'), default=False)    
+    active = models.BooleanField(verbose_name=_('active'), default=False)
     createdDate = models.DateTimeField(null=True)
 
     def __str__(self):
@@ -69,8 +70,8 @@ class Location(models.Model):
 class Device(models.Model):
     organization = models.ForeignKey(Organization, on_delete=models.SET_NULL, blank=True, null=True)    
     installationLocation = models.ForeignKey(Location, on_delete=models.SET_NULL, blank=True, null=True)
-    id1 = models.CharField(max_length=30, verbose_name="Id1 * ")
-    id2 = models.CharField(max_length=30, verbose_name="Id2 * ")
+    id1 = models.CharField(max_length=30, verbose_name=_("id1") + " * ")
+    id2 = models.CharField(max_length=30, verbose_name=_("id2") + " * ")
     enabled = models.BooleanField()
     registeredDate = models.DateTimeField(blank=True, null=True)
     createdDate = models.DateTimeField(null=True)

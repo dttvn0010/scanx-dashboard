@@ -363,18 +363,6 @@ def searchOrganization(request):
         "data": data
     })
 
-@api_view(['GET'])
-def viewOrganizationDetails(request, pk):    
-    org = Organization.objects.get(pk=pk)
-    data = OrganizationSerializer(org).data
-    tenantAdmin = User.objects.filter(username=org.adminUsername).first()
-    data['admin'] = {'name': tenantAdmin.fullname if tenantAdmin else "", 'email': tenantAdmin.email if tenantAdmin else ""}
-    data['userCount'] = User.objects.filter(organization=org).count()
-    data['deviceCount'] = Device.objects.filter(organization=org).count()
-    data['status'] = tenantAdmin.status if tenantAdmin else User.Status.INVITED
-    
-    return Response(data)
-
 @api_view(['POST'])
 def deleteOrganization(request, pk):    
     try:

@@ -1,4 +1,5 @@
 {% extends "../base.html" %}
+{% load i18n %}
 
 {% block sidebar %}
 {% with group=1 page=1 %}
@@ -6,23 +7,23 @@
 {% endwith %}
 {% endblock %}
 
-{% block content %}
+{% block content %} 
 <div class="content p-3">  
   <div class="card shadow mb-4">
     <div class="card-header py-3">
-      <h6 class="m-0 font-weight-bold text-primary">List of Organizations</h6>
+      <h6 class="m-0 font-weight-bold text-primary">{% trans "list.of.organizations" %}</h6>
     </div>
     <div class="card-body">
       <div class="row mb-4">
         <div class="col-8">
           <a href='/_admin/organizations/add' class="btn btn-sm btn-primary mr-1">
-            <i class="fas fa-plus text-white-50"></i> Add Organization
+            <i class="fas fa-plus text-white-50"></i> {% trans "add.organization" %}
           </a>
           <button class="btn btn-sm btn-primary mr-1" onclick="showImportModal()">
-            <i class="fas fa-upload text-white-50"></i> Import
+            <i class="fas fa-upload text-white-50"></i> {% trans "import" %}
           </button>
           <a href='/_admin/organizations/export' class="btn btn-sm btn-primary mr-1">
-            <i class="fas fa-download text-white-50"></i> Export
+            <i class="fas fa-download text-white-50"></i> {% trans "export" %}
           </a>
         </div>
       </div>
@@ -30,12 +31,12 @@
         <table id="table" class="table table-bordered" width="100%" cellspacing="0">
           <thead>
             <tr>
-              <th style="width: 22%;">Company Name</th>
-              <th style="width: 12%;">Users</th>
-              <th style="width: 14%;">Admin Name</th>
-              <th style="width: 14%;">Admin Email</th>
-              <th style="width: 12%;">Devices</th>
-              <th style="width: 12%;">Status</th>
+              <th style="width: 22%;">{% trans "company.name" %}</th>
+              <th style="width: 12%;">{% trans "users" %}</th>
+              <th style="width: 14%;">{% trans "admin.name" %}</th>
+              <th style="width: 14%;">{% trans "admin.email" %}</th>
+              <th style="width: 12%;">{% trans "devices" %}</th>
+              <th style="width: 12%;">{% trans "status" %}</th>
               <th style="width: 14%;"></th>
             </tr>
           </thead>
@@ -43,68 +44,12 @@
       </div>
     </div>
   </div>
-  <div class="modal fade" id="viewDetailsModal">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Organization Details</h5>
-          <button type="button" class="close" data-dismiss="modal">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-
-        <div class="modal-body">
-          <div class="container">
-            <table class="table">
-              <tbody>
-                <tr>
-                  <td>Organization Name:</td>
-                  <th><span id="org_name"></span></th>
-                </tr>
-                <tr>
-                  <td>Number of Users:</td>
-                  <th><span id="org_user_count"></span></th>
-                </tr>
-                <tr>
-                  <td>Admin Name:</td>
-                  <th><span id="org_admin_name"></span></th>
-                </tr>
-                <tr>
-                  <td>Admin Email:</td>
-                  <th><span id="org_admin_email"></span></th>
-                </tr>
-                <tr>
-                  <td>Number of Registered Devices:</td>
-                  <th><span id="org_device_count"></span></th>
-                </tr>
-                <tr>
-                  <td>NFC Enabled:</td>
-                  <th><span id="org_nfc_enabled"></span></th>
-                </tr>
-                <tr>
-                  <td>QR Scan Enabled:</td>
-                  <th><span id="org_qr_scan_enabled"></span></th>
-                </tr>
-                <tr>
-                  <td>Status:</td>
-                  <th><span id="org_status"></span></th>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-sm btn-primary" data-dismiss="modal">Close</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
+ 
   <div class="modal fade" id="uploadModal">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Import Organizations</h5>
+          <h5 class="modal-title">{% trans "import.organizations" %}</h5>
           <button type="button" class="close" data-dismiss="modal">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -115,7 +60,7 @@
             {%csrf_token%}
             <div class="row">
               <div class="col-3">
-                <label>CSV file:</label>
+                <label>{% trans "csv.file" %}</label>
               </div>
               <div class="col-5">
                 <input type="file" accept=".csv" class="form-control-file" id="csv_file" name="csv_file"
@@ -126,10 +71,10 @@
 
           <form id="fmt2" style="display: none;" method="POST" action="/_admin/organizations/import">
             {%csrf_token%}
-            <label>Select the CSV column you want to use the data from for each field.</label>
+            <label>{% trans "csv.select.columns" %}</label>
             <div id="fmt2Body"></div>
             <button type="submit" class="mt-3 btn btn-sm btn-primary">
-              <i class="fas fa-upload text-white-50"></i> Import
+              <i class="fas fa-upload text-white-50"></i> {% trans "import" %}
             </button>
           </form>
         </div>
@@ -141,7 +86,7 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Delete this Organization?</h5>
+          <h5 class="modal-title">{% trans "delete.this.organization" %}?</h5>
           <button type="button" class="close" data-dismiss="modal">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -152,7 +97,7 @@
             {%csrf_token%}
             <input type="hidden" id="orgId">
             <div class="row">
-              <div class="col"><label>Please enter your password to confirm:</label></div>
+              <div class="col"><label>{% trans "prompt.password" %}:</label></div>
             </div>
             <div class="row mt-2">
               <div class="col"><input class="form-control" type="password" id="password" name="password"></div>
@@ -163,7 +108,7 @@
               </div>
             </div>
             <button type="button" onclick="deleteOrganization()" class="mt-3 btn btn-sm btn-danger">
-              Delete
+              {% trans "delete" %}
             </button>
           </form>
         </div>
@@ -181,7 +126,7 @@
       "language": {
         "processing": "<div class='spinner-border'></div>"
       },
-      "ajax": "/api/organization/search",
+      "ajax": "/api/organizations/search",
       "columns": [
         { "data": "name" },
         { "data": "userCount" },
@@ -190,18 +135,18 @@
         { "data": "deviceCount" },
         {
           "data": "status", "render": function (data, type, row) {
-            return row.status == 1 ? "Active" : "Pending"
+            return row.status == 1 ? '{% trans "active" %}' : '{% trans "pending" %}'
           }
         },
         {
           render: function (data, type, row) {
-            var html = `<a title="View details" href="#" onclick="viewInfo(${row['id']})"><i class="fas fa-eye"></i></a>&nbsp;&nbsp;` +
-              `<a title="View users" href="/_admin/organizations/user_list/${row['id']}"><i class="fas fa-user"></i></a>&nbsp;&nbsp;` +
-              `<a title="Edit" href="/_admin/organizations/update/${row['id']}"><i class="fas fa-edit"></i></a>&nbsp;&nbsp;` +
-              `<a title="Delete" href="#" onclick="openDeleteConfirmation(${row['id']})" ><i class="fas fa-trash" style="color:red"></i></a>`;
+            var html = `<a title='{% trans "view.details" %}' href="/_admin/organizations/details/${row['id']}"><i class="fas fa-eye"></i></a>&nbsp;&nbsp;` +
+              `<a title='{% trans "view.users" %}' href="/_admin/organizations/user_list/${row['id']}"><i class="fas fa-user"></i></a>&nbsp;&nbsp;` +
+              `<a title='{% trans "edit" %}' href="/_admin/organizations/update/${row['id']}"><i class="fas fa-edit"></i></a>&nbsp;&nbsp;` +
+              `<a title='{% trans "delete" %}' href="#" onclick="openDeleteConfirmation(${row['id']})" ><i class="fas fa-trash" style="color:red"></i></a>`;
 
             if (row.status == 0) {
-              html += `&nbsp;&nbsp;<a title="Resend invitation email" href="#" onclick="resendMail(${row['id']})" ><i class="fas fa-envelope"></i></a>`;
+              html += `&nbsp;&nbsp;<a title='{% trans "resend.mail" %}' href="#" onclick="resendMail(${row['id']})" ><i class="fas fa-envelope"></i></a>`;
             }
 
             return html;
@@ -210,20 +155,7 @@
       ],
     });
   });
-  async function viewInfo(id) {
-    var resp = await fetch("/api/organization/details/" + id);
-    var org = await resp.json();
-    $("#org_name").html(org.name);
-    $("#org_user_count").html(org.userCount);
-    $("#org_admin_name").html(org.admin.name);
-    $("#org_admin_email").html(org.admin.email);
-    $("#org_device_count").html(org.deviceCount);
-    $("#org_nfc_enabled").html(org.nfcEnabled? "Yes": "No");
-    $("#org_qr_scan_enabled").html(org.qrScanEnabled? "Yes": "No");
-    $("#org_status").html(org.status == 1? "Active" : "Pending");
-    $("#viewDetailsModal").modal();
-  }
-
+  
   function openDeleteConfirmation(id) {
     $("#errorLabel").html('');
     $('#password').val('');
@@ -234,7 +166,7 @@
   async function deleteOrganization() {
     $("#errorLabel").html('');
     var formData = new FormData(document.getElementById("fmt3"));
-    var response = await fetch("/api/organization/delete/" + $('#orgId').val(), {
+    var response = await fetch("/api/organizations/delete/" + $('#orgId').val(), {
       body: formData,
       method: "POST"
     });
@@ -247,7 +179,7 @@
   }
 
   async function resendMail(id) {
-    if (confirm('Resend an invitation email to this organization?')) {
+    if (confirm('{% trans "confirm.resend.mail" %}')) {
       location.href = "/_admin/organizations/resend_mail/" + id;
     }
   }

@@ -178,7 +178,7 @@ $(document).ready(function() {
     "language": {
       "processing": "<div class='spinner-border'></div>"
     },
-    "ajax": "/api/user/search",
+    "ajax": "/api/users/search",
     "columns": [
       { "data": "fullname",
         render: function(data, type, row) {
@@ -226,7 +226,7 @@ $(document).ready(function() {
 });
 
 async function viewInfo(id) {
-  var resp = await fetch("/api/user/details/" + id);
+  var resp = await fetch("/api/users/details/" + id);
   var user = await resp.json();
   $("#full_name").html(user.fullname);
   $("#email").html(user.email);
@@ -248,7 +248,7 @@ function openDeleteConfirmation(id) {
 async function deleteUser() {
   $("#errorLabel").html('');
   var formData = new FormData(document.getElementById("fmt3"));
-  var response = await fetch("/api/user/delete/" + $('#userId').val(), {
+  var response = await fetch("/api/users/delete/" + $('#userId').val(), {
     body: formData,
     method: "POST"
   });

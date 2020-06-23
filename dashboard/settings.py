@@ -116,7 +116,8 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LOCALE_PATHS = ( os.path.join(BASE_DIR, 'locale'), )
+LANGUAGE_CODE = 'en'
 
 TIME_ZONE = 'Europe/London'
 
@@ -170,3 +171,4 @@ MOBILE_NO_LOG_IN = True
 MOBILE_USERNAME = 'dttvn0010@gmail.com'
 MOBILE_PASSWORD = 'abcd@1234'
 PROFILE_IMAGE_SIZE = 300
+

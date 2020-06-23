@@ -1,18 +1,19 @@
 from django import forms
 from .models import *
+from django.utils.translation import gettext_lazy as _
 
 class OrganizationCreationForm(forms.ModelForm):
     class Meta:
         model = Organization
         fields = ('name', 'nfcEnabled', 'qrScanEnabled', 'active')
 
-    adminName = forms.CharField(max_length=30, label="Admin name  * ")
-    adminEmail = forms.EmailField(max_length=50, label="Admin email * ")
+    adminName = forms.CharField(max_length=30, label=_("admin.name") + " * ")
+    adminEmail = forms.EmailField(max_length=50, label=_("admin.email") + " * ")
 
     def clean_adminEmail(self):
         email = self.cleaned_data.get('adminEmail')
         if User.objects.filter(email=email):
-            raise forms.ValidationError('User with email "%s" already exists' % (email))
+            raise forms.ValidationError('_("User with email") "%s" _("already exists")' % (email))
 
         return email
 
@@ -32,7 +33,7 @@ class UnRegisteredDeviceForm(forms.ModelForm):
         device = Device.objects.filter(id1=id1).filter(id2=id2).first()
 
         if device and (self.instance == None or self.instance.id != device.id):
-            raise forms.ValidationError(f'Device with id1={id1} & id2={id2} already exists')
+            raise forms.ValidationError(f'_("Device with") id1={id1} & id2={id2} _("already exists")')
 
         return self.cleaned_data
 

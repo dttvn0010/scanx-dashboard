@@ -60,7 +60,7 @@ def addUser(request):
     if not request.user.organization:
         return redirect('login')
 
-    form = UserCreateForm(initial={'nfcEnabled': True, 'qrScanEnabled': True, 'sharedLocation': True})
+    form = UserCreateForm(initial={'nfcEnabled': True, 'qrScanEnabled': False, 'sharedLocation': True})
 
     if request.method == 'POST':
         form = UserCreateForm(request.POST)

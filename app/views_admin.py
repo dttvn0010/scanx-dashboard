@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, HttpResponse, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password
 from django.conf import settings
+from django.utils.translation import gettext as _
 
 import csv
 import json
@@ -42,6 +43,26 @@ def listOrganizations(request):
     return render(request, "_admin/organizations/list.html")
 
 @login_required
+def viewOrganizationDetails(request, pk):
+    if not request.user.is_superuser:
+        return redirect('login')
+
+    org = get_object_or_404(Organization, pk=pk)
+    tenantAdmin = User.objects.filter(username=org.adminUsername).first()
+    users = User.objects.filter(organization=org).order_by('role__level', 'createdDate')
+    devices = Device.objects.filter(organization=org)
+    locations = Location.objects.filter(organization=org)
+
+    return render(request, "_admin/organizations/details.html",
+        {
+            "organization": org,
+            "tenantAdmin": tenantAdmin,
+            "users": users,
+            "locations": locations,
+            "devices": devices
+        })
+
+@login_required
 def listOrganizationUsers(request, pk):
     if not request.user.is_superuser:
         return redirect('login')
@@ -53,7 +74,7 @@ def addOrganization(request):
     if not request.user.is_superuser:
         return redirect('login')
 
-    form = OrganizationCreationForm(initial={'nfcEnabled': True, 'qrScanEnabled': True, 'active': True})
+    form = OrganizationCreationForm(initial={'nfcEnabled': True, 'qrScanEnabled': False, 'active': True})
 
     if request.method == 'POST':
         form = OrganizationCreationForm(request.POST)
@@ -103,7 +124,7 @@ def resendMail(request, pk):
     return redirect('admin-home')
     
 
-ORG_HEADER = ['Name', 'Admin Name', 'Admin Email', 'NFC Enabled', 'QR Scan Enabled', 'Active']
+ORG_HEADER = [_('name'), _('admin.name'), _('admin.email'), _('nfc.enabled'), _('qr.scanning.enabled'), _('active')]
 
 @login_required
 def exportOrganization(request):
@@ -219,7 +240,7 @@ def deleteUnregisteredDevice(request, pk):
     device.delete()
     return redirect("admin-unregistered-device")
 
-DEVICE_HEADER = ['ID #1', 'ID #2']
+DEVICE_HEADER = [_('id1'), _('id2')]
 
 @login_required
 def exportUnregisteredDevice(request):

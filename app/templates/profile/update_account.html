@@ -1,4 +1,5 @@
 {% extends "./base.html" %}
+{% load i18n %}
 
 {% block content %}
 <style>
@@ -12,31 +13,31 @@
 <div id="content" class="container p-3">
   <ul class="nav nav-tabs mb-4">
     <li class="nav-item">
-      <a href="/profile/update" class="nav-link active">Update Account</a>
+      <a href="/profile/update" class="nav-link active">{% trans "update.account" %}</a>
     </li>
     <li class="nav-item">
-      <a href="/profile/change_password" class="nav-link">Change Password</a>
+      <a href="/profile/change_password" class="nav-link">{% trans "change.password" %}</a>
     </li>
   </ul>
   <div class="row">
     <div class="col-6 offset-3">
       <form class="update-account-form" method="POST" enctype="multipart/form-data">{% csrf_token %}
         <div class="form-group">
-          <label><b>Email * :</b></label>
+          <label><b>{% trans "email" %} * :</b></label>
           <input name="email" type="text" class="form-control" value="{{form.email.value}}" />
           {{ form.email.errors }}
         </div>
   
         <div class="form-group">
-          <label><b>Full Name * :</b></label>
+          <label><b>{% trans "fullname" %} * :</b></label>
           <input name="fullname" type="text" class="form-control" value="{{form.fullname.value|default:''}}" />
           {{ form.fullname.errors }}
         </div>
 
         <div class="form-group">
           <label>
-            <b>Profile picture:</b>
-            <br>(<small>JPG/PNG/GIF file with maximum size of 25Mb</small>)
+            <b>{% trans "profile.picture" %}:</b>
+            <br>(<small>{% trans "profile.picture.legend" %}</small>)
           </label>
           <input type="file" id="profilePicture" name="profilePicture" accept="image/*" class="mt-2 form-control-file" />
           <div class="row justify-content-center" >
@@ -52,7 +53,7 @@
         <div>{{form.non_field_errors}}</div>
   
         <div class="form-group">
-          <button type="submit" class="mt-4 btn btn-primary btn-block">Save</button>
+          <button type="submit" class="mt-4 btn btn-primary btn-block">{% trans "save" %}</button>
         </div>
       </form>
     </div>
