@@ -96,6 +96,6 @@ urlpatterns = [
     path('api/devices/delete_from_org/<int:pk>', views_api.deleteDeviceFromOrg),    
 
     path('api/locations/search', views_api.searchLocation),
+    path('api/locations/search_by_postcode', views_api.searchLocationByPostCode),
     path('api/locations/delete/<int:pk>', views_api.deleteLocation),
-    
 ]

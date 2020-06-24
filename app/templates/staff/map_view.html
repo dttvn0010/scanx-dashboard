@@ -27,6 +27,8 @@
   }
 
   function addMarker(item) {
+    if(!item.geoLocation) return;
+    
     var marker =  new google.maps.Marker({ 
         position: item.geoLocation, map: map, 
         title: `${item.user}` 

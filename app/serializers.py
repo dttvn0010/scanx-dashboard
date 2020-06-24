@@ -38,7 +38,6 @@ class CheckInSerializer(ModelSerializer):
     addressLine2 = CharField(source='location.addressLine2', default="")
     postCode = CharField(source='location.postCode', default="")
     city = CharField(source='location.city', default="")
-    geoLocation = CharField(source='location.geoLocation', default="")
     date = DateTimeField(format="%d/%m/%Y %H:%M:%S", required=False, read_only=True)
     class Meta:
         model = CheckIn

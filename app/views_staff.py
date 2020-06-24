@@ -1,6 +1,7 @@
 from django.shortcuts import render, HttpResponse, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password
+from django.conf import settings
 
 import csv
 import json
@@ -504,7 +505,9 @@ def reportLogInExportPdf(request):
 
 def configureOranization(request):
     org = request.user.organization
-    initial = {'name': org.name, 'nfcEnabled': org.nfcEnabled, 'qrScanEnabled': org.qrScanEnabled}
+    initial = {'name': org.name, 'description': org.description,
+                 'nfcEnabled': org.nfcEnabled, 'qrScanEnabled': org.qrScanEnabled}
+
     form = OrganizationChangeForm(initial=initial)
     saved = False
     
@@ -512,6 +515,7 @@ def configureOranization(request):
         form = OrganizationChangeForm(request.POST)
         if form.is_valid():
             org.name = form.cleaned_data.get("name")
+            org.description = form.cleaned_data.get("description")
             org.nfcEnabled = form.cleaned_data.get("nfcEnabled")
             org.qrScanEnabled = form.cleaned_data.get("qrScanEnabled")
             org.save()

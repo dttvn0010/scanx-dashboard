@@ -78,5 +78,7 @@ class DeviceChangeForm(forms.Form):
 
 class OrganizationChangeForm(forms.Form):
     name = forms.CharField(label="Organization Name * ")
+    description = forms.CharField(label="Detail Information", required=False, 
+                        widget=forms.Textarea(attrs={'rows':4}))
     nfcEnabled = forms.BooleanField(label='NFC Enabled', required=False)
     qrScanEnabled = forms.BooleanField(label='QR Scanning Enabled', required=False)

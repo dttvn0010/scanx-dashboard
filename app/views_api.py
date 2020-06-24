@@ -121,6 +121,12 @@ def checkIn(request):
     code = request.data.get("code")
     position = request.data.get("position")
 
+    if not position or not position.get('lng') or not position.get('lat'):
+        return Response({
+            'success': False, 
+            'error': 'No GPS location included, please enable GPS on your device!'
+        })
+
     arr = code.split('-')
     if len(arr) != 3 or arr[0] != "SCANX":
         pos = code.find('en')
@@ -168,10 +174,9 @@ def checkIn(request):
     checkIn.user = request.user
     checkIn.date = datetime.now()
 
-    if position:
-        lat = position.get("lat", "")
-        lng = position.get("lng", "")
-        checkIn.geoLocation = f"{lat},{lng}"
+    lat = position.get("lat", "")
+    lng = position.get("lng", "")
+    checkIn.geoLocation = f"{lat},{lng}"
         
     checkIn.save()
 
@@ -320,10 +325,13 @@ def searchCheckIn(request):
             item['datediff'] = f'{hours} hour{"" if hours == 1 else "s"}'
 
         arr = item['geoLocation'].split(',')
+        
         if len(arr) == 2:
             lat = float(arr[0])
             lng = float(arr[1])
             item['geoLocation'] = {'lat': lat, 'lng': lng}
+        else:
+            del item['geoLocation']
 
     return Response({
         "draw": draw,
@@ -450,7 +458,7 @@ def searchUnregisteredDevice(request):
     start = int(request.query_params.get('start', 0))
     length = int(request.query_params.get('length', 0))
     
-    devices = Device.objects.filter(organization__isnull=True)
+    devices = Device.objects.filter(organization__isNone=True)
     recordsTotal = devices.count()
 
     devices = devices.filter(Q(id1__contains=keyword) | Q(id2__contains=keyword)).order_by('-createdDate')
@@ -506,7 +514,7 @@ def searchRegisteredDevice(request):
     start = int(request.query_params.get('start', 0))
     length = int(request.query_params.get('length', 0))
     
-    devices = Device.objects.filter(organization__isnull=False)
+    devices = Device.objects.filter(organization__isNone=False)
     recordsTotal = devices.count()
 
     devices = devices.filter(Q(id1__contains=keyword) | Q(id2__contains=keyword)).order_by('-createdDate')
@@ -589,3 +597,24 @@ def deleteLocation(request, pk):
         traceback.print_exc()
         return Response({'success': False, 'error': str(e)})
 
+@api_view(['GET'])
+def searchLocationByPostCode(request):
+    q = request.GET.get('q')
+    if q:
+        resp_text = requests.get(settings.POST_CODER_API_URL + q + '?format=json&lines=2').text
+        try:
+            items = json.loads(resp_text)
+
+            items = [{
+                        'addressLine1': item.get('addressline1', ''),
+                        'addressLine2': item.get('addressline2', ''),
+                        'city': item.get('county', ''),
+                        'postCode': item.get('postcode', ''),
+                        
+                    } for i,item in enumerate(items)]
+
+            return Response({'items': items, 'success': True})
+        except:           
+            return Response({'error': resp_text, 'success': False})
+    else:
+        return Response({'items': [], 'success': True})

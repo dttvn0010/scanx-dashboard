@@ -140,11 +140,11 @@ $(document).ready(function() {
 });
 
 function openDeleteConfirmation(id) {
-    $("#errorLabel").html('');
-    $('#password').val('');
-    $('#locationId').val(id);
-    $("#deleteConfirmModal").modal();
-  }
+  $("#errorLabel").html('');
+  $('#password').val('');
+  $('#locationId').val(id);
+  $("#deleteConfirmModal").modal();
+}
 
 async function deleteLocation() {
   $("#errorLabel").html('');
