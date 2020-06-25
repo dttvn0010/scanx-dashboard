@@ -25,9 +25,10 @@
       <table id="table" class="table table-bordered" width="100%" cellspacing="0">
         <thead>
           <tr>
-            <th style="width: 20%;">{% trans "id1" %}</th>
-            <th style="width: 20%;">{% trans "id2" %}</th>
-            <th style="width: 50%;">{% trans "location" %}</th>
+            <th style="width: 15%;">{% trans "id1" %}</th>
+            <th style="width: 15%;">{% trans "id2" %}</th>
+            <th style="width: 30%;">{% trans "uid" %}</th>
+            <th style="width: 30%;">{% trans "location" %}</th>
             <th style="width: 10%;"></th>
           </tr>
         </thead>
@@ -83,12 +84,14 @@ $(document).ready(function() {
     "columns": [
       { "data": "id1" },
       { "data": "id2" },
+      { "data": "uid" },
       { "data": "location" },
       {
         render: function (data, type, row) {
           return `<a title='{% trans "edit" %}' href="/staff/devices/update/${row['id']}"><i class="fas fa-edit"></i></a>&nbsp;&nbsp;`
                + `<a title='{% trans "delete" %}' href="#" onclick="openDeleteConfirmation(${row['id']})" ><i class="fas fa-trash" style="color:red"></i></a>`;
-        }
+        },
+        sClass: "text-center"
       }
     ],
   })

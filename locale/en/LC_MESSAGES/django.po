@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-25 17:26+0700\n"
+"POT-Creation-Date: 2020-06-26 02:01+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,11 +22,20 @@ msgstr ""
 msgid "incorrect.temporary.password"
 msgstr "Incorrect temporary password"
 
-#: .\app\forms.py:38 .\app\forms.py:82
+#: .\app\forms.py:38 .\app\forms.py:82 .\app\views_api.py:453
 msgid "password.too.short"
 msgstr "Password is too short"
 
-#: .\app\forms.py:41 .\app\forms.py:85
+msgid "new.password.too.short"
+msgstr "New Password is too short"
+
+msgid "new.password.empty"
+msgstr "New Password is empty"
+
+msgid "new.password.cannot.be.all.digits"
+msgstr "New Password cannot be all digits"
+
+#: .\app\forms.py:41 .\app\forms.py:85 .\app\views_api.py:459
 msgid "password.cannot.be.all.digits"
 msgstr "Password cannot be all digits"
 
@@ -39,16 +48,16 @@ msgid "incorrect.password"
 msgstr "Incorrect Password"
 
 #: .\app\forms_admin.py:10 .\app\templates\_admin\organizations\details.html:29
-#: .\app\templates\_admin\organizations\list.html:36 .\app\views_admin.py:127
+#: .\app\templates\_admin\organizations\list.html:36 .\app\views_admin.py:129
 msgid "admin.name"
 msgstr "Admin Name"
 
 #: .\app\forms_admin.py:11 .\app\templates\_admin\organizations\details.html:33
-#: .\app\templates\_admin\organizations\list.html:37 .\app\views_admin.py:127
+#: .\app\templates\_admin\organizations\list.html:37 .\app\views_admin.py:129
 msgid "admin.email"
 msgstr "Admin Email"
 
-#: .\app\forms_staff.py:10 .\app\models.py:42
+#: .\app\forms_staff.py:10 .\app\models.py:41
 #: .\app\templates\_admin\organizations\details.html:73
 #: .\app\templates\_admin\organizations\list_users.html:23
 #: .\app\templates\profile\update_account.html:32
@@ -65,21 +74,21 @@ msgid "email.address"
 msgstr "Email Address"
 
 #: .\app\forms_staff.py:12 .\app\forms_staff.py:29 .\app\forms_staff.py:38
-#: .\app\forms_staff.py:84 .\app\models.py:10 .\app\models.py:44
+#: .\app\forms_staff.py:84 .\app\models.py:10 .\app\models.py:43
 #: .\app\templates\_admin\organizations\details.html:41
-#: .\app\templates\staff\users\list.html:69 .\app\views_admin.py:127
+#: .\app\templates\staff\users\list.html:69 .\app\views_admin.py:129
 msgid "nfc.enabled"
 msgstr "NFC Enabled"
 
 #: .\app\forms_staff.py:13 .\app\forms_staff.py:30 .\app\forms_staff.py:39
-#: .\app\forms_staff.py:85 .\app\models.py:11 .\app\models.py:45
+#: .\app\forms_staff.py:85 .\app\models.py:11 .\app\models.py:44
 #: .\app\templates\_admin\organizations\details.html:47
-#: .\app\templates\staff\users\list.html:73 .\app\views_admin.py:127
+#: .\app\templates\staff\users\list.html:73 .\app\views_admin.py:129
 msgid "qr.scanning.enabled"
 msgstr "QR Scanning Enabled"
 
 #: .\app\forms_staff.py:14 .\app\forms_staff.py:31 .\app\forms_staff.py:40
-#: .\app\models.py:46 .\app\templates\staff\users\list.html:77
+#: .\app\models.py:45 .\app\templates\staff\users\list.html:77
 msgid "geolocation.enabled"
 msgstr "GeoLocation Enabled"
 
@@ -118,60 +127,148 @@ msgstr "Company Name"
 #: .\app\templates\_admin\organizations\list.html:138
 #: .\app\templates\_admin\organizations\list_users.html:70
 #: .\app\templates\staff\users\list.html:204
-#: .\app\templates\staff\users\list.html:241 .\app\views_admin.py:127
+#: .\app\templates\staff\users\list.html:241 .\app\views_admin.py:129
 msgid "active"
 msgstr "Active"
 
-#: .\app\models.py:43 .\app\templates\_admin\organizations\details.html:75
+#: .\app\models.py:42 .\app\templates\_admin\organizations\details.html:75
 #: .\app\templates\_admin\organizations\list_users.html:25
 #: .\app\templates\staff\users\list.html:36
 #: .\app\templates\staff\users\list.html:85
 msgid "role"
 msgstr "Role"
 
-#: .\app\models.py:60 .\app\templates\_admin\organizations\details.html:111
+#: .\app\models.py:59 .\app\templates\_admin\organizations\details.html:111
 #: .\app\templates\staff\locations\form.html:159
 #: .\app\templates\staff\locations\list.html:34
 msgid "addressLine1"
 msgstr "Address Line 1"
 
-#: .\app\models.py:61 .\app\templates\_admin\organizations\details.html:112
+#: .\app\models.py:60 .\app\templates\_admin\organizations\details.html:112
 #: .\app\templates\staff\locations\form.html:160
 #: .\app\templates\staff\locations\list.html:35
 msgid "addressLine2"
 msgstr "Address Line 2"
 
-#: .\app\models.py:62 .\app\templates\_admin\organizations\details.html:113
+#: .\app\models.py:61 .\app\templates\_admin\organizations\details.html:113
 #: .\app\templates\staff\locations\form.html:161
 #: .\app\templates\staff\locations\list.html:36
 msgid "city"
 msgstr "City"
 
-#: .\app\models.py:63 .\app\templates\_admin\organizations\details.html:114
+#: .\app\models.py:62 .\app\templates\_admin\organizations\details.html:114
 #: .\app\templates\staff\locations\form.html:162
 #: .\app\templates\staff\locations\list.html:37
 msgid "postCode"
 msgstr "Post Code"
 
-#: .\app\models.py:64 .\app\templates\staff\locations\list.html:38
+#: .\app\models.py:63 .\app\templates\staff\locations\list.html:38
 msgid "map.coordinates"
 msgstr "Map Coordinates"
 
-#: .\app\models.py:73 .\app\templates\_admin\devices\registered\list.html:22
+#: .\app\models.py:71 .\app\templates\_admin\devices\registered\list.html:22
 #: .\app\templates\_admin\devices\unregistered\list.html:35
 #: .\app\templates\_admin\organizations\details.html:141
 #: .\app\templates\staff\devices\form.html:22
-#: .\app\templates\staff\devices\list.html:28 .\app\views_admin.py:243
+#: .\app\templates\staff\devices\list.html:28 .\app\views_admin.py:245
 msgid "id1"
 msgstr "ID #1"
 
-#: .\app\models.py:74 .\app\templates\_admin\devices\registered\list.html:23
+#: .\app\models.py:72 .\app\templates\_admin\devices\registered\list.html:23
 #: .\app\templates\_admin\devices\unregistered\list.html:36
 #: .\app\templates\_admin\organizations\details.html:142
 #: .\app\templates\staff\devices\form.html:26
-#: .\app\templates\staff\devices\list.html:29 .\app\views_admin.py:243
+#: .\app\templates\staff\devices\list.html:29 .\app\views_admin.py:245
 msgid "id2"
 msgstr "ID #2"
+
+#: .\app\models.py:73
+msgid "uid"
+msgstr "UID"
+
+#: .\app\models.py:77
+msgid "description"
+msgstr "Description"
+
+#: .\app\models.py:99
+msgid "check_in.status.success"
+msgstr "Success"
+
+#: .\app\models.py:100
+msgid "check_in.status.incorrect.mobile.time"
+msgstr "Incorrect mobile time"
+
+#: .\app\models.py:101
+msgid "check_in.status.no.gps.location"
+msgstr "No GPS location included"
+
+#: .\app\models.py:102
+msgid "check_in.status.incorrect.location"
+msgstr "Incorrect device location"
+
+#: .\app\models.py:103
+msgid "check_in.status.invalid.device.code"
+msgstr "Invalid device code"
+
+#: .\app\models.py:104
+msgid "check_in.status.incorrect.device.uid"
+msgstr "Incorrect device UID"
+
+#: .\app\models.py:105
+msgid "check_in.status.device.not.existed"
+msgstr "Device not exist"
+
+#: .\app\models.py:106
+msgid "check_in.status.device.unregistered"
+msgstr "Unregistered device"
+
+#: .\app\models.py:107
+msgid "check_in.status.device.from.other.org"
+msgstr "Device from other organization"
+
+#: .\app\models.py:108
+msgid "check_in.status.scan.not.time.out.yet"
+msgstr "Scan not time out yet"
+
+#: .\app\models.py:112
+msgid "check_in.mobile.message.success"
+msgstr "Successfully Scanned Device. Location is: %s"
+
+#: .\app\models.py:113
+msgid "check_in.mobile.message.incorrect.mobile.time"
+msgstr "Incorrect mobile time !"
+
+#: .\app\models.py:114
+msgid "check_in.mobile.message.no.gps.location"
+msgstr "No GPS location included, please enable GPS on your device!"
+
+#: .\app\models.py:115
+msgid "check_in.mobile.message.incorrect.location"
+msgstr "Device location is incorrect, please contact admin!"
+
+#: .\app\models.py:116
+msgid "check_in.mobile.message.invalid.device.code"
+msgstr "Invalid device code, please contact admin!"
+
+#: .\app\models.py:117
+msgid "check_in.mobile.message.incorrect.device.uid"
+msgstr "Device's UID is incorrect, please contact admin!"
+
+#: .\app\models.py:118
+msgid "check_in.mobile.message.device.not.existed"
+msgstr "Device does not exist, please contact admin!"
+
+#: .\app\models.py:119
+msgid "check_in.mobile.message.device.unregistered"
+msgstr "Device is not registered, please contact admin!"
+
+#: .\app\models.py:120
+msgid "check_in.mobile.message.device.from.other.org"
+msgstr "Device is from another organization, please contact admin!"
+
+#: .\app\models.py:121
+msgid "check_in.mobile.message.scan.not.time.out.yet"
+msgstr "Please wait a minimum of %d minutes before next scan"
 
 #: .\app\templates\_admin\base.html:7 .\app\templates\profile\base.html:3
 #: .\app\templates\staff\base.html:5
@@ -221,27 +318,27 @@ msgid "system.parameters"
 msgstr "System Parameters"
 
 #: .\app\templates\_admin\base.html:102 .\app\templates\profile\base.html:38
-#: .\app\templates\staff\base.html:138 .\app\templates\users\index.html:39
+#: .\app\templates\staff\base.html:141 .\app\templates\users\index.html:39
 msgid "last.login"
 msgstr "Last Login"
 
 #: .\app\templates\_admin\base.html:119 .\app\templates\profile\base.html:54
-#: .\app\templates\staff\base.html:156 .\app\templates\users\index.html:54
+#: .\app\templates\staff\base.html:159 .\app\templates\users\index.html:54
 msgid "profile"
 msgstr "Profile"
 
 #: .\app\templates\_admin\base.html:124 .\app\templates\profile\base.html:59
-#: .\app\templates\staff\base.html:161 .\app\templates\users\index.html:59
+#: .\app\templates\staff\base.html:164 .\app\templates\users\index.html:59
 msgid "logout"
 msgstr "Logout"
 
 #: .\app\templates\_admin\base.html:138 .\app\templates\profile\base.html:71
-#: .\app\templates\staff\base.html:175 .\app\templates\users\index.html:101
+#: .\app\templates\staff\base.html:178 .\app\templates\users\index.html:101
 msgid "copyright"
 msgstr "Copyright &copy; ScanX 3.0 2020. All rights reserved."
 
 #: .\app\templates\_admin\base.html:140 .\app\templates\profile\base.html:73
-#: .\app\templates\staff\base.html:177 .\app\templates\users\index.html:103
+#: .\app\templates\staff\base.html:180 .\app\templates\users\index.html:103
 msgid "server.time"
 msgstr "Server time"
 
@@ -452,11 +549,12 @@ msgstr "Organization Details"
 #: .\app\templates\_admin\organizations\form.html:26
 #: .\app\templates\_admin\settings\admin_mail_template.html:24
 #: .\app\templates\_admin\settings\mail_template.html:24
-#: .\app\templates\_admin\settings\system_params.html:38
+#: .\app\templates\_admin\settings\system_params.html:39
 #: .\app\templates\profile\update_account.html:56
 #: .\app\templates\staff\devices\form.html:38
 #: .\app\templates\staff\locations\form.html:31
 #: .\app\templates\staff\settings\organization.html:24
+#: .\app\templates\staff\settings\tenant_params.html:39
 #: .\app\templates\staff\users\form.html:36
 msgid "save"
 msgstr "Save"
@@ -515,8 +613,9 @@ msgid "mail.template.successfully.saved"
 msgstr "Mail Template successfully saved"
 
 #: .\app\templates\_admin\settings\system_params.html:18
-msgid "system.parameters.successfully.saved"
-msgstr "System Parameters successfully saved"
+#: .\app\templates\staff\settings\tenant_params.html:18
+msgid "parameters.successfully.saved"
+msgstr "Parameters successfully saved"
 
 #: .\app\templates\profile\change_password.html:16
 #: .\app\templates\profile\update_account.html:16
@@ -591,11 +690,16 @@ msgstr "Check-In"
 msgid "log_in"
 msgstr "Log-In"
 
-#: .\app\templates\staff\base.html:105
+#: .\app\templates\staff\base.html:98
+#: .\app\templates\staff\settings\tenant_params.html:14
+msgid "custom.parameters"
+msgstr "Custom Parameters"
+
+#: .\app\templates\staff\base.html:108
 msgid "logs"
 msgstr "Logs"
 
-#: .\app\templates\staff\base.html:112
+#: .\app\templates\staff\base.html:115
 msgid "app.info"
 msgstr "App Info"
 
@@ -804,35 +908,33 @@ msgstr "Deactivate this user"
 msgid "activate.this.user"
 msgstr "Activate this user"
 
-#: .\app\views_admin.py:127
+#: .\app\views_admin.py:129
 msgid "name"
 msgstr "Name"
 
-#: .\app\views_api.py:128
-msgid "no.gps.location.error"
-msgstr "No GPS location included, please enable GPS on your device!"
+#: .\app\views_api.py:39
+msgid "incorrect.username.or.password"
+msgstr "Incorrect username or password"
 
-#: .\app\views_api.py:138
-msgid "invalid.device.code"
-msgstr "Invalid device code!"
+#: .\app\views_api.py:47
+msgid "incorrect.mobile.time"
+msgstr "Incorrect mobile time"
 
-#: .\app\views_api.py:146
-msgid "device.not.exist.error"
-msgstr "Device does not exist in device table - please contact admin!"
-
-#: .\app\views_api.py:152
-msgid "device.unregistered.error"
-msgstr "Device is unregistered - please contact admin!"
-
-#: .\app\views_api.py:169
-msgid "scan.timeout.error"
-msgstr "Please wait a minimum of %d minutes before next scan"
-
-#: .\app\views_api.py:189
-msgid "success.scan.message"
-msgstr "Successfully Scanned Device\nLocation is:"
-
-#: .\app\views_api.py:385 .\app\views_api.py:447 .\app\views_api.py:487
-#: .\app\views_api.py:505 .\app\views_api.py:595
+#: .\app\views_api.py:413 .\app\views_api.py:524 .\app\views_api.py:582
+#: .\app\views_api.py:601 .\app\views_api.py:695
 msgid "wrong.password"
 msgstr "Wrong Password!"
+
+#: .\app\views_api.py:447
+msgid "incorrect.old.password"
+msgstr "Incorrect Old Password"
+
+
+msgid "user.with.email"
+msgstr "User with Email"
+
+msgid "already.exists"
+msgstr "already exists"
+
+msgid "device.with"
+msgstr "Device with"

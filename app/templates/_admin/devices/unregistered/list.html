@@ -32,8 +32,9 @@
           <thead>
             <tr>
               <th style="width: 10%;">{% trans "enabled" %}</th>
-              <th style="width: 40%;">{% trans "id1" %}</th>
-              <th style="width: 40%;">{% trans "id2" %}</th>
+              <th style="width: 20%;">{% trans "id1" %}</th>
+              <th style="width: 20%;">{% trans "id2" %}</th>
+              <th style="width: 40%;">{% trans "uid" %}</th>
               <th style="width: 10%;"></th>
             </tr>
           </thead>
@@ -130,11 +131,13 @@ $(document).ready(function() {
       },
       { "data": "id1" },
       { "data": "id2" },
+      { "data": "uid" },
       {
         render: function (data, type, row) {
           return `<a title='{% trans "edit" %}' href="/_admin/devices/unregistered/update/${row['id']}"><i class="fas fa-edit"></i></a>&nbsp;&nbsp;`
                 + `<a title='{% trans "delete" %}' href="#" onclick="openDeleteConfirmation(${row['id']})(${row['id']})" ><i class="fas fa-trash" style="color:red"></i></a>`;
-        }
+        },
+        sClass: "text-center"
       }
     ],
   })

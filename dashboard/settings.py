@@ -165,13 +165,17 @@ ROLES = {
     'USER': 'USER'
 }
 
-HOST_URL = "https://scanx.cloud"
+HOST_URL = "http://localhost:8000" #"https://scanx.cloud"
 INVITE_URL = HOST_URL + "/accounts/initial_setup"
-MOBILE_NO_LOG_IN = True
-MOBILE_USERNAME = 'dttvn0010@gmail.com'
-MOBILE_PASSWORD = 'abcd@1234'
 PROFILE_IMAGE_SIZE = 300
 
 POST_CODER_API_KEY = "PCWJ7-LXWC9-ZGHHK-LFD5B"
 POST_CODER_API_URL = f"https://ws.postcoder.com/pcw/{POST_CODER_API_KEY}/address/UK/"
 
+SCAN_TIME_DELAY = 5
+MAP_VIEW_FLUSH_TIME = '00:00'
+MAX_TIME_DIFF_ALLOW = 300
+NFC_BUTTON_TEXT = 'NFC Scan'
+QR_BUTTON_TEXT = 'QR Scan'
+
+SCAN_CODE_PREFIX = "SCANX"

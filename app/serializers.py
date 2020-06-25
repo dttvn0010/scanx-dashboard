@@ -24,7 +24,7 @@ class DeviceSerializer(ModelSerializer):
     
     class Meta:
         model = Device
-        fields = ('id', 'addressLine1', 'addressLine2', 'postCode', 'city', 'organizationName', 'id1', 'id2', 'enabled', 'registeredDate') 
+        fields = ('id', 'addressLine1', 'addressLine2', 'postCode', 'city', 'organizationName', 'id1', 'id2', 'uid', 'enabled', 'registeredDate') 
 
 class LocationSerializer(ModelSerializer):
     class Meta:
@@ -41,7 +41,7 @@ class CheckInSerializer(ModelSerializer):
     date = DateTimeField(format="%d/%m/%Y %H:%M:%S", required=False, read_only=True)
     class Meta:
         model = CheckIn
-        fields = ('username', 'userFullName', 'addressLine1', 'addressLine2', 'postCode', 'city', 'geoLocation', 'date',)
+        fields = ('username', 'userFullName', 'addressLine1', 'addressLine2', 'postCode', 'city', 'lat', 'lng', 'date', 'status',)
 
 class LogInSerializer(ModelSerializer):    
     userFullName = CharField(source='user.fullname', default="")

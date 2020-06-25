@@ -12,6 +12,7 @@ from threading import Thread
 from .models import *
 from .forms_admin import *
 
+from .param_utils import getSystemParamValue
 from .user_utils import genPassword
 from .import_utils import getPermutation, importPreview
 from .mail_utils import sendAdminInvitationMail
@@ -88,6 +89,7 @@ def addOrganization(request):
             adminName = form.cleaned_data['adminName']
 
             createTenantAdmin(request, org, adminName, adminEmail)
+
             return redirect('admin-home')
 
     return render(request, '_admin/organizations/form.html', {'form': form})
@@ -352,19 +354,19 @@ def editSystemParams(request):
         return redirect('login')
 
     params = Parameter.objects.all()
+    param_map = {p.key: p for p in params}
 
     saved = False
 
     if request.method == 'POST':
-        for key in request.POST:
-            value = request.POST[key]
-            for p in params:
-                if p.key == key:                    
-                    p.value = value
+        keys = [key for key in request.POST if key in param_map]
 
-        for param in params:
+        for key in keys:
+            param = param_map[key]
+            value = request.POST[key]
+            param.value = value
             param.save()
-            
+
         saved = True
 
     return render(request, "_admin/settings/system_params.html", 

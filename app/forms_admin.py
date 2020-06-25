@@ -25,7 +25,17 @@ class OrganizationChangeForm(forms.ModelForm):
 class UnRegisteredDeviceForm(forms.ModelForm):
     class Meta:
         model = Device
-        fields = ('id1', 'id2')
+        fields = ('id1', 'id2', 'uid', 'description')
+
+    def clean_uid(self):
+        uid = self.cleaned_data.get('uid', '')
+
+        if uid != '':
+            device = Device.objects.filter(uid=uid).first()
+            if device and (self.instance == None or self.instance.id != device.id):
+                raise forms.ValidationError(f'{_("device.with")} {_("uid")}={uid} {_("already.exists")}')
+
+        return uid
 
     def clean(self):
         id1 = self.cleaned_data.get('id1')

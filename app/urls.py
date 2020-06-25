@@ -68,6 +68,7 @@ urlpatterns = [
     path('staff/reports/log_in/export_pdf', views_staff.reportLogInExportPdf),
 
     path('staff/settings/organization', views_staff.configureOranization),
+    path('staff/settings/custom_params', views_staff.editCustomParams),
     path('staff/app_info', views_staff.appInfo),
 
     # API
@@ -75,6 +76,9 @@ urlpatterns = [
     path('api/login', views_api.logIn),
     path('api/login/search', views_api.searchLogIn),
     path('api/get_user_config', views_api.getUserConfig),
+    path('api/user/change_password', views_api.changeUserPassword),
+    
+    path('api/get_all_nfc_tags', views_api.getAllNFCTags),
 
     path('api/checkin', views_api.checkIn),
     path('api/checkin/get_history', views_api.getCheckInHistory),

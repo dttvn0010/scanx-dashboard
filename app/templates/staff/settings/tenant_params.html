@@ -2,7 +2,7 @@
 {% load i18n %}
 
 {% block sidebar %}
-{% with group=3 page=6 %}
+{% with page=7 group=2 %}
 {{ block.super }}
 {% endwith %}
 {% endblock %}
@@ -11,7 +11,7 @@
 <div class="content p-3">
   <div class="card shadow mb-4">
     <div class="card-header py-3">
-      <h6 class="m-0 font-weight-bold text-primary">{% trans "system.parameters" %}</h6>
+      <h6 class="m-0 font-weight-bold text-primary">{% trans "custom.parameters" %}</h6>
     </div>
     <div class="card-body">
       {%if saved%}
@@ -21,15 +21,15 @@
         {% csrf_token %}
         <table class="table">
           <tbody>
-            {% for param in params %}
+            {% for param in tenant_params %}
             <tr>
-              <th style="width:40%">{{param.name}}:</th>
+              <th style="width:40%">{{param.parameter.name}}:</th>
               <td>
-                <input type='{{param.type}}' value='{{param.value}}' 
-                  {%if param.min or param.min == 0 %} min='{{param.min}}' {%endif%}
-                  {%if param.max %} max='{{param.max}}' {%endif%}
-                  {%if param.maxLength %} max='{{param.maxLength}}' {%endif%}
-                  class="form-control" name='{{ param.key }}'>
+                <input type='{{param.parameter.type}}' value='{{param.value}}' 
+                  {%if param.parameter.min or param.parameter.min == 0 %} min='{{param.parameter.min}}' {%endif%}
+                  {%if param.parameter.max %} max='{{param.parameter.max}}' {%endif%}
+                  {%if param.parameter.maxLength %} max='{{param.parameter.maxLength}}' {%endif%}
+                  class="form-control" name='{{ param.parameter.key }}'>
               </td>
             </tr>
             {% endfor %}

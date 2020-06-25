@@ -3,14 +3,17 @@ from django.conf import settings
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from pytz import timezone
+from django.contrib.auth.hashers import make_password
 from django.utils.translation import gettext_lazy as _
 
 import json
 import requests
 import traceback
+from time import time
 from datetime import datetime, timedelta
+from pytz import timezone
 
+from. param_utils import getTenantParamValue
 from .models import *
 from .serializers import *
 
@@ -19,45 +22,48 @@ from .serializers import *
 def test(request):
     return Response({'success': True})
 
-@api_view(['GET'])
-@permission_classes((IsAuthenticated,))
-def getUserConfig(request):
-    nfcEnabled = qrScanEnabled = sharedLocation = False
-
-    if request.user and request.user.organization:
-        nfcEnabled = request.user.nfcEnabled and request.user.organization.nfcEnabled
-        qrScanEnabled = request.user.qrScanEnabled and request.user.organization.qrScanEnabled
-        sharedLocation = request.user.sharedLocation
-
-    return Response({ 
-        'nfcEnabled': nfcEnabled,
-        'qrScanEnabled': qrScanEnabled,
-        'sharedLocation': sharedLocation and (request.user.username != settings.MOBILE_USERNAME)
-    })
-
 # ================================================ LogIn ========================================================
 
 @api_view(['POST'])
 def logIn(request):
-    noLogIn = settings.MOBILE_NO_LOG_IN
+    mobiletime = float(request.data.get('mobiletime', '0'))
+    
     headers = {'Content-type': 'application/json'}
     resp_text = requests.post(settings.HOST_URL + "/api/token", data=json.dumps(request.data), headers=headers).text    
     resp = json.loads(resp_text)
-    username = request.data.get("username")
+    user = User.objects.filter(username=request.data.get("username")).first()
 
-    if noLogIn and not resp.get('access'):
-        username = settings.MOBILE_USERNAME
-        data = {'username': username, 'password': settings.MOBILE_PASSWORD}
-        resp_text = requests.post(settings.HOST_URL + "/api/token", data=json.dumps(data), headers=headers).text
-        resp = json.loads(resp_text)
+    if not user or not resp.get('access'):
+        return Response({
+            "success": False,
+            "message": _('incorrect.username.or.password')
+        })
 
-    if resp.get('access'):
-        logIn = LogIn()
-        logIn.user = User.objects.filter(username=username).first()
-        logIn.date = datetime.now()
-        logIn.save()
+    allowedTimeDiff = getTenantParamValue('MAX_TIME_DIFF_ALLOW', user.organization, settings.MAX_TIME_DIFF_ALLOW)
     
-    return Response(resp)
+    if abs(mobiletime - time()) > allowedTimeDiff:
+        return Response({
+            "success": False,
+            "message": _("incorrect.mobile.time")
+        })
+
+    logIn = LogIn()
+    logIn.user = user
+    logIn.date = datetime.now()
+    logIn.save()
+    
+    return Response({
+        "success": True,
+        "access": resp["access"],
+        "fullname": user.fullname,
+        "email": user.email,
+        "profilepicture": settings.HOST_URL + '/' + user.profilePicture.url,
+        "company": user.organization.name,
+        "NFCButtonText": getTenantParamValue('NFC_BUTTON_TEXT', user.organization, settings.NFC_BUTTON_TEXT),
+        "QRButtonText": getTenantParamValue('QR_BUTTON_TEXT', user.organization, settings.QR_BUTTON_TEXT)
+    })
+
+    
 
 @api_view(['GET'])
 def searchLogIn(request):
@@ -119,74 +125,82 @@ def searchLogIn(request):
 @permission_classes((IsAuthenticated,))
 def checkIn(request):
 
-    code = request.data.get("code")
-    position = request.data.get("position")
-
-    if not position or not position.get('lng') or not position.get('lat'):
-        return Response({
-            'success': False, 
-            'error': _('no.gps.location.error')
-        })
-
-    arr = code.split('-')
-    if len(arr) != 3 or arr[0] != "SCANX":
-        pos = code.find('en')
-        if pos >= 0:
-            code = code[pos+2:]
-        return Response({
-            'success': False, 
-            'error': _('invalid.device.code')
-        })
+    code = request.data.get("code", "")
+    position = request.data.get("position", {})
+    lat = position.get("lat")
+    lng = position.get("lng")
     
-    id1, id2 = arr[1:]
-    device = Device.objects.filter(id1=id1).filter(id2=id2).first()
-    if not device:
-        return Response({
-            'success': False, 
-            'error': _('device.not.exist.error')
-        })
-
-    if not device.installationLocation:
-        return Response({
-            'success': False, 
-            'error': _('device.unregistered.error')
-        })
-
-    lastCheckIn = CheckIn.objects.filter(user=request.user).order_by('-date').first()
-    delayParam = Parameter.objects.filter(key='SCAN_TIME_DELAY').first()
+    uid = request.data.get("uid", "")
+    scantime = float(request.data.get("scantime", 0))
     
-    if lastCheckIn and delayParam and delayParam.value:
-        minWaitTime = float(delayParam.value)
-        
-        if minWaitTime == int(minWaitTime):
-            minWaitTime = int(minWaitTime)
-
-        timediff = datetime.timestamp(datetime.now()) - datetime.timestamp(lastCheckIn.date)
-
-        if timediff < minWaitTime * 60:
-            return Response({
-                'success': False, 
-                'error': _('scan.timeout.error') % (minWaitTime)
-            })
-        
     checkIn = CheckIn()
-    checkIn.location = device.installationLocation
-    checkIn.device = device
     checkIn.user = request.user
-    checkIn.date = datetime.now()
+    checkIn.organization = requests.user.organization
+    checkIn.scanCode = code
+    checkIn.uid = uid
+    checkIn.lat = lat
+    checkIn.lng = lng
+    checkIn.date = datetime.fromtimestamp(scantime)
 
-    lat = position.get("lat", "")
-    lng = position.get("lng", "")
-    checkIn.geoLocation = f"{lat},{lng}"
+    message_params = []
+    status = CheckIn.Status.SUCCESS
+
+    allowedTimeDiff = getTenantParamValue('MAX_TIME_DIFF_ALLOW', request.user.organization, settings.MAX_TIME_DIFF_ALLOW)
+
+    if abs(scantime - time()) > allowedTimeDiff:
+        status = CheckIn.Status.INCORRECT_MOBILE_TIME
+
+    if status == CheckIn.Status.SUCCESS and (lat == '' or lng == ''):
+        status = CheckIn.Status.NO_GPS_LOCATION
+    
+    device = None
+
+    if status == CheckIn.Status.SUCCESS :
+        arr = code.split('-')
+        if len(arr) != 3 or arr[0] != settings.SCAN_CODE_PREFIX:
+            status = CheckIn.Status.INVALID_DEVICE_CODE
+        else:
+            id1, id2 = arr[1:]
+            device = Device.objects.filter(id1=id1).filter(id2=id2).first()
+            checkIn.device = device
+            checkIn.location = device.installationLocation if device else None
+    
+    if status == CheckIn.Status.SUCCESS and not device:
+        status = CheckIn.Status.DEVICE_NOT_EXIST
         
+    if status == CheckIn.Status.SUCCESS and device.uid != uid:
+        status = CheckIn.Status.INCORRECT_DEVICE_UID
+
+    if status == CheckIn.Status.SUCCESS and not device.installationLocation:
+        status = CheckIn.Status.DEVICE_UNREGISTERED
+
+    if status == CheckIn.Status.SUCCESS and device.organization != request.user.organization:
+        status = CheckIn.Status.DEVICE_FROM_OTHER_ORG
+
+    lastCheckIn = CheckIn.objects.filter(user=request.user,status=CheckIn.Status.SUCCESS).order_by('-date').first()
+    scanDelay = getTenantParamValue('SCAN_TIME_DELAY', request.user.organization, settings.SCAN_TIME_DELAY)
+
+    if lastCheckIn and scanDelay > 0:
+        if scanDelay == int(scanDelay):
+            scanDelay = int(scanDelay)
+
+        timediff = scantime - datetime.timestamp(lastCheckIn.date)
+        print('timediff=', timediff)
+
+        if status == CheckIn.Status.SUCCESS and timediff < scanDelay * 60:
+            status = CheckIn.Status.SCAN_NOT_TIME_OUT_YET
+            message_params = [scanDelay]
+
+    checkIn.status = status    
     checkIn.save()
 
-    deviceId = f'{device.id1}-{device.id2}'
-    location = str(device.installationLocation)
+    if status == CheckIn.Status.SUCCESS:
+        location = str(device.installationLocation)
+        message_params = [location]
 
     return Response({
-        'success': True, 
-        'message': _('success.scan.message') + location
+        'success': status == CheckIn.Status.SUCCESS, 
+        'message': CheckIn.Status.mobile_messages.get(status, '') % tuple(message_params)
     })
 
 @api_view(['GET'])
@@ -199,7 +213,7 @@ def getCheckInHistory(request):
     endDate = datetime.strptime(endDate, '%d/%m/%Y') + timedelta(days=1) if endDate else None
 
     start = int(request.query_params.get('start', 0))
-    length = int(request.query_params.get('length', 0))
+    length = int(request.query_params.get('length', 10))
     
     checkIns = CheckIn.objects.filter(user__id=request.user.id)
 
@@ -212,23 +226,26 @@ def getCheckInHistory(request):
     checkIns = checkIns.order_by('-date')
     checkIns = checkIns[start:start+length]
     
-    data = []
+    result = []
 
     for item in checkIns:
-        data.append({
+        result.append({
             'location': str(item.location),
             'date': item.date.strftime('%d/%m/%Y %H:%M:%S') if item.date else '',
-            'geoLocation': item.geoLocation
+            'position': {
+                'lat': item.lat,
+                'lng': item.lng
+            }
         })
 
     return Response({
-        "data": data
+        "data": result
     })
 
 @api_view(['GET'])
 @permission_classes((IsAuthenticated,))
 def getLastCheckInTime(request):
-    lastCheckIn = CheckIn.objects.order_by('-date').first()
+    lastCheckIn = CheckIn.objects.filter(organization=request.user.organization, status=CheckIn.Status.SUCCESS).order_by('-date').first()
     if lastCheckIn:
         lastUpdated = CheckInSerializer(lastCheckIn).data['date']
         return Response({'time': lastUpdated})
@@ -244,7 +261,7 @@ def checkForNewCheckIn(request):
 
     if lastUpdated != '':
         lastUpdatedTime = datetime.strptime(lastUpdated, '%d/%m/%Y %H:%M:%S')
-        lastCheckIn = CheckIn.objects.order_by('-date').first()
+        lastCheckIn = CheckIn.objects.filter(organization=request.user.organization, status=CheckIn.Status.SUCCESS).order_by('-date').first()
 
         if lastCheckIn:
             newCheckIn = CheckInSerializer(lastCheckIn).data
@@ -253,15 +270,25 @@ def checkForNewCheckIn(request):
             updated = lastCheckInDate > lastUpdatedTime
 
             newCheckIn['user'] = newCheckIn["userFullName"]
-            arr = newCheckIn['geoLocation'].split(',')
-            if len(arr) == 2:
-                lat = float(arr[0])
-                lng = float(arr[1])
-                newCheckIn['geoLocation'] = {'lat': lat, 'lng': lng}
-
+            newCheckIn['geoLocation'] = {'lat': newCheckIn['lat'], 'lng': newCheckIn['lng']}
+                
     return Response({'updated': updated, 'lastUpdated': lastUpdated, 'newCheckIn': newCheckIn})
 
+def parseHourMin(flushTime):
+    hour, minute = None, None
+
+    arr = flushTime.split(':')
+
+    if len(arr) == 2 and arr[0].isdigit() and arr[1].isdigit():
+        hour = int(arr[0])
+        minute = int(arr[1])
+        if not (0 <= hour <= 23): hour = None
+        if not (0 <= minute <= 59): minute = None        
+
+    return hour, minute
+        
 @api_view(['GET'])
+@permission_classes((IsAuthenticated,))
 def searchCheckIn(request):
     draw = request.query_params.get('draw', 1)    
     keyword = request.query_params.get('search[value]', '')    
@@ -272,11 +299,19 @@ def searchCheckIn(request):
     
     mapView = request.query_params.get("mapView")
     if mapView:
-        flushTimeParam = Parameter.objects.filter(key='MAP_VIEW_FLUSH_TIME').first()
-        if flushTimeParam and flushTimeParam.value:
-            flushTime = float(flushTimeParam.value)
-            startDate = datetime.now() - timedelta(seconds=3600*flushTime)
+        flushTime = getTenantParamValue('MAP_VIEW_FLUSH_TIME', request.user.organization, settings.MAP_VIEW_FLUSH_TIME)
+        hour, minute = parseHourMin(flushTime)
+        
+        if hour and minute:
+            now = datetime.now()
+            flushTime = datetime(now.year, now.day, now.month, hour, minute)
+            if flushTimeParam >= now:
+                flushTime -= timedelta(days=1)
+
+            startDate = flushTime
             endDate = None
+        else:
+            startDate = endDate = None
     else:
         startDate = datetime.strptime(startDate, '%d/%m/%Y') if startDate else None
         endDate = datetime.strptime(endDate, '%d/%m/%Y') + timedelta(days=1) if endDate else None
@@ -311,7 +346,13 @@ def searchCheckIn(request):
 
     for item in data:
         item['user'] = f'{item["userFullName"]}'
-        item['location'] = f'{item["addressLine1"]}, {item["addressLine2"]}, {item["city"]}, {item["postCode"]}'
+        item['statusText'] = CheckIn.Status.messages.get(item['status'])
+        
+        tmp = f'{item["addressLine1"]}, {item["addressLine2"]}, {item["city"]}, {item["postCode"]}'
+        if tmp.replace(',', '').strip() == '':
+            tmp = ''
+
+        item['location'] = tmp
         
         d = datetime.strptime(item['date'], "%d/%m/%Y %H:%M:%S")
         diff = datetime.now() - d        
@@ -325,14 +366,8 @@ def searchCheckIn(request):
         else:
             item['datediff'] = f'{hours} hour{"" if hours == 1 else "s"}'
 
-        arr = item['geoLocation'].split(',')
-        
-        if len(arr) == 2:
-            lat = float(arr[0])
-            lng = float(arr[1])
-            item['geoLocation'] = {'lat': lat, 'lng': lng}
-        else:
-            del item['geoLocation']
+        if item['lat'] and item['lng']:
+            item['geoLocation'] = {'lat': item['lat'], 'lng': item['lng']}
 
     return Response({
         "draw": draw,
@@ -344,6 +379,7 @@ def searchCheckIn(request):
 # =================================================== Organization ======================================================
 
 @api_view(['GET'])
+@permission_classes((IsAuthenticated,))
 def searchOrganization(request):
     draw = request.query_params.get('draw', 1)    
     keyword = request.query_params.get('search[value]', '')
@@ -373,6 +409,7 @@ def searchOrganization(request):
     })
 
 @api_view(['POST'])
+@permission_classes((IsAuthenticated,))
 def deleteOrganization(request, pk):    
     try:
         password = request.data.get('password', '')
@@ -391,6 +428,59 @@ def deleteOrganization(request, pk):
 # =================================================== User ======================================================
 
 @api_view(['GET'])
+@permission_classes((IsAuthenticated,))
+def getUserConfig(request):
+    nfcEnabled = qrScanEnabled = sharedLocation = False
+
+    if request.user and request.user.organization:
+        nfcEnabled = request.user.nfcEnabled and request.user.organization.nfcEnabled
+        qrScanEnabled = request.user.qrScanEnabled and request.user.organization.qrScanEnabled
+        sharedLocation = request.user.sharedLocation
+
+    return Response({ 
+        'nfcEnabled': nfcEnabled,
+        'qrScanEnabled': qrScanEnabled,
+        'sharedLocation': sharedLocation and (request.user.username != settings.MOBILE_USERNAME)
+    })
+
+@api_view(['POST'])
+@permission_classes((IsAuthenticated,))
+def changeUserPassword(request):
+    user = request.user
+    oldPassword = request.data.get('oldPassword', '')
+    newPassword = request.data.get('newPassword', '')
+
+    if not user.check_password(oldPassword):
+        return Response({
+            'success': False,
+            'message': _('incorrect.old.password')
+        })
+
+    if newPassword == '':
+        return Response({
+            'success': False,
+            'message': _('new.password.empty')
+        })
+
+    if len(newPassword) < 8:
+        return Response({
+            'success': False,
+            'message': _('new.password.too.short')
+        })
+
+    if newPassword.isdigit():
+        return Response({
+            'success': False,
+            'message': _('new.password.cannot.be.all.digits')
+        })
+    
+    user.password = make_password(newPassword)
+    user.save()
+
+    return Response({'success': True})
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticated,))
 def searchUser(request):
     draw = request.query_params.get('draw', 1)    
     keyword = request.query_params.get('search[value]', '')
@@ -429,12 +519,14 @@ def searchUser(request):
     })
 
 @api_view(['GET'])
+@permission_classes((IsAuthenticated,))
 def viewUserDetails(request, pk):    
     user = User.objects.get(pk=pk)
     data = UserSerializer(user).data
     return Response(data)
 
 @api_view(['POST'])
+@permission_classes((IsAuthenticated,))
 def deleteUser(request, pk):   
     try:
         password = request.data.get('password', '')
@@ -451,15 +543,32 @@ def deleteUser(request, pk):
         return Response({'success': False, 'error': str(e)})
 
 # =================================================== Device ======================================================
+@api_view(['GET'])
+@permission_classes((IsAuthenticated,))
+def getAllNFCTags(request):
+    devices = Device.objects.filter(uid__isnull=False)
+    result = []
+
+    for device in devices:
+        result.append({
+            'uid': device.uid,
+            'position': {
+                'lat': device.lat,
+                'lng': device.lng
+            }
+        })
+
+    return Response(result)
 
 @api_view(['GET'])
+@permission_classes((IsAuthenticated,))
 def searchUnregisteredDevice(request):
     draw = request.query_params.get('draw', 1)    
     keyword = request.query_params.get('search[value]', '')
     start = int(request.query_params.get('start', 0))
     length = int(request.query_params.get('length', 0))
     
-    devices = Device.objects.filter(organization__isNone=True)
+    devices = Device.objects.filter(organization__isnull=True)
     recordsTotal = devices.count()
 
     devices = devices.filter(Q(id1__contains=keyword) | Q(id2__contains=keyword)).order_by('-createdDate')
@@ -475,6 +584,7 @@ def searchUnregisteredDevice(request):
     })
 
 @api_view(['POST'])
+@permission_classes((IsAuthenticated,))
 def deleteDevice(request, pk):
     try:
         password = request.data.get('password', '')
@@ -491,6 +601,7 @@ def deleteDevice(request, pk):
         return Response({'success': False, 'error': str(e)})
 
 @api_view(['POST'])
+@permission_classes((IsAuthenticated,))
 def deleteDeviceFromOrg(request, pk):
     try:
         password = request.data.get('password', '')
@@ -509,13 +620,14 @@ def deleteDeviceFromOrg(request, pk):
         return Response({'success': False, 'error': str(e)})
 
 @api_view(['GET'])
+@permission_classes((IsAuthenticated,))
 def searchRegisteredDevice(request):
     draw = request.query_params.get('draw', 1)    
     keyword = request.query_params.get('search[value]', '')
     start = int(request.query_params.get('start', 0))
     length = int(request.query_params.get('length', 0))
     
-    devices = Device.objects.filter(organization__isNone=False)
+    devices = Device.objects.filter(organization__isnull=False)
     recordsTotal = devices.count()
 
     devices = devices.filter(Q(id1__contains=keyword) | Q(id2__contains=keyword)).order_by('-createdDate')
@@ -531,6 +643,7 @@ def searchRegisteredDevice(request):
     })    
 
 @api_view(['GET'])
+@permission_classes((IsAuthenticated,))
 def searchDeviceByOrganization(request):
     draw = request.query_params.get('draw', 1)    
     keyword = request.query_params.get('search[value]', '')
@@ -559,6 +672,7 @@ def searchDeviceByOrganization(request):
 
 # =================================================== Location ======================================================
 @api_view(['GET'])
+@permission_classes((IsAuthenticated,))
 def searchLocation(request):
     draw = request.query_params.get('draw', 1)    
     keyword = request.query_params.get('search[value]', '')
@@ -583,6 +697,7 @@ def searchLocation(request):
     })     
 
 @api_view(['POST'])
+@permission_classes((IsAuthenticated,))
 def deleteLocation(request, pk):
     try:
         password = request.data.get('password', '')
@@ -599,6 +714,7 @@ def deleteLocation(request, pk):
         return Response({'success': False, 'error': str(e)})
 
 @api_view(['GET'])
+@permission_classes((IsAuthenticated,))
 def searchLocationByPostCode(request):
     q = request.GET.get('q')
     if q:

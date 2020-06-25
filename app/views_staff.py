@@ -319,6 +319,23 @@ def listDevices(request):
     devices = Device.objects.filter(organization=request.user.organization)
     return render(request, "staff/devices/list.html", {"devices": devices})
 
+def tryParseFloat(s):
+    try:
+        return float(s)
+    except:
+        return None
+
+def updateDeviceGeoLocation(device):
+    if not device.installationLocation:
+        return
+
+    geoLocation = device.installationLocation.geoLocation
+    if geoLocation and geoLocation != '':
+        arr = geoLocation.split(',')
+        if len(arr) == 2:
+            device.lat = arr[0]
+            device.lng = arr[1]
+
 @login_required
 def addDevice(request):
     if not request.user.organization:
@@ -336,6 +353,7 @@ def addDevice(request):
             device = Device.objects.filter(id1=id1).filter(id2=id2).first()
             if device:
                 device.installationLocation = installationLocation
+                updateDeviceGeoLocation(device)
                 device.organization = request.user.organization
                 device.registeredDate = datetime.now()
                 device.save()
@@ -358,6 +376,7 @@ def updateDevice(request, pk):
         if form.is_valid():
             installationLocation = form.cleaned_data['installationLocation']
             device.installationLocation = installationLocation
+            updateDeviceGeoLocation(device)
             device.save()
             return redirect('staff-device')
 
@@ -416,6 +435,9 @@ def reportCheckIn(request):
 
 @login_required
 def reportCheckInExportPdf(request):
+    if not request.user.organization:
+        return redirect('login')
+
     query_params = request.GET
     userId = query_params.get('userId', '')
     locationId = query_params.get('locationId', '')
@@ -480,7 +502,10 @@ def reportLogIn(request):
         })    
 
 @login_required
-def reportLogInExportPdf(request):        
+def reportLogInExportPdf(request):  
+    if not request.user.organization:
+        return redirect('login')
+
     query_params = request.GET
     userId = query_params.get('userId', '')
     startDate = query_params.get('startDate', '')
@@ -504,6 +529,9 @@ def reportLogInExportPdf(request):
 #================================= Settings  ====================================================================
 
 def configureOranization(request):
+    if not request.user.organization:
+        return redirect('login')
+
     org = request.user.organization
     initial = {'name': org.name, 'description': org.description,
                  'nfcEnabled': org.nfcEnabled, 'qrScanEnabled': org.qrScanEnabled}
@@ -524,4 +552,41 @@ def configureOranization(request):
     return render(request, 'staff/settings/organization.html', {'form': form, 'saved': saved})
 
 def appInfo(request):
+    if not request.user.organization:
+        return redirect('login')
+
     return render(request, 'staff/app_link.html')    
+
+def createTenantParams(organization):
+    params = Parameter.objects.all()
+    
+    for param in params:
+        existed = TenantParameter.objects.filter(organization=organization, parameter=param).count() > 0
+        if not existed:
+            TenantParameter(organization=organization, parameter=param, value=param.value).save()
+
+@login_required
+def editCustomParams(request):
+    if not request.user.organization:
+        return redirect('login')
+
+    createTenantParams(request.user.organization)
+    tenant_params = TenantParameter.objects.filter(organization=request.user.organization)
+    tenant_param_map = {p.parameter.key:p for p in tenant_params}
+
+    saved = False
+    
+    if request.method == 'POST':
+        keys = [key for key in request.POST if key in tenant_param_map]
+
+        for key in keys:
+            value = request.POST[key]
+            tenant_param = tenant_param_map[key]
+            tenant_param.value = value
+            tenant_param.save()
+            print(key, value)
+            
+        saved = True
+
+    return render(request, "staff/settings/tenant_params.html", 
+                                {"tenant_params": tenant_params, "saved": saved})     
