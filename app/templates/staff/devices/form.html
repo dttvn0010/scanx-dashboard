@@ -1,4 +1,5 @@
 {% extends "../base.html" %}
+{% load i18n %}
 
 {% block sidebar %}
 {% with page=3 %}
@@ -10,7 +11,7 @@
 <div class="content p-3">
   <div class="card shadow mb-4">
     <div class="card-header py-3">
-      <h6 class="m-0 font-weight-bold text-primary">Device Details</h6>
+      <h6 class="m-0 font-weight-bold text-primary">{% trans "device.details" %}</h6>
     </div>
     <div class="card-body">
       <form method="POST" novalidate> 
@@ -18,11 +19,11 @@
         <table class="table table-form mb-2">
           {% if edit_device %}
             <tr>
-              <th>Id1:</th>
+              <th>{% trans "id1" %}:</th>
               <td>{{ edit_device.id1 }}</td>              
             </tr>
             <tr>
-              <th>Id2:</th>
+              <th>{% trans "id2" %}:</th>
               <td>{{ edit_device.id2 }}</td>              
             </tr>         
           {%endif%}
@@ -30,11 +31,11 @@
         </table>
         
         <a class="btn btn-sm btn-secondary mr-1" href='/staff/devices'>
-          <i class="fas fa-arrow-left text-white-50"></i> Back
+          <i class="fas fa-arrow-left text-white-50"></i> {% trans "back" %}
         </a>
         
         <button class="btn btn-sm btn-primary" type="submit">
-          <i class="fas fa-save text-white-50"></i> Save
+          <i class="fas fa-save text-white-50"></i> {% trans "save" %}
         </button>        
       </form>
     </div>

@@ -1,5 +1,8 @@
+{% load tz %}
+{% load i18n %}
+
 <meta charset="utf-8">
-<title>ScanX Cloud Dashboard</title>
+<title>{% trans "scanx.cloud.dashboard" %}</title>
 <link rel="/static/img/apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=XBb4w6pr3a">
 <link rel="icon" type="image/png" sizes="32x32" href="/static/img/favicon-32x32.png?v=XBb4w6pr3a">
 <link rel="icon" type="image/png" sizes="16x16" href="/static/img/favicon-16x16.png?v=XBb4w6pr3a">
@@ -29,54 +32,53 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.26.0/moment.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/pc-bootstrap4-datetimepicker@4.17/build/js/bootstrap-datetimepicker.min.js"></script>
-{% load tz %}
 
 <body id="page-top">
   <div id="wrapper">
     {% block sidebar %}
     <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark" id="accordionSidebar">
       <a class="sidebar-brand d-flex align-items-center" href="/">
-        <div class="sidebar-brand-text">ScanX</div>
+        <div class="sidebar-brand-text">{% trans "scanx" %}</div>
       </a>
 
       <hr class="sidebar-divider my-0">
 
       <li class="nav-item {% if not page  %} active {%endif%}">
         <a class="nav-link" href="/staff">
-          <span>Dashboard</span></a>
+          <span>{% trans "dashboard" %}</span></a>
       </li>
       {%if user.role and user.role.code == 'ADMIN' %}
         <hr class="sidebar-divider my-0">
 
         <li class="nav-item {% if page == 1 %} active {%endif%}">
           <a class="nav-link" href="/staff/users">
-            <span>Users</span></a>
+            <span>{% trans "users" %}</span></a>
         </li>
 
         <hr class="sidebar-divider my-0">
 
         <li class="nav-item {% if page == 2 %} active {%endif%}">
           <a class="nav-link" href="/staff/locations">
-            <span>Locations</span></a>
+            <span>{% trans "locations" %}</span></a>
         </li>
 
         <hr class="sidebar-divider my-0">
 
         <li class="nav-item {% if page == 3 %} active {%endif%}">
           <a class="nav-link" href="/staff/devices">
-            <span>Devices</span></a>
+            <span>{% trans "devices" %}</span></a>
         </li>
                     
         <hr class="sidebar-divider my-0">
 
         <li class="nav-item">
           <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapse1" aria-expanded="true">
-            <span>Reports</span>
+            <span>{% trans "reports" %}</span>
           </a>
           <div id="collapse1" class="collapse {% if group == 1%}show{%endif%}" data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
-              <a class="collapse-item {% if page == 4 %} active {%endif%}" href="/staff/reports/check_in">Check-In</a>
-              <a class="collapse-item {% if page == 5 %} active {%endif%}" href="/staff/reports/log_in">Log-In</a>
+              <a class="collapse-item {% if page == 4 %} active {%endif%}" href="/staff/reports/check_in">{% trans "check_in" %}</a>
+              <a class="collapse-item {% if page == 5 %} active {%endif%}" href="/staff/reports/log_in">{% trans "log_in" %}</a>
             </div>
           </div>
         </li>
@@ -85,11 +87,13 @@
 
         <li class="nav-item">
           <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapse2" aria-expanded="true">
-            <span>Settings</span>
+            <span>{% trans "settings" %}</span>
           </a>
           <div id="collapse2" class="collapse {% if group == 2%}show{%endif%}" data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
-              <a class="collapse-item {% if page == 6 %} active {%endif%}" href="/staff/settings/organization">Organization</a>
+              <a class="collapse-item {% if page == 6 %} active {%endif%}" href="/staff/settings/organization">
+                {% trans "organizations" %}
+              </a>
             </div>
           </div>
         </li>
@@ -98,14 +102,14 @@
 
         <li class="nav-item">
           <a class="nav-link" href="#">
-            <span>Logs</span></a>
+            <span>{% trans "logs" %}</span></a>
         </li>
 
         <hr class="sidebar-divider my-0">
 
         <li class="nav-item {% if page == 7 %} active {%endif%}">
           <a class="nav-link" href="/staff/app_info">
-            <span>App Info</span></a>
+            <span>{% trans "app.info" %}</span></a>
         </li>
 
         <hr class="sidebar-divider my-0">
@@ -130,7 +134,10 @@
           </ul>
           <ul class="navbar-nav ml-auto">
             <li class="nav-item d-flex mr-4">
-              <span class="align-self-center">Last Login: {{ user.last_login|date:"d/m/Y H:i:s" }}</span>
+              <span class="align-self-center">
+                {% trans "last.login" %}: 
+                {{ user.last_login|date:"d/m/Y H:i:s" }}
+              </span>
             </li>
          
             <li class="nav-item dropdown no-arrow d-flex">
@@ -146,12 +153,12 @@
               <div class="dropdown-menu dropdown-menu-right">
                 <a class="dropdown-item" href="/profile/update">
                   <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                  Profile
+                  {% trans "profile" %}
                 </a>
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="/accounts/logout">
                   <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                  Logout
+                  {% trans "logout" %}
                 </a>
               </div>
             </li>
@@ -165,9 +172,9 @@
       <footer class="sticky-footer bg-white">
         <div class="container my-auto">
           <div class="copyright text-center my-auto">
-            <span>Copyright &copy; ScanX 3.0 2020. All rights reserved.</span>
+            <span>{% trans "copyright" %}</span>
             <br><br>
-            Server time: {% now "d/m/Y H:i:s" %}
+            {% trans "server.time" %}: {% now "d/m/Y H:i:s" %}
           </div>
         </div>
       </footer>

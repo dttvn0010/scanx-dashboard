@@ -4,8 +4,9 @@ import traceback
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from django.conf import settings
+from django.utils.translation import gettext_lazy as _
 
-INVITE_TITLE = 'Invitation to join ScanX'
+INVITE_TITLE = _('join.invitation')
 
 SMTP_PORT = 465 
 SMTP_SERVER = "smtp.gmail.com"
@@ -14,7 +15,6 @@ GMAIL = "scanx.cloud@gmail.com"
 GMAIL_PASS = "abc@123@def"
 
 def sendMail2(to, subject, body):
-    print('===============', body)
 
     proc = subprocess.Popen(['mail',
                  '-s', f'{subject}\nContent-Type: text/html', 

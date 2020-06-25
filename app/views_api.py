@@ -4,6 +4,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from pytz import timezone
+from django.utils.translation import gettext_lazy as _
 
 import json
 import requests
@@ -124,7 +125,7 @@ def checkIn(request):
     if not position or not position.get('lng') or not position.get('lat'):
         return Response({
             'success': False, 
-            'error': 'No GPS location included, please enable GPS on your device!'
+            'error': _('no.gps.location.error')
         })
 
     arr = code.split('-')
@@ -134,7 +135,7 @@ def checkIn(request):
             code = code[pos+2:]
         return Response({
             'success': False, 
-            'error': 'Invalid device code!'
+            'error': _('invalid.device.code')
         })
     
     id1, id2 = arr[1:]
@@ -142,13 +143,13 @@ def checkIn(request):
     if not device:
         return Response({
             'success': False, 
-            'error': f'Device does not exist in device table - please contact admin!'
+            'error': _('device.not.exist.error')
         })
 
     if not device.installationLocation:
         return Response({
             'success': False, 
-            'error': f'Device is unregistered - please contact admin!'
+            'error': _('device.unregistered.error')
         })
 
     lastCheckIn = CheckIn.objects.filter(user=request.user).order_by('-date').first()
@@ -165,7 +166,7 @@ def checkIn(request):
         if timediff < minWaitTime * 60:
             return Response({
                 'success': False, 
-                'error': f'Please wait a minimum of {minWaitTime} minutes before next scan'
+                'error': _('scan.timeout.error') % (minWaitTime)
             })
         
     checkIn = CheckIn()
@@ -185,7 +186,7 @@ def checkIn(request):
 
     return Response({
         'success': True, 
-        'message': f'Successfully Scanned Device\nLocation is: {location}'
+        'message': _('success.scan.message') + location
     })
 
 @api_view(['GET'])
@@ -381,7 +382,7 @@ def deleteOrganization(request, pk):
             organization.delete()  
             return Response({'success': True})    
         else:
-            return Response({'success': False, 'error': 'Wrong password'})    
+            return Response({'success': False, 'error': _('wrong.password')})    
 
     except Exception as e:
         traceback.print_exc()
@@ -443,7 +444,7 @@ def deleteUser(request, pk):
             user.delete() 
             return Response({'success': True})    
         else:
-            return Response({'success': False, 'error': 'Wrong password'})    
+            return Response({'success': False, 'error': _('wrong.password')})    
 
     except Exception as e:
         traceback.print_exc()
@@ -483,7 +484,7 @@ def deleteDevice(request, pk):
             device.delete()  
             return Response({'success': True})    
         else:
-            return Response({'success': False, 'error': 'Wrong password'})    
+            return Response({'success': False, 'error': _('wrong.password')})    
 
     except Exception as e:
         traceback.print_exc()
@@ -501,7 +502,7 @@ def deleteDeviceFromOrg(request, pk):
             device.save()
             return Response({'success': True})    
         else:
-            return Response({'success': False, 'error': 'Wrong password'})    
+            return Response({'success': False, 'error': _('wrong.password')})    
 
     except Exception as e:
         traceback.print_exc()
@@ -591,7 +592,7 @@ def deleteLocation(request, pk):
             location.delete()
             return Response({'success': True})    
         else:
-            return Response({'success': False, 'error': 'Wrong password'})    
+            return Response({'success': False, 'error': _('wrong.password')})    
 
     except Exception as e:
         traceback.print_exc()

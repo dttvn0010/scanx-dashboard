@@ -59,7 +59,7 @@ class UpdateAccountForm(forms.Form):
     def clean_email(self):
         email = self.cleaned_data.get('email')
         if email != self.initial.get('email') and User.objects.filter(email=email):
-            raise forms.ValidationError('_("User with email") "%s" _("already exists")' % (email))
+            raise forms.ValidationError('{_("user.with.email")} "%s" {_("already.exists")}' % (email))
 
         return email
 

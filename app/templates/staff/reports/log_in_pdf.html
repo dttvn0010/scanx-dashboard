@@ -1,4 +1,5 @@
-<title>ScanX Report</title>
+{% load i18n %}
+<title>{% trans "scanx.report" %}</title>
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
 <style>
   @page {
@@ -10,13 +11,13 @@
 <body onload="window.print()">
   <div class="container">
     <div class="text-center mt-3">
-      <h2>ScanX Log-in Report</h2>
+      <h2>{% trans "scanx.log_in.report" %}</h2>
     </div>
     <br>
     <div>      
       <div class="row">
         <div class="col-2">
-          <label>Organization:</label>
+          <label>{% trans "organization" %}:</label>
         </div>
         <div class="col-10">
           <label><b>{{request.user.organization.name}}</b></label>
@@ -29,7 +30,7 @@
       </div>
       <div class="row">
         <div class="col-2">
-          <label>Reported by:</label>
+          <label>{% trans "reported.by" %}:</label>
         </div>
         <div class="col-10">
           <label><b>{{request.user.fullname}}</b></label>
@@ -37,7 +38,7 @@
       </div>
       <div class="row">
         <div class="col-2">
-          <label>Reported at:</label>
+          <label>{% trans "reported.at" %}:</label>
         </div>
         <div class="col-10">
           <label><b>{{date|date:"d/m/Y H:i:s"}}</b></label>
@@ -47,7 +48,7 @@
       {% if reportedUser %}
       <div class="row">
         <div class="col-2">
-          <label>Check-in User:</label>
+          <label>{% trans "check_in" %} {% trans "user" %}:</label>
         </div>
         <div class="col-10">
           <label><b>{{reportedUser.fullname}}</b></label>
@@ -58,7 +59,7 @@
       {% if startDate %}
       <div class="row">
         <div class="col-2">
-          <label>From Date:</label>
+          <label>{% trans "from.date" %}:</label>
         </div>
         <div class="col-10">
           <label><b>{{startDate}}</b></label>
@@ -69,7 +70,7 @@
       {% if endDate %}
       <div class="row">
         <div class="col-2">
-          <label>To Date:</label>
+          <label>{% trans "to.date" %}:</label>
         </div>
         <div class="col-10">
           <label><b>{{endDate}}</b></label>
@@ -81,8 +82,8 @@
     <table class="table mt-4">
       <thead>
         <tr>
-          <th style="width: 50%;">Date/Time</th>
-          <th style="width: 50%;">User</th>
+          <th style="width: 50%;">{% trans "date.time" %}</th>
+          <th style="width: 50%;">{% trans "user" %}</th>
         </tr>
       </thead>
       <tbody>
@@ -94,7 +95,7 @@
       {% endfor %}
       {% if not logIns %}
       <tr>
-        <td colspan="2">No record found.</td>
+        <td colspan="2">{% trans "no.result.found" %}.</td>
       </tr>
       {% endif %}
       </tbody>

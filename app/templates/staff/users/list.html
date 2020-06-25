@@ -1,4 +1,5 @@
 {% extends "../base.html" %}
+{% load i18n %}
 
 {% block sidebar %}
 {% with page=1 %}
@@ -10,19 +11,19 @@
 <div class="content p-3">
   <div class="card shadow mb-4">
     <div class="card-header py-3">
-      <h6 class="m-0 font-weight-bold text-primary">List of Users</h6>
+      <h6 class="m-0 font-weight-bold text-primary">{% trans "list.of.users" %}</h6>
     </div>
     <div class="card-body">
       <div class="row mb-4">
         <div class="col-8"> 
           <a href='/staff/users/add' class="btn btn-sm btn-primary  mr-1">
-            <i class="fas fa-plus text-white-50"></i> Add User
+            <i class="fas fa-plus text-white-50"></i> {% trans "add.user" %}
           </a>
           <button class="btn btn-primary btn-sm mr-1" onclick="showImportModal()">
-            <i class="fas fa-upload text-white-50"></i> Import
+            <i class="fas fa-upload text-white-50"></i> {% trans "import" %}
           </button>      
           <a href='/staff/users/export' class="btn btn-sm btn-primary mr-1">
-            <i class="fas fa-download text-white-50"></i> Export
+            <i class="fas fa-download text-white-50"></i> {% trans "export" %}
           </a>      
         </div>
       </div>
@@ -30,10 +31,10 @@
         <table id="table" class="table table-bordered" width="100%" cellspacing="0">
           <thead>
             <tr>
-              <th style="width: 25%;">Full Name</th>
-              <th style="width: 25%;">Email</th>
-              <th style="width: 15%;">Role</th>
-              <th style="width: 15%;">Status</th>
+              <th style="width: 25%;">{% trans "fullname" %}</th>
+              <th style="width: 25%;">{% trans "email.address" %}</th>
+              <th style="width: 15%;">{% trans "role" %}</th>
+              <th style="width: 15%;">{% trans "status" %}</th>
               <th style="width: 15%;"></th>
             </tr>
           </thead>
@@ -46,7 +47,7 @@
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">User Details</h5>
+          <h5 class="modal-title">{% trans "user.details" %}</h5>
           <button type="button" class="close" data-dismiss="modal">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -57,38 +58,40 @@
             <table class="table">
               <tbody>
                 <tr>
-                  <td><label>Full Name:</label></td>
+                  <td><label>{% trans "fullname" %}:</label></td>
                   <th><span id="full_name"></span></th>
                 </tr>
                 <tr>
-                  <td><label>Email:</label></td>
+                  <td><label>{% trans "email.address" %}:</label></td>
                   <th><span id="email"></span></th>
                 </tr>
                 <tr>
-                  <td><label>NFC Enabled:</label></td>
+                  <td><label>{% trans "nfc.enabled" %}:</label></td>
                   <th><span id="nfc_enabled"></span></th>
                 </tr>
                 <tr>
-                  <td><label>QR Scan Enabled:</label></td>
+                  <td><label>{% trans "qr.scanning.enabled" %}:</label></td>
                   <th><span id="qr_scan_enabled"></span></th>
                 </tr>
                 <tr>
-                  <td><label>GeoLocation Enabled:</label></td>
+                  <td><label>{% trans "geolocation.enabled" %}:</label></td>
                   <th><span id="geo_location_enabled"></span></th>
                 </tr>
                 <tr>
-                  <td><label>Status:</label></td>
+                  <td><label>{% trans "status" %}:</label></td>
                   <th><span id="status"></span></th>
                 </tr>
                 <tr>
-                  <td><label>Role:</label></td>
+                  <td><label>{% trans "role" %}:</label></td>
                   <th><span id="role"></span></th>
                 </tr>
               </tbody>
             </table>         
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-sm btn-primary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-sm btn-primary" data-dismiss="modal">
+              {% trans "close" %}
+            </button>
           </div>
         </div>
       </div>
@@ -99,7 +102,7 @@
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Import Users</h5>
+          <h5 class="modal-title">{% trans "import.users" %}</h5>
           <button type="button" class="close" data-dismiss="modal">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -110,7 +113,7 @@
             {%csrf_token%}
             <div class="row">
               <div class="col-3">
-                <label>CSV file:</label>
+                <label>{% trans "csv.file" %}:</label>
               </div>
               <div class="col-5">
                 <input type="file" accept=".csv" class="form-control-file" 
@@ -121,10 +124,10 @@
 
           <form id="fmt2" style="display: none;" method="POST" action="/staff/users/import">
             {%csrf_token%}
-            <label>Select the CSV column you want to use the data from for each field.</label>
+            <label>{% trans "csv.select.columns"%}</label>
             <div id="fmt2Body"></div>
             <button type="submit" class="mt-3 btn btn-sm btn-primary">
-              <i class="fas fa-upload text-white-50"></i> Import
+              <i class="fas fa-upload text-white-50"></i> {% trans "import" %}
             </button>
           </form>
         </div>       
@@ -136,7 +139,7 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">Delete this User?</h5>
+          <h5 class="modal-title">{% trans "delete.this.user" %}?</h5>
           <button type="button" class="close" data-dismiss="modal">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -147,7 +150,7 @@
             {%csrf_token%}
             <input type="hidden" id="userId">
             <div class="row">
-              <div class="col"><label>Please enter your password to confirm:</label></div>
+              <div class="col"><label>{% trans "prompt.password" %}:</label></div>
             </div>
             <div class="row mt-2">
               <div class="col"><input class="form-control" type="password" id="password" name="password"></div>
@@ -157,7 +160,9 @@
                 <label id="errorLabel" style="color: red;"></label>
               </div>
             </div>
-            <button type="button" onclick="deleteUser()" class="mt-3 btn btn-sm btn-danger">Delete</button>
+            <button type="button" onclick="deleteUser()" class="mt-3 btn btn-sm btn-danger">
+              {% trans "delete" %}
+            </button>
           </form>
         </div>
       </div>
@@ -195,26 +200,26 @@ $(document).ready(function() {
       { "data": "email" },
       { "data": "role" },
       { "data": "status", "render": function(data, type, row) {
-          if(data == 0) return "Pending";
-          return row.is_active? "Active": "Inactive";
+          if(data == 0) return '{% trans "pending" %}';
+          return row.is_active? '{% trans "active" %}': '{% trans "inactive" %}';
         } 
       },      
       {
         render: function (data, type, row) { 
-          var html = `<a title="View details" href="#" onclick="viewInfo(${row['id']})"><i class="fas fa-eye"></i></a>&nbsp;&nbsp;`
-                       + `<a title="Edit" href="/staff/users/update/${row['id']}"><i class="fas fa-edit"></i></a>&nbsp;&nbsp`;
+          var html = `<a title='{% trans "view.details" %}' href="#" onclick="viewInfo(${row['id']})"><i class="fas fa-eye"></i></a>&nbsp;&nbsp;`
+                       + `<a title='{% trans "edit" %}' href="/staff/users/update/${row['id']}"><i class="fas fa-edit"></i></a>&nbsp;&nbsp`;
 
           if(!row.locked){
-            html += `<a title="Delete" href="#" onclick="openDeleteConfirmation(${row['id']})" ><i class="fas fa-trash" style="color:red"></i></a>`;
+            html += `<a title='{% trans "delete" %}' href="#" onclick="openDeleteConfirmation(${row['id']})" ><i class="fas fa-trash" style="color:red"></i></a>`;
           }
           
           if(row.status == 0) {
-            html += `&nbsp;&nbsp;<a title="Resend invitation email" href="#" onclick="resendMail(${row['id']})" ><i class="fas fa-envelope"></i></a>`;
+            html += `&nbsp;&nbsp;<a title='{% trans "resend.mail" %}' href="#" onclick="resendMail(${row['id']})" ><i class="fas fa-envelope"></i></a>`;
           }else if(!row.locked) {
             if(row.is_active) {
-              html += `&nbsp;&nbsp;<a title="Deactivate this user" href="#" onclick="lockUser(${row['id']})" ><i class="fas fa-ban"></i></a>`;
+              html += `&nbsp;&nbsp;<a title='{% trans "deactivate.this.user" %}' href="#" onclick="lockUser(${row['id']})" ><i class="fas fa-ban"></i></a>`;
             }else {
-              html += `&nbsp;&nbsp;<a title="Activate this user" href="#" onclick="unlockUser(${row['id']})" ><i class="fas fa-toggle-on"></i></a>`;
+              html += `&nbsp;&nbsp;<a title='{% trans "activate.this.user" %}' href="#" onclick="unlockUser(${row['id']})" ><i class="fas fa-toggle-on"></i></a>`;
             }
           }
 
@@ -230,10 +235,10 @@ async function viewInfo(id) {
   var user = await resp.json();
   $("#full_name").html(user.fullname);
   $("#email").html(user.email);
-  $("#nfc_enabled").html(user.nfcEnabled? "Yes": "No");
-  $("#qr_scan_enabled").html(user.qrScanEnabled? "Yes": "No");
-  $("#geo_location_enabled").html(user.sharedLocation? "Yes": "No");
-  $("#status").html(user.status == 0? "Pending" : (user.is_active? "Active": "Inactive"));
+  $("#nfc_enabled").html(user.nfcEnabled? '{% trans "yes" %}': '{% trans "no" %}');
+  $("#qr_scan_enabled").html(user.qrScanEnabled? '{% trans "yes" %}': '{% trans "no" %}');
+  $("#geo_location_enabled").html(user.sharedLocation? '{% trans "yes" %}': '{% trans "no" %}');
+  $("#status").html(user.status == 0? '{% trans "pending" %}' : (user.is_active? '{% trans "active" %}': '{% trans "inactive" %}'));
   $("#role").html(user.role);
   $("#viewDetailsModal").modal();
 }
@@ -256,25 +261,25 @@ async function deleteUser() {
   if (result.success) {
     location.href = "/staff/users";
   } else {
-    $("#errorLabel").html(result.error || "Error occurred");
+    $("#errorLabel").html(result.error || '{% trans "error.occured" %}');
   }
 }
 
 
 async function resendMail(id) {
-  if (confirm('Resend an invitation email to this user?')) {
+  if (confirm('{% trans "confirm.resend.mail" %}')) {
     location.href = "/staff/users/resend_mail/" + id;
   }
 }
 
 function lockUser(id) {
-  if(confirm('Deactivate this user?')) {
+  if(confirm('{% trans "deactivate.this.user" %}?')) {
     location.href = "/staff/users/lock/" + id;
   }
 }
 
 function unlockUser(id) {
-  if(confirm('Activate this user?')) {
+  if(confirm('{% trans "activate.this.user" %}?')) {
     location.href = "/staff/users/unlock/" + id;
   }
 }

@@ -1,5 +1,8 @@
+{% load tz %}
+{% load i18n %}
+
 <meta charset="utf-8">
-<title>ScanX</title>
+<title>{% trans "scanx" %}</title>
 <link rel="/static/img/apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=XBb4w6pr3a">
 <link rel="icon" type="image/png" sizes="32x32" href="/static/img/favicon-32x32.png?v=XBb4w6pr3a">
 <link rel="icon" type="image/png" sizes="16x16" href="/static/img/favicon-16x16.png?v=XBb4w6pr3a">
@@ -33,7 +36,7 @@
           </ul>
           <ul class="navbar-nav ml-auto">
             <li class="nav-item d-flex mr-4">
-              <span class="align-self-center">Last Login: {{ user.last_login|date:"d/m/Y H:i:s" }}</span>
+              <span class="align-self-center">{% trans "last.login" %}: {{ user.last_login|date:"d/m/Y H:i:s" }}</span>
             </li>
             <li class="nav-item dropdown no-arrow d-flex">
               <span class="mr-2 align-self-center">{{ user.fullname|default:'' }}</span>
@@ -48,12 +51,12 @@
               <div class="dropdown-menu dropdown-menu-right">
                 <a class="dropdown-item" href="/profile/update">
                   <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                  Profile
+                  {% trans "profile" %}
                 </a>
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="/accounts/logout">
                   <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                  Logout
+                  {% trans "logout" %}
                 </a>
               </div>
             </li>
@@ -64,13 +67,13 @@
         <div class="container mt-3 mb-3 text-center">
           <div class="row">
             <div class="col">
-              <h1>Welcome to ScanX!</h1>
-              Please use the below links download the mobile app
+              <h1>{% trans "welcome.to.scanx" %}!</h1>
+              {% trans "please.use.the.below.links.to.download.the.mobile.app" %}
             </div>
           </div>
           <div class="row mt-3">
             <div class="col-4 text-center">
-              <h4>iOS</h4>
+              <h4>{% trans "iOS" %}</h4>
               <br>
               <img class="mb-3" style="max-width:250px;" src="/static/img/ios_app.png">
               <br>
@@ -80,7 +83,7 @@
               <img style="width: 200px; height: 200px;" src="/static/img/scanX.png">
             </div>
             <div class="col-4 text-center">
-              <h4>Android</h4>
+              <h4>{% trans "android" %}</h4>
               <br>
               <img class="mb-3" style="max-width:250px;" src="/static/img/android_app.png">
               <br>
@@ -95,9 +98,9 @@
       <footer class="sticky-footer bg-white">
         <div class="container my-auto">
           <div class="copyright text-center my-auto">
-            <span>Copyright &copy; ScanX 3.0 2020. All rights reserved.</span>
+            <span>{% trans "copyright" %}</span>
             <br><br>
-            Server time: {% now "d/m/Y H:i:s" %}
+            {% trans "server.time" %}: {% now "d/m/Y H:i:s" %}
           </div>
         </div>
       </footer>

@@ -1,4 +1,5 @@
 {% extends "../base.html" %}
+{% load i18n %}
 
 {% block sidebar %}
 {% with page=1 %}
@@ -10,7 +11,7 @@
 <div class="content p-3">
   <div class="card shadow mb-4">
     <div class="card-header py-3">
-      <h6 class="m-0 font-weight-bold text-primary">User Details</h6>
+      <h6 class="m-0 font-weight-bold text-primary">{% trans "user.details" %}</h6>
     </div>
     <div class="card-body">
       <form id="fmt" method="POST" novalidate> 
@@ -18,21 +19,21 @@
         <table class="table table-form mb-2">
           {% if edit_user %}
             <tr>
-              <th>Full Name:</th>
+              <th>{% trans "fullname" %}:</th>
               <td>{{ edit_user.fullname }}</td>              
             </tr>
             <tr>
-              <th>Email address:</th>
+              <th>{% trans "email.address" %}:</th>
               <td>{{edit_user.email}}</td>              
             </tr>         
           {%endif%}
           {{ form }}
         </table>
         <a class="btn btn-sm btn-secondary mr-1" href='/staff/users'>
-          <i class="fas fa-arrow-left text-white-50"></i> Back
+          <i class="fas fa-arrow-left text-white-50"></i> {% trans "back" %}
         </a>
         <button class="btn btn-sm btn-primary" id="btn_save" onclick="save()" type="button">
-          <i class="fas fa-save text-white-50"></i> Save
+          <i class="fas fa-save text-white-50"></i> {% trans "save" %}
         </button>        
       </form>
     </div>
@@ -42,7 +43,7 @@
   function save() {
     $('#btn_save').prop('disabled', true);
     if($('#id_role').val() == '1') {
-      if(!confirm('This user will have complete access to all features of Dashboard (can add/remove users etc.). Do you want to continue')) {
+      if(!confirm('{% trans "admin.role.warning" %}')) {
         $('#btn_save').prop('disabled', false);
         return;
       }
