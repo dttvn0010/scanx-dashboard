@@ -123,6 +123,11 @@
               <td>{{l.postCode}}</td>
             </tr>
             {% endfor %}
+            {% if not locations %}
+            <tr>
+              <td colspan="4">No result found</td>
+            </tr>
+            {% endif %}
           </tbody>
         </table>
       </div>
@@ -151,6 +156,11 @@
               <td>{{d.installationLocation}}</td>
             </tr>
             {% endfor %}
+            {% if not devices %}
+            <tr>
+              <td colspan="3">No result found</td>
+            </tr>
+            {% endif %}
           </tbody>
         </table>
       </div>
