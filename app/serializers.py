@@ -7,8 +7,6 @@ class OrganizationSerializer(ModelSerializer):
         fields = '__all__'
 
 class UserSerializer(ModelSerializer):
-    role = CharField(source='role.name', default="")
-    roleCode = CharField(source='role.code', default="")
 
     class Meta:
         model = User
@@ -24,7 +22,7 @@ class DeviceSerializer(ModelSerializer):
     
     class Meta:
         model = Device
-        fields = ('id', 'addressLine1', 'addressLine2', 'postCode', 'city', 'organizationName', 'id1', 'id2', 'uid', 'enabled', 'registeredDate') 
+        fields = ('id', 'addressLine1', 'addressLine2', 'postCode', 'city', 'organizationName', 'id1', 'id2', 'uid', 'status', 'registeredDate') 
 
 class LocationSerializer(ModelSerializer):
     class Meta:

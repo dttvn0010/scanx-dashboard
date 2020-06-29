@@ -64,85 +64,9 @@
       </div>
     </div>
   </div>
-
-  <div class="modal fade" id="locationModal">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">{% trans "choose.location" %}</h5>
-          <button type="button" class="close" data-dismiss="modal">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-
-        <div class="modal-body">
-          <div id="map" style="width: 100%; height: 500px;"></div>
-        </div>       
-      </div>
-    </div>
-  </div>
 </div>
 
 <script>
-var map;
-var marker;
-var ref_position = { lat: 52.479865, lng: -1.911067 };
-
-function getPosition() {  
-  var geoLocation = $('#id_geoLocation').val();
-
-  if(geoLocation && geoLocation.indexOf(',') >0) {
-    var arr = geoLocation.split(',');
-    return { lat: parseFloat(arr[0]), lng: parseFloat(arr[1]) };
-  }
-
-  return null;
-}
-
-function setMarker(position, update) {  
-  if(marker) {
-    marker.setMap(null);
-  }
-  marker = new google.maps.Marker({ position: position, map: map });
-  if(update) map.setCenter(position);
-}
-
-function initMapEvent() {
-  google.maps.event.addListener(map, 'click', function(e) {
-      var position = e.latLng;
-      var lat = position.lat().toFixed(6);
-      var lng = position.lng().toFixed(6);
-      $('#id_geoLocation').val(`${lat},${lng}`);
-      setMarker(position);
-      setTimeout(() => $('#locationModal').modal('hide'), 500);
-  });
-}
-
-function initMap() {  
-  var position = getPosition();
-  if(position) {
-    map = new google.maps.Map(document.getElementById('map'), { zoom: 16, center: position });
-    setMarker(position);
-    initMapEvent();
-  }else {
-    map = new google.maps.Map(document.getElementById('map'), { zoom: 16, center: ref_position });
-    initMapEvent();
-    
-    if(navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(x => {
-        map.setCenter({lat: x.coords.latitude, lng: x.coords.longitude});
-      });
-    }
-  }  
-}
-
-function openLocationModal() {
-  $('#locationModal').modal();
-}
-
-$('#locationModal').on('shown.bs.modal', function() {
-  setMarker(getPosition(), true);
-});
 
 function openSearchAddressModal(id) {
   $("#keyword").val('');
@@ -192,7 +116,7 @@ async function searchAddress() {
   $('#error').html('');
   $('#searchResult').html('');
   $('#spinner').show();  
-  var resp = await fetch("/api/locations/search_by_postcode?q=" + keyword);
+  var resp = await fetch("/api/location/search_by_postcode?q=" + keyword);
   var result = await resp.json();
 
   if(!result.success) {
@@ -214,13 +138,5 @@ function selectAddress(i) {
   $("#id_postCode").val($(`#postCode_${i}`).html());
 }
 
-$(document).ready(function(){
-  $('#id_geoLocation').click(function(){
-    openLocationModal();
-  });
-});
-
-
 </script>
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBR8gU4Te36NCYlc2ZdynsOWQOS03lzWKc&callback=initMap"></script>
 {% endblock %}

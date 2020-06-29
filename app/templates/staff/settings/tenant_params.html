@@ -28,7 +28,7 @@
                 <input type='{{param.parameter.type}}' value='{{param.value}}' 
                   {%if param.parameter.min or param.parameter.min == 0 %} min='{{param.parameter.min}}' {%endif%}
                   {%if param.parameter.max %} max='{{param.parameter.max}}' {%endif%}
-                  {%if param.parameter.maxLength %} max='{{param.parameter.maxLength}}' {%endif%}
+                  {%if param.parameter.maxLength %} maxlength='{{param.parameter.maxLength}}' {%endif%}
                   class="form-control" name='{{ param.parameter.key }}'>
               </td>
             </tr>

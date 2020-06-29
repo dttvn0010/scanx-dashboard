@@ -45,7 +45,7 @@
         "processing": "<div class='spinner-border'></div>"
       },
       "ajax": {
-        "url": "/api/users/search",
+        "url": "/api/user/search",
         "data": function(data) {
           data.organizationId = '{{organization.id}}';
         }
@@ -64,7 +64,7 @@
           } 
         },
         { "data": "email" },
-        { "data": "role"},
+        { "data": "role_names"},
         { "data": "status", "render": function(data, type, row) {
             if(data == 0) return '{% trans "pending" %}';
             return row.is_active? '{% trans "active" %}': '{% trans "inactive" %}';

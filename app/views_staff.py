@@ -2,6 +2,7 @@ from django.shortcuts import render, HttpResponse, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password
 from django.conf import settings
+from django.utils import timezone
 
 import csv
 import json
@@ -38,7 +39,7 @@ def createTempUser(request, fullname, email):
     user.fullname = fullname
     user.email = email
     user.status = User.Status.INVITED
-    user.createdDate = datetime.now()
+    user.createdDate = timezone.now()
     user.organization = request.user.organization
     user.save()
     
@@ -72,7 +73,7 @@ def addUser(request):
             user.nfcEnabled = form.cleaned_data['nfcEnabled']
             user.qrScanEnabled = form.cleaned_data['qrScanEnabled']
             user.sharedLocation = form.cleaned_data['sharedLocation']
-            user.role = pk=form.cleaned_data['role']
+            user.roles.add(*form.cleaned_data['roles'])
             user.save()
             return redirect('staff-user')
 
@@ -85,22 +86,18 @@ def updateUser(request, pk):
 
     user = get_object_or_404(User, pk=pk)
     
-    if user.role.code == 'ADMIN' and user.username == request.user.username:
-        form = UserAdminChangeForm(instance=user)
-    else:
-        form = UserChangeForm(instance=user)
+    form = UserChangeForm(instance=user)
+
+    lockAdmin = request.user.username == user.username and user.hasRole('ADMIN')
 
     if request.method == 'POST':
-        if user.role.code == 'ADMIN' and user.username == request.user.username:
-            form = UserAdminChangeForm(request.POST, instance=user)
-        else:
-            form = UserChangeForm(request.POST, instance=user)
+        form = UserChangeForm(request.POST, instance=user)
 
         if form.is_valid():
             form.save()
             return redirect('staff-user')
 
-    return render(request, 'staff/users/form.html', {'form': form, 'edit_user': user})
+    return render(request, 'staff/users/form.html', {'form': form, 'edit_user': user, 'lockAdmin': lockAdmin})
 
 @login_required
 def deleteUser(request, pk):
@@ -123,8 +120,8 @@ def exportUser(request):
         writer = csv.writer(fo)
         writer.writerow(USER_HEADER)
         for item in lst:
-            role = item.role.code if item.role else ''
-            writer.writerow([item.fullname, item.email, role, item.nfcEnabled, item.qrScanEnabled, item.sharedLocation])
+            roles = '|'.join([role.code for role in item.roles.all()])
+            writer.writerow([item.fullname, item.email, roles, item.nfcEnabled, item.qrScanEnabled, item.sharedLocation])
 
     csv_file = open('users.csv', 'rb')
     response = HttpResponse(content=csv_file)
@@ -152,12 +149,15 @@ def importUser(request):
             indexes[i] = int(request.POST.get(f'col_{i}', '0'))
         
         for row in records:
-            fullname, email, role, nfcEnabled, qrScanEnabled, sharedLocation  = getPermutation(row, indexes)
+            fullname, email, roles, nfcEnabled, qrScanEnabled, sharedLocation  = getPermutation(row, indexes)
             if User.objects.filter(email=email).count() > 0 or User.objects.filter(fullname=fullname).count() > 0:
                 continue
 
             user = createTempUser(request, fullname, email)
-            user.role = Role.objects.get(code=role)
+            
+            for role in roles.split('|'):
+                user.roles.add(Role.objects.get(code=role))
+
             user.nfcEnabled = nfcEnabled == 'True'
             user.qrScanEnabled = qrScanEnabled == 'True'
             user.sharedLocation = sharedLocation == 'True'
@@ -220,7 +220,7 @@ def addLocation(request):
         form = LocationForm(request.POST)
         if form.is_valid():
             location = form.save(commit=False)
-            location.createdDate = datetime.now()
+            location.createdDate = timezone.now()
             location.organization = request.user.organization
             location.save()
             return redirect('staff-location')
@@ -243,7 +243,7 @@ def updateLocation(request, pk):
 
     return render(request, 'staff/locations/form.html', {'form': form})
 
-LOCATION_HEADER = ['Address Line 1', 'Address Line 2', 'Postcode', 'City', 'Geo Location']
+LOCATION_HEADER = ['Address Line 1', 'Address Line 2', 'City', 'Postcode']
 
 @login_required
 def exportLocation(request):
@@ -255,7 +255,7 @@ def exportLocation(request):
         writer = csv.writer(fo)
         writer.writerow(LOCATION_HEADER)
         for item in lst:
-            writer.writerow([item.addressLine1, item.addressLine2, item.city, item.postCode, item.geoLocation])
+            writer.writerow([item.addressLine1, item.addressLine2, item.city, item.postCode])
 
     csv_file = open('location.csv', 'rb')
     response = HttpResponse(content=csv_file)
@@ -289,7 +289,7 @@ def importLocation(request):
             indexes[i] = int(request.POST.get(f'col_{i}', '0'))
         
         for row in records:                        
-            addressLine1, addressLine2, city, postCode, geoLocation = row
+            addressLine1, addressLine2, city, postCode = row
             
             if Location.objects.filter(postCode=postCode).count() > 0:
                 continue
@@ -300,8 +300,7 @@ def importLocation(request):
             location.postCode = postCode
             location.city = city
             location.organization = request.user.organization
-            location.geoLocation = geoLocation
-            location.createdDate = datetime.now()
+            location.createdDate = timezone.now()
             location.save()
         
         del request.session['records']
@@ -325,17 +324,6 @@ def tryParseFloat(s):
     except:
         return None
 
-def updateDeviceGeoLocation(device):
-    if not device.installationLocation:
-        return
-
-    geoLocation = device.installationLocation.geoLocation
-    if geoLocation and geoLocation != '':
-        arr = geoLocation.split(',')
-        if len(arr) == 2:
-            device.lat = arr[0]
-            device.lng = arr[1]
-
 @login_required
 def addDevice(request):
     if not request.user.organization:
@@ -348,14 +336,13 @@ def addDevice(request):
         if form.is_valid():            
             id1 = form.cleaned_data['id1']
             id2 = form.cleaned_data['id2']
-            installationLocation = form.cleaned_data['installationLocation']
             
             device = Device.objects.filter(id1=id1).filter(id2=id2).first()
             if device:
-                device.installationLocation = installationLocation
-                updateDeviceGeoLocation(device)
+                device.installationLocation = form.cleaned_data['installationLocation']
+                device.description = form.cleaned_data['description']
                 device.organization = request.user.organization
-                device.registeredDate = datetime.now()
+                device.registeredDate = timezone.now()
                 device.save()
 
             return redirect('staff-device')
@@ -368,15 +355,15 @@ def updateDevice(request, pk):
         return redirect('login')
 
     device = get_object_or_404(Device, pk=pk)
-    form = DeviceChangeForm(organization=request.user.organization, initial={'installationLocation': device.installationLocation})
+    form = DeviceChangeForm(organization=request.user.organization, 
+            initial={'installationLocation': device.installationLocation, 'description': device.description})
 
     if request.method == 'POST':
         form = DeviceChangeForm(request.POST, organization=request.user.organization)
 
         if form.is_valid():
-            installationLocation = form.cleaned_data['installationLocation']
-            device.installationLocation = installationLocation
-            updateDeviceGeoLocation(device)
+            device.installationLocation = form.cleaned_data['installationLocation']
+            device.description = form.cleaned_data['description']
             device.save()
             return redirect('staff-device')
 
@@ -385,7 +372,7 @@ def updateDevice(request, pk):
 #================================= Reports  ====================================================================
 
 def getCheckInReport(organization, userId, locationId, startDate, endDate):
-    checkIns = CheckIn.objects.filter(user__organization=organization)
+    checkIns = CheckIn.objects.filter(user__organization=organization, status=CheckIn.Status.SUCCESS)
 
     if userId:
         checkIns = checkIns.filter(user__id=int(userId))
@@ -451,7 +438,7 @@ def reportCheckInExportPdf(request):
     resp = render(request, 'staff/reports/check_in_pdf.html', 
                 {
                     'checkIns': checkIns, 
-                    'date': datetime.now(),
+                    'date': timezone.now(),
                     'startDate': startDate,
                     'endDate': endDate,
                     'reportedUser': reportedUser,
@@ -516,7 +503,7 @@ def reportLogInExportPdf(request):
 
     resp =  render(request, 'staff/reports/log_in_pdf.html', {
                 'logIns': logIns,
-                'date': datetime.now(),
+                'date': timezone.now(),
                 'startDate': startDate,
                 'endDate': endDate,
                 'reportedUser': reportedUser
@@ -558,7 +545,7 @@ def appInfo(request):
     return render(request, 'staff/app_link.html')    
 
 def createTenantParams(organization):
-    params = Parameter.objects.all()
+    params = SystemParameter.objects.filter(customizedByTenants=True)
     
     for param in params:
         existed = TenantParameter.objects.filter(organization=organization, parameter=param).count() > 0
@@ -571,7 +558,7 @@ def editCustomParams(request):
         return redirect('login')
 
     createTenantParams(request.user.organization)
-    tenant_params = TenantParameter.objects.filter(organization=request.user.organization)
+    tenant_params = TenantParameter.objects.filter(organization=request.user.organization, parameter__customizedByTenants=True)
     tenant_param_map = {p.parameter.key:p for p in tenant_params}
 
     saved = False

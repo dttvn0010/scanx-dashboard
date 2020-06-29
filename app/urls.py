@@ -75,31 +75,36 @@ urlpatterns = [
     path('api/test', views_api.test),
     path('api/login', views_api.logIn),
     path('api/login/search', views_api.searchLogIn),
-    path('api/get_user_config', views_api.getUserConfig),
-    path('api/user/change_password', views_api.changeUserPassword),
-    
-    path('api/get_all_nfc_tags', views_api.getAllNFCTags),
 
-    path('api/checkin', views_api.checkIn),
-    path('api/checkin/get_history', views_api.getCheckInHistory),
+    path('api/get_admin_role_id', views_api.getAdminRoleId),
+
     path('api/checkin/search', views_api.searchCheckIn),
     path('api/checkin/last_updated', views_api.getLastCheckInTime),
     path('api/checkin/check_for_update', views_api.checkForNewCheckIn),
     
-    path('api/organizations/search',  views_api.searchOrganization),
-    path('api/organizations/delete/<int:pk>', views_api.deleteOrganization),
+    path('api/organization/search',  views_api.searchOrganization),
+    path('api/organization/delete/<int:pk>', views_api.deleteOrganization),
 
-    path('api/users/search', views_api.searchUser),
-    path('api/users/details/<int:pk>', views_api.viewUserDetails),
-    path('api/users/delete/<int:pk>', views_api.deleteUser),
+    path('api/user/get_info', views_api.getUserInfo),    
+    path('api/user/checkin', views_api.userCheckIn),
+    path('api/user/get_checkin_history', views_api.getUserCheckInHistory),
+    path('api/user/change_password', views_api.changeUserPassword),
 
-    path('api/devices/unregistered/search', views_api.searchUnregisteredDevice),    
-    path('api/devices/registered/search', views_api.searchRegisteredDevice),
-    path('api/devices/search_by_org', views_api.searchDeviceByOrganization),
-    path('api/devices/delete/<int:pk>', views_api.deleteDevice),    
-    path('api/devices/delete_from_org/<int:pk>', views_api.deleteDeviceFromOrg),    
+    path('api/user/search', views_api.searchUser),
+    path('api/user/details/<int:pk>', views_api.viewUserDetails),
+    path('api/user/delete/<int:pk>', views_api.deleteUser),
 
-    path('api/locations/search', views_api.searchLocation),
-    path('api/locations/search_by_postcode', views_api.searchLocationByPostCode),
-    path('api/locations/delete/<int:pk>', views_api.deleteLocation),
+    path('api/device/set_uid', views_api.setDeviceUID),
+    path('api/device/update_coordinator', views_api.updateDeviceCoordinator),
+    path('api/device/get_all_nfc_tags', views_api.getAllNFCTags),
+
+    path('api/device/unregistered/search', views_api.searchUnregisteredDevice),    
+    path('api/device/registered/search', views_api.searchRegisteredDevice),
+    path('api/device/search_by_org', views_api.searchDeviceByOrganization),
+    path('api/device/delete/<int:pk>', views_api.deleteDevice),    
+    path('api/device/delete_from_org/<int:pk>', views_api.deleteDeviceFromOrg),    
+
+    path('api/location/search', views_api.searchLocation),
+    path('api/location/search_by_postcode', views_api.searchLocationByPostCode),
+    path('api/location/delete/<int:pk>', views_api.deleteLocation),
 ]

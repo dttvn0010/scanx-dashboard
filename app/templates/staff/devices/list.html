@@ -80,7 +80,7 @@ $(document).ready(function() {
     "language": {
       "processing": "<div class='spinner-border'></div>"
     },
-    "ajax": "/api/devices/search_by_org",
+    "ajax": "/api/device/search_by_org",
     "columns": [
       { "data": "id1" },
       { "data": "id2" },
@@ -107,7 +107,7 @@ function openDeleteConfirmation(id) {
 async function deleteDevice() {
   $("#errorLabel").html('');
   var formData = new FormData(document.getElementById("fmt3"));
-  var response = await fetch("/api/devices/delete_from_org/" + $('#deviceId').val(), {
+  var response = await fetch("/api/device/delete_from_org/" + $('#deviceId').val(), {
     body: formData,
     method: "POST"
   });

@@ -6,7 +6,7 @@ from email.mime.text import MIMEText
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
-INVITE_TITLE = _('join.invitation')
+INVITE_TITLE = str(_('join.invitation'))
 
 SMTP_PORT = 465 
 SMTP_SERVER = "smtp.gmail.com"
@@ -25,7 +25,7 @@ def sendMail2(to, subject, body):
     proc.stdin.close()
 
 def sendMail(to, subject, body):
-   
+
     msg = MIMEMultipart('alternative')
     msg['Subject'] = subject
     msg['From'] = SENDER
@@ -37,6 +37,7 @@ def sendMail(to, subject, body):
     with smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT, context=context) as server:
         server.login(GMAIL, GMAIL_PASS)
         server.sendmail(GMAIL, to, msg.as_string())
+        
 
 def sendAdminInvitationMail(organization, fullname, email, password):
     try:

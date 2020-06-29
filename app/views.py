@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.signals import user_logged_in
 from django.conf import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.utils import timezone
 
 from datetime import datetime
 import string
@@ -26,8 +27,9 @@ from .mail_utils import sendAdminInvitationMail, sendInvitationMail
 
 def logInHook(sender, user, request, **kwargs):
     logIn = LogIn()
+    logIn.fromMobileApp = False
     logIn.user = user
-    logIn.date = datetime.now()
+    logIn.date = timezone.now()
     logIn.save()
 
 user_logged_in.connect(logInHook)
@@ -47,7 +49,7 @@ def initialSetup(request):
         if form.is_valid():
             user.fullname = form.cleaned_data['fullname']
             user.password = make_password(form.cleaned_data['password'])
-            user.status = User.Status.REGISTERED
+            user.status = User.Status.ACTIVE
             
             profilePicture = form.cleaned_data.get('profilePicture')
             if profilePicture and profilePicture.name != '' :
@@ -70,7 +72,7 @@ def home(request):
     else:
         if(request.user.status == User.Status.INVITED):
             return HttpResponseRedirect("/accounts/login")
-        elif request.user.role and request.user.role.code in [settings.ROLES['ADMIN'], settings.ROLES['STAFF']]:
+        elif request.user.hasRole('ADMIN') or request.user.hasRole('STAFF'):
             return HttpResponseRedirect("/staff")
         else:
             return HttpResponseRedirect("/users")

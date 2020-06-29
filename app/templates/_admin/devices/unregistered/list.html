@@ -30,11 +30,11 @@
       <div class="table-responsive">
         <table id="table" class="table table-bordered" width="100%" cellspacing="0">
           <thead>
-            <tr>
-              <th style="width: 10%;">{% trans "enabled" %}</th>
+            <tr>              
               <th style="width: 20%;">{% trans "id1" %}</th>
               <th style="width: 20%;">{% trans "id2" %}</th>
               <th style="width: 40%;">{% trans "uid" %}</th>
+              <th style="width: 10%;">{% trans "status" %}</th>
               <th style="width: 10%;"></th>
             </tr>
           </thead>
@@ -122,16 +122,18 @@ $(document).ready(function() {
     "language": {
       "processing": "<div class='spinner-border'></div>"
     },
-    "ajax": "/api/devices/unregistered/search",
+    "ajax": "/api/device/unregistered/search",
     "columns": [
-      { "data": "enabled",
-        render: function (data, type, row){
-          return '<input type="checkbox" onclick="return false;"' + (data? ' checked' : '') + '/>'
-        } 
-      },
       { "data": "id1" },
       { "data": "id2" },
       { "data": "uid" },
+      { "data": "status",
+        render: function (data, type, row){
+          if(data == 1) return '{% trans "enabled" %}';
+          if(data > 1) return '{% trans "disabled" %}';
+          return '';          
+        } 
+      },
       {
         render: function (data, type, row) {
           return `<a title='{% trans "edit" %}' href="/_admin/devices/unregistered/update/${row['id']}"><i class="fas fa-edit"></i></a>&nbsp;&nbsp;`
@@ -153,7 +155,7 @@ function openDeleteConfirmation(id) {
 async function deleteDevice() {
   $("#errorLabel").html('');
   var formData = new FormData(document.getElementById("fmt3"));
-  var response = await fetch("/api/devices/delete/" + $('#deviceId').val(), {
+  var response = await fetch("/api/device/delete/" + $('#deviceId').val(), {
     body: formData,
     method: "POST"
   });

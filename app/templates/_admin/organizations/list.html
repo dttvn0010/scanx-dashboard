@@ -126,7 +126,7 @@
       "language": {
         "processing": "<div class='spinner-border'></div>"
       },
-      "ajax": "/api/organizations/search",
+      "ajax": "/api/organization/search",
       "columns": [
         { "data": "name" },
         { "data": "userCount" },
@@ -167,7 +167,7 @@
   async function deleteOrganization() {
     $("#errorLabel").html('');
     var formData = new FormData(document.getElementById("fmt3"));
-    var response = await fetch("/api/organizations/delete/" + $('#orgId').val(), {
+    var response = await fetch("/api/organization/delete/" + $('#orgId').val(), {
       body: formData,
       method: "POST"
     });

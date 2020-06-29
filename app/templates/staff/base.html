@@ -47,7 +47,7 @@
         <a class="nav-link" href="/staff">
           <span>{% trans "dashboard" %}</span></a>
       </li>
-      {%if user.role and user.role.code == 'ADMIN' %}
+      {%if user.is_tenant_admin %}
         <hr class="sidebar-divider my-0">
 
         <li class="nav-item {% if page == 1 %} active {%endif%}">

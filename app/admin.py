@@ -13,12 +13,12 @@ class MyUserAdmin(UserAdmin):
             'Other information',  # group heading of your choice; set to None for a blank space instead of a header
             {
                 'fields': (
-                    'fullname', 'organization', 'status', 'role'
+                    'fullname', 'organization', 'status', 'roles'
                 ),
             },
         ),
     )
-    list_display = ['username', 'fullname', 'email', 'organization', 'role']
+    list_display = ['username', 'fullname', 'email', 'organization']
 
 admin.site.register(models.Organization)
 admin.site.register(models.Location)
@@ -27,4 +27,4 @@ admin.site.register(models.CheckIn)
 admin.site.register(models.LogIn)
 admin.site.register(models.User, MyUserAdmin)
 admin.site.register(models.Role)
-admin.site.register(models.Parameter)
+admin.site.register(models.SystemParameter)

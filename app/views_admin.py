@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password
 from django.conf import settings
 from django.utils.translation import gettext as _
+from django.utils import timezone
 
 import csv
 import json
@@ -25,11 +26,12 @@ def createTenantAdmin(request, organization, adminName, adminEmail):
     user = User.objects.create_user(username=adminEmail, password='temp_' + password)
     user.fullname = adminName
     user.email = adminEmail
-    user.nfcEnabled = user.qrScanEnabled = user.sharedLocation = True
+    user.nfcEnabled =  user.sharedLocation = True
+    user.qrScanEnabled = False
     user.status = User.Status.INVITED
-    user.createdDate = datetime.now()
+    user.createdDate = timezone.now()
     user.organization = organization
-    user.role = Role.objects.get(code=settings.ROLES['ADMIN'])
+    user.roles.add(Role.objects.get(code=settings.ROLES['ADMIN']))
     user.save()
 
     sendAdminInvitationMail(organization.name, adminName, adminEmail, password)
@@ -50,7 +52,7 @@ def viewOrganizationDetails(request, pk):
 
     org = get_object_or_404(Organization, pk=pk)
     tenantAdmin = User.objects.filter(username=org.adminUsername).first()
-    users = User.objects.filter(organization=org).order_by('role__level', 'createdDate')
+    users = User.objects.filter(organization=org).order_by('createdDate')
     devices = Device.objects.filter(organization=org)
     locations = Location.objects.filter(organization=org)
 
@@ -81,7 +83,7 @@ def addOrganization(request):
         form = OrganizationCreationForm(request.POST)
         if form.is_valid():
             org = form.save(commit=False)
-            org.createdDate = datetime.now()
+            org.createdDate = timezone.now()
             org.adminUsername = form.cleaned_data['adminEmail']
             org.save()
 
@@ -179,7 +181,7 @@ def importOrganization(request):
             org.nfcEnabled = nfcEnabled == 'True'
             org.qrScanEnabled = qrScanEnabled == 'True'
             org.active = active == 'True'
-            org.createdDate = datetime.now()
+            org.createdDate = timezone.now()
             org.save()
 
             createTenantAdmin(request, org, adminName, adminEmail)
@@ -209,8 +211,8 @@ def addUnregisteredDevice(request):
         form = UnRegisteredDeviceForm(request.POST)
         if form.is_valid():            
             device = form.save(commit=False)
-            device.createdDate = datetime.now()
-            device.enabled = True
+            device.createdDate = timezone.now()
+            device.status = Device.Status.ENABLED
             device.save()
             return redirect('admin-unregistered-device')
 
@@ -353,7 +355,7 @@ def editSystemParams(request):
     if not request.user.is_superuser:
         return redirect('login')
 
-    params = Parameter.objects.all()
+    params = SystemParameter.objects.all()
     param_map = {p.key: p for p in params}
 
     saved = False

@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 class UserCreateForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ('fullname', 'email', 'nfcEnabled', 'qrScanEnabled', 'sharedLocation', 'role')
+        fields = ('fullname', 'email', 'nfcEnabled', 'qrScanEnabled', 'sharedLocation', 'roles')
 
     fullname = forms.CharField(max_length=30, label=_("fullname") + " * ")
     email = forms.EmailField(max_length=50, label=_("email.address") + " * ")
@@ -24,20 +24,11 @@ class UserCreateForm(forms.ModelForm):
 class UserChangeForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ( 'nfcEnabled', 'qrScanEnabled', 'sharedLocation', 'role')
+        fields = ( 'nfcEnabled', 'qrScanEnabled', 'sharedLocation', 'roles')
 
     nfcEnabled = forms.BooleanField(label=_('nfc.enabled'), required=False)
     qrScanEnabled = forms.BooleanField(label=_('qr.scanning.enabled'), required=False)
     sharedLocation = forms.BooleanField(label=_('geolocation.enabled'), required=False)
-
-class UserAdminChangeForm(forms.ModelForm):
-    class Meta:
-        model = User
-        fields = ( 'nfcEnabled', 'qrScanEnabled', 'sharedLocation')
-
-    nfcEnabled = forms.BooleanField(label=_('nfc.enabled'), required=False)
-    qrScanEnabled = forms.BooleanField(label=_('qr.scanning.enabled'), required=False)
-    sharedLocation = forms.BooleanField(label=_('geolocation.enabled'), required=False)    
 
 class LocationForm(forms.ModelForm):
     class Meta:
@@ -50,9 +41,10 @@ class DeviceCreateForm(forms.Form):
         super().__init__(*args, **kwargs)  
         self.fields['installationLocation'].queryset = Location.objects.filter(organization=organization)
 
-    id1 = forms.CharField(label="Id1 * ")
-    id2 = forms.CharField(label="Id2 * ")
+    id1 = forms.CharField(label=_('id1') + " * ")
+    id2 = forms.CharField(label=_('id2') + " * ")
     installationLocation = forms.ModelChoiceField(label=_("installation.location") + " * ", queryset=Location.objects.all())
+    description = forms.CharField(label=_('description'), required=False, widget=forms.Textarea(attrs={'rows':2}))
 
     def clean(self):
         id1 = self.cleaned_data.get('id1')
@@ -75,6 +67,8 @@ class DeviceChangeForm(forms.Form):
 
     installationLocation = forms.ModelChoiceField(label=_("installation.location") + " * ",
                                 queryset=Location.objects.all())
+
+    description = forms.CharField(label=_('description'), required=False, widget=forms.Textarea(attrs={'rows':2}))
 
 
 class OrganizationChangeForm(forms.Form):

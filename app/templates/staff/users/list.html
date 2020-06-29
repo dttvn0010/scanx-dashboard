@@ -33,7 +33,7 @@
             <tr>
               <th style="width: 25%;">{% trans "fullname" %}</th>
               <th style="width: 25%;">{% trans "email.address" %}</th>
-              <th style="width: 15%;">{% trans "role" %}</th>
+              <th style="width: 20%;">{% trans "role" %}</th>
               <th style="width: 15%;">{% trans "status" %}</th>
               <th style="width: 15%;"></th>
             </tr>
@@ -183,7 +183,7 @@ $(document).ready(function() {
     "language": {
       "processing": "<div class='spinner-border'></div>"
     },
-    "ajax": "/api/users/search",
+    "ajax": "/api/user/search",
     "columns": [
       { "data": "fullname",
         render: function(data, type, row) {
@@ -198,7 +198,7 @@ $(document).ready(function() {
         } 
       },
       { "data": "email" },
-      { "data": "role" },
+      { "data": "role_names" },
       { "data": "status", "render": function(data, type, row) {
           if(data == 0) return '{% trans "pending" %}';
           return row.is_active? '{% trans "active" %}': '{% trans "inactive" %}';
@@ -224,14 +224,15 @@ $(document).ready(function() {
           }
 
           return html;
-        }
+        },
+        sClass: "pl-3 pr-3"
       }
     ],
   })
 });
 
 async function viewInfo(id) {
-  var resp = await fetch("/api/users/details/" + id);
+  var resp = await fetch("/api/user/details/" + id);
   var user = await resp.json();
   $("#full_name").html(user.fullname);
   $("#email").html(user.email);
@@ -239,7 +240,7 @@ async function viewInfo(id) {
   $("#qr_scan_enabled").html(user.qrScanEnabled? '{% trans "yes" %}': '{% trans "no" %}');
   $("#geo_location_enabled").html(user.sharedLocation? '{% trans "yes" %}': '{% trans "no" %}');
   $("#status").html(user.status == 0? '{% trans "pending" %}' : (user.is_active? '{% trans "active" %}': '{% trans "inactive" %}'));
-  $("#role").html(user.role);
+  $("#role").html(user.role_names);
   $("#viewDetailsModal").modal();
 }
 
@@ -253,7 +254,7 @@ function openDeleteConfirmation(id) {
 async function deleteUser() {
   $("#errorLabel").html('');
   var formData = new FormData(document.getElementById("fmt3"));
-  var response = await fetch("/api/users/delete/" + $('#userId').val(), {
+  var response = await fetch("/api/user/delete/" + $('#userId').val(), {
     body: formData,
     method: "POST"
   });

@@ -5,15 +5,15 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.hashers import make_password
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
 
 import json
 import requests
 import traceback
 from time import time
 from datetime import datetime, timedelta
-from pytz import timezone
 
-from. param_utils import getTenantParamValue
+from. param_utils import getTenantParamValue, getSystemParamValue
 from .models import *
 from .serializers import *
 
@@ -22,48 +22,8 @@ from .serializers import *
 def test(request):
     return Response({'success': True})
 
+
 # ================================================ LogIn ========================================================
-
-@api_view(['POST'])
-def logIn(request):
-    mobiletime = float(request.data.get('mobiletime', '0'))
-    
-    headers = {'Content-type': 'application/json'}
-    resp_text = requests.post(settings.HOST_URL + "/api/token", data=json.dumps(request.data), headers=headers).text    
-    resp = json.loads(resp_text)
-    user = User.objects.filter(username=request.data.get("username")).first()
-
-    if not user or not resp.get('access'):
-        return Response({
-            "success": False,
-            "message": _('incorrect.username.or.password')
-        })
-
-    allowedTimeDiff = getTenantParamValue('MAX_TIME_DIFF_ALLOW', user.organization, settings.MAX_TIME_DIFF_ALLOW)
-    
-    if abs(mobiletime - time()) > allowedTimeDiff:
-        return Response({
-            "success": False,
-            "message": _("incorrect.mobile.time")
-        })
-
-    logIn = LogIn()
-    logIn.user = user
-    logIn.date = datetime.now()
-    logIn.save()
-    
-    return Response({
-        "success": True,
-        "access": resp["access"],
-        "fullname": user.fullname,
-        "email": user.email,
-        "profilepicture": settings.HOST_URL + '/' + user.profilePicture.url,
-        "company": user.organization.name,
-        "NFCButtonText": getTenantParamValue('NFC_BUTTON_TEXT', user.organization, settings.NFC_BUTTON_TEXT),
-        "QRButtonText": getTenantParamValue('QR_BUTTON_TEXT', user.organization, settings.QR_BUTTON_TEXT)
-    })
-
-    
 
 @api_view(['GET'])
 def searchLogIn(request):
@@ -100,8 +60,7 @@ def searchLogIn(request):
 
     for item in data:
         item['user'] = f'{item["userFullName"]}'
-        d = datetime.strptime(item['date'], "%d/%m/%Y %H:%M:%S")
-        diff = datetime.now() - d
+        diff = timezone.now() - item['date']
         seconds = diff.seconds + diff.days * 24 * 3600
         
         minutes = seconds // 60
@@ -120,127 +79,6 @@ def searchLogIn(request):
     })
 
 # ================================================ CheckIn ========================================================
-
-@api_view(['POST'])
-@permission_classes((IsAuthenticated,))
-def checkIn(request):
-
-    code = request.data.get("code", "")
-    position = request.data.get("position", {})
-    lat = position.get("lat")
-    lng = position.get("lng")
-    
-    uid = request.data.get("uid", "")
-    scantime = float(request.data.get("scantime", 0))
-    
-    checkIn = CheckIn()
-    checkIn.user = request.user
-    checkIn.organization = requests.user.organization
-    checkIn.scanCode = code
-    checkIn.uid = uid
-    checkIn.lat = lat
-    checkIn.lng = lng
-    checkIn.date = datetime.fromtimestamp(scantime)
-
-    message_params = []
-    status = CheckIn.Status.SUCCESS
-
-    allowedTimeDiff = getTenantParamValue('MAX_TIME_DIFF_ALLOW', request.user.organization, settings.MAX_TIME_DIFF_ALLOW)
-
-    if abs(scantime - time()) > allowedTimeDiff:
-        status = CheckIn.Status.INCORRECT_MOBILE_TIME
-
-    if status == CheckIn.Status.SUCCESS and (lat == '' or lng == ''):
-        status = CheckIn.Status.NO_GPS_LOCATION
-    
-    device = None
-
-    if status == CheckIn.Status.SUCCESS :
-        arr = code.split('-')
-        if len(arr) != 3 or arr[0] != settings.SCAN_CODE_PREFIX:
-            status = CheckIn.Status.INVALID_DEVICE_CODE
-        else:
-            id1, id2 = arr[1:]
-            device = Device.objects.filter(id1=id1).filter(id2=id2).first()
-            checkIn.device = device
-            checkIn.location = device.installationLocation if device else None
-    
-    if status == CheckIn.Status.SUCCESS and not device:
-        status = CheckIn.Status.DEVICE_NOT_EXIST
-        
-    if status == CheckIn.Status.SUCCESS and device.uid != uid:
-        status = CheckIn.Status.INCORRECT_DEVICE_UID
-
-    if status == CheckIn.Status.SUCCESS and not device.installationLocation:
-        status = CheckIn.Status.DEVICE_UNREGISTERED
-
-    if status == CheckIn.Status.SUCCESS and device.organization != request.user.organization:
-        status = CheckIn.Status.DEVICE_FROM_OTHER_ORG
-
-    lastCheckIn = CheckIn.objects.filter(user=request.user,status=CheckIn.Status.SUCCESS).order_by('-date').first()
-    scanDelay = getTenantParamValue('SCAN_TIME_DELAY', request.user.organization, settings.SCAN_TIME_DELAY)
-
-    if lastCheckIn and scanDelay > 0:
-        if scanDelay == int(scanDelay):
-            scanDelay = int(scanDelay)
-
-        timediff = scantime - datetime.timestamp(lastCheckIn.date)
-        print('timediff=', timediff)
-
-        if status == CheckIn.Status.SUCCESS and timediff < scanDelay * 60:
-            status = CheckIn.Status.SCAN_NOT_TIME_OUT_YET
-            message_params = [scanDelay]
-
-    checkIn.status = status    
-    checkIn.save()
-
-    if status == CheckIn.Status.SUCCESS:
-        location = str(device.installationLocation)
-        message_params = [location]
-
-    return Response({
-        'success': status == CheckIn.Status.SUCCESS, 
-        'message': CheckIn.Status.mobile_messages.get(status, '') % tuple(message_params)
-    })
-
-@api_view(['GET'])
-@permission_classes((IsAuthenticated,))
-def getCheckInHistory(request):
-    startDate = request.query_params.get("startDate")
-    endDate = request.query_params.get("endDate")
-    
-    startDate = datetime.strptime(startDate, '%d/%m/%Y') if startDate else None
-    endDate = datetime.strptime(endDate, '%d/%m/%Y') + timedelta(days=1) if endDate else None
-
-    start = int(request.query_params.get('start', 0))
-    length = int(request.query_params.get('length', 10))
-    
-    checkIns = CheckIn.objects.filter(user__id=request.user.id)
-
-    if startDate:        
-        checkIns = checkIns.filter(date__gte=startDate)
-
-    if endDate:        
-        checkIns = checkIns.filter(date__lt=endDate)
-        
-    checkIns = checkIns.order_by('-date')
-    checkIns = checkIns[start:start+length]
-    
-    result = []
-
-    for item in checkIns:
-        result.append({
-            'location': str(item.location),
-            'date': item.date.strftime('%d/%m/%Y %H:%M:%S') if item.date else '',
-            'position': {
-                'lat': item.lat,
-                'lng': item.lng
-            }
-        })
-
-    return Response({
-        "data": result
-    })
 
 @api_view(['GET'])
 @permission_classes((IsAuthenticated,))
@@ -265,14 +103,14 @@ def checkForNewCheckIn(request):
 
         if lastCheckIn:
             newCheckIn = CheckInSerializer(lastCheckIn).data
-            lastUpdated = lastCheckInDate = newCheckIn['date']
-            lastCheckInDate = datetime.strptime(lastCheckInDate, '%d/%m/%Y %H:%M:%S')
-            updated = lastCheckInDate > lastUpdatedTime
+            lastCheckInDate = lastCheckIn.date
+            updated = datetime.timestamp(lastCheckInDate) > datetime.timestamp(lastUpdatedTime)
 
             newCheckIn['user'] = newCheckIn["userFullName"]
             newCheckIn['geoLocation'] = {'lat': newCheckIn['lat'], 'lng': newCheckIn['lng']}
                 
-    return Response({'updated': updated, 'lastUpdated': lastUpdated, 'newCheckIn': newCheckIn})
+    return Response({'updated': updated, 'lastUpdated': lastCheckInDate.strftime('%d/%m/%Y %H:%M:%S'),
+                         'newCheckIn': newCheckIn})
 
 def parseHourMin(flushTime):
     hour, minute = None, None
@@ -303,7 +141,7 @@ def searchCheckIn(request):
         hour, minute = parseHourMin(flushTime)
         
         if hour and minute:
-            now = datetime.now()
+            now = timezone.now()
             flushTime = datetime(now.year, now.day, now.month, hour, minute)
             if flushTimeParam >= now:
                 flushTime -= timedelta(days=1)
@@ -344,7 +182,7 @@ def searchCheckIn(request):
     checkIns = checkIns[start:start+length]
     data = CheckInSerializer(checkIns, many=True).data
 
-    for item in data:
+    for i,item in enumerate(data):
         item['user'] = f'{item["userFullName"]}'
         item['statusText'] = CheckIn.Status.messages.get(item['status'])
         
@@ -354,8 +192,7 @@ def searchCheckIn(request):
 
         item['location'] = tmp
         
-        d = datetime.strptime(item['date'], "%d/%m/%Y %H:%M:%S")
-        diff = datetime.now() - d        
+        diff = timezone.now() - checkIns[i].date
         seconds = diff.seconds + diff.days * 24 * 3600
         
         minutes = seconds // 60
@@ -375,6 +212,14 @@ def searchCheckIn(request):
         "recordsFiltered": recordsFiltered,
         "data": data
     })
+
+# =================================================== Role ==============================================================
+@api_view(['GET'])
+@permission_classes((IsAuthenticated,))
+def getAdminRoleId(request):
+    adminRole = Role.objects.filter(code='ADMIN').first()
+    adminRoleId = adminRole.id if adminRole else -1
+    return Response({'adminRoleId' : adminRoleId})
 
 # =================================================== Organization ======================================================
 
@@ -426,21 +271,210 @@ def deleteOrganization(request, pk):
         return Response({'success': False, 'error': str(e)})
 
 # =================================================== User ======================================================
+def isValidLng(lng):
+    try:
+        lng = float(lng)
+        return -180 <= lng <= 180
+    except:
+        return False
+
+def isValidLat(lat):
+    try:
+        lat = float(lat)
+        return -90 <= lat <= 90
+    except:
+        return False
+
+def getUserData(user):
+    nfcEnabled = qrScanEnabled = sharedLocation = False
+
+    if user.organization:
+        nfcEnabled = user.nfcEnabled and user.organization.nfcEnabled
+        qrScanEnabled = user.qrScanEnabled and user.organization.qrScanEnabled
+        sharedLocation = user.sharedLocation
+
+    data = {
+        'fullname': user.fullname, 
+        'email': user.email,
+        'nfcEnabled': nfcEnabled,
+        'qrScanEnabled': qrScanEnabled,
+        'sharedLocation': sharedLocation,
+    }
+
+    if user.profilePicture:
+        data['profilepicture'] = settings.HOST_URL + '/' +  user.profilePicture.url
+
+    if user.organization:
+        data['company'] = user.organization.name
+        data['NFCButtonText'] = getTenantParamValue('NFC_BUTTON_TEXT', user.organization, settings.NFC_BUTTON_TEXT)
+        data['QRButtonText'] = getTenantParamValue('QR_BUTTON_TEXT', user.organization, settings.QR_BUTTON_TEXT)
+
+    if user.hasAnyRole(['ADMIN', 'INSTALLER']):
+        data['UpdateDeviceCoordinatorButtonText'] = getTenantParamValue('UPDATE_DEVICE_COORDINATOR_BUTTON_TEXT', user.organization, settings.UPDATE_DEVICE_COORDINATOR_BUTTON_TEXT) 
+
+    if user.is_superuser:
+        data['SetDeviceUIDButtonText'] = getSystemParamValue('SET_DEVICE_UID_BUTTON_TEXT', settings.SET_DEVICE_UID_BUTTON_TEXT)        
+    
+    return data
+
+@api_view(['POST'])
+def logIn(request):
+    mobiletime = float(request.data.get('mobiletime', '0'))
+    
+    headers = {'Content-type': 'application/json'}
+    resp_text = requests.post(settings.HOST_URL + "/api/token", data=json.dumps(request.data), headers=headers).text    
+    resp = json.loads(resp_text)
+    user = User.objects.filter(username=request.data.get("username")).first()
+
+    if not user or not resp.get('access'):
+        return Response({
+            "success": False,
+            "message": _('incorrect.username.or.password')
+        })
+
+    allowedTimeDiff = getTenantParamValue('MAX_TIME_DIFF_ALLOW', user.organization, settings.MAX_TIME_DIFF_ALLOW)
+    
+    if abs(mobiletime - time()) > allowedTimeDiff:
+        return Response({
+            "success": False,
+            "message": _("incorrect.mobile.time")
+        })
+
+    logIn = LogIn()
+    logIn.user = user
+    logIn.date = timezone.now()
+    logIn.fromMobileApp = True
+    logIn.save()
+    
+    data = getUserData(user)
+    data['success'] = True
+    data['access'] = resp['access']
+     
+    return Response(data)
 
 @api_view(['GET'])
 @permission_classes((IsAuthenticated,))
-def getUserConfig(request):
-    nfcEnabled = qrScanEnabled = sharedLocation = False
+def getUserInfo(request):    
+    data = getUserData(request.user)
+    data['success'] = True
+    return Response(data)
 
-    if request.user and request.user.organization:
-        nfcEnabled = request.user.nfcEnabled and request.user.organization.nfcEnabled
-        qrScanEnabled = request.user.qrScanEnabled and request.user.organization.qrScanEnabled
-        sharedLocation = request.user.sharedLocation
 
-    return Response({ 
-        'nfcEnabled': nfcEnabled,
-        'qrScanEnabled': qrScanEnabled,
-        'sharedLocation': sharedLocation and (request.user.username != settings.MOBILE_USERNAME)
+@api_view(['POST'])
+@permission_classes((IsAuthenticated,))
+def userCheckIn(request):
+    if not request.user.organization or not request.user.hasAnyRole(['ADMIN', 'STAFF', 'USER']):
+        return Response({'success': False, 'message': _('no.permission')})
+
+    code = request.data.get("scanCode", "")
+    position = request.data.get("position", {})
+    lat = position.get("lat")
+    lng = position.get("lng")
+    
+    uid = request.data.get("uid", "")
+    scantime = float(request.data.get("scantime", 0))
+    
+    checkIn = CheckIn()
+    checkIn.user = request.user
+    checkIn.organization = request.user.organization
+    checkIn.scanCode = code
+    checkIn.uid = uid
+    checkIn.lat = lat
+    checkIn.lng = lng
+    checkIn.date = datetime.fromtimestamp(scantime)
+
+    message_params = []
+    status = CheckIn.Status.SUCCESS
+
+    allowedTimeDiff = getTenantParamValue('MAX_TIME_DIFF_ALLOW', request.user.organization, settings.MAX_TIME_DIFF_ALLOW)
+
+    if abs(scantime - time()) > allowedTimeDiff:
+        status = CheckIn.Status.INCORRECT_MOBILE_TIME
+
+    if status == CheckIn.Status.SUCCESS and (not isValidLat(lat) or not isValidLng(lng)):
+        status = CheckIn.Status.INVALID_GPS_POSITION
+    
+    device = None
+
+    if status == CheckIn.Status.SUCCESS :
+        arr = code.split('-')
+        if len(arr) != 3 or arr[0] != settings.SCAN_CODE_PREFIX:
+            status = CheckIn.Status.INVALID_DEVICE_CODE
+        else:
+            id1, id2 = arr[1:]
+            device = Device.objects.filter(id1=id1, id2=id2, organization=request.user.organization).first()
+            checkIn.device = device
+            checkIn.location = device.installationLocation if device else None
+    
+    if status == CheckIn.Status.SUCCESS and not device:
+        status = CheckIn.Status.DEVICE_NOT_REGISTERED
+        
+    if status == CheckIn.Status.SUCCESS and device.uid != uid:
+        status = CheckIn.Status.INCORRECT_DEVICE_UID
+
+    lastCheckIn = CheckIn.objects.filter(user=request.user,status=CheckIn.Status.SUCCESS).order_by('-date').first()
+    scanDelay = getTenantParamValue('SCAN_TIME_DELAY', request.user.organization, settings.SCAN_TIME_DELAY)
+
+    if lastCheckIn and scanDelay > 0:
+        if scanDelay == int(scanDelay):
+            scanDelay = int(scanDelay)
+
+        timediff = scantime - datetime.timestamp(lastCheckIn.date)
+        print('timediff=', timediff)
+
+        if status == CheckIn.Status.SUCCESS and timediff < scanDelay * 60:
+            status = CheckIn.Status.SCAN_NOT_TIME_OUT_YET
+            message_params = [scanDelay]
+
+    checkIn.status = status    
+    checkIn.save()
+
+    if status == CheckIn.Status.SUCCESS:
+        location = str(device.installationLocation)
+        message_params = [location]
+
+    return Response({
+        'success': status == CheckIn.Status.SUCCESS, 
+        'message': CheckIn.Status.mobile_messages.get(status, '') % tuple(message_params)
+    })
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticated,))
+def getUserCheckInHistory(request):
+    startDate = request.query_params.get("startDate")
+    endDate = request.query_params.get("endDate")
+    
+    startDate = datetime.strptime(startDate, '%d/%m/%Y') if startDate else None
+    endDate = datetime.strptime(endDate, '%d/%m/%Y') + timedelta(days=1) if endDate else None
+
+    start = int(request.query_params.get('start', 0))
+    length = int(request.query_params.get('length', 10))
+    
+    checkIns = CheckIn.objects.filter(user__id=request.user.id, status=CheckIn.Status.SUCCESS)
+
+    if startDate:        
+        checkIns = checkIns.filter(date__gte=startDate)
+
+    if endDate:        
+        checkIns = checkIns.filter(date__lt=endDate)
+        
+    checkIns = checkIns.order_by('-date')
+    checkIns = checkIns[start:start+length]
+    
+    result = []
+
+    for item in checkIns:
+        result.append({
+            'location': str(item.location),
+            'date': item.date.strftime('%d/%m/%Y %H:%M:%S') if item.date else '',
+            'position': {
+                'lat': item.lat,
+                'lng': item.lng
+            }
+        })
+
+    return Response({
+        "data": result
     })
 
 @api_view(['POST'])
@@ -450,6 +484,16 @@ def changeUserPassword(request):
     oldPassword = request.data.get('oldPassword', '')
     newPassword = request.data.get('newPassword', '')
 
+    mobiletime = float(request.data.get('mobiletime', '0'))
+    
+    allowedTimeDiff = getTenantParamValue('MAX_TIME_DIFF_ALLOW', request.user.organization, settings.MAX_TIME_DIFF_ALLOW)
+    
+    if abs(mobiletime - time()) > allowedTimeDiff:
+        return Response({
+            "success": False,
+            "message": _("incorrect.mobile.time")
+        })
+        
     if not user.check_password(oldPassword):
         return Response({
             'success': False,
@@ -496,7 +540,7 @@ def searchUser(request):
     recordsTotal = users.count()
 
     users = users.filter(Q(fullname__contains=keyword) | Q(email__contains=keyword))
-    users = users.order_by('role__level', 'createdDate')
+    users = users.order_by('-createdDate')
     
     recordsFiltered = users.count()
     users = users[start:start+length]
@@ -504,12 +548,13 @@ def searchUser(request):
     tenantAdminName = organization.adminUsername if organization else None
 
     for i, user in enumerate(users):
-        locked = user.role and user.role.code == 'ADMIN'
+        locked = user.hasRole('ADMIN')
 
         if request.user.username == tenantAdminName  and user.username != tenantAdminName:
             locked = False
 
         data[i]['locked'] = locked
+        data[i]['role_names'] = user.role_names
         
     return Response({
         "draw": draw,
@@ -523,6 +568,7 @@ def searchUser(request):
 def viewUserDetails(request, pk):    
     user = User.objects.get(pk=pk)
     data = UserSerializer(user).data
+    data['role_names'] = user.role_names
     return Response(data)
 
 @api_view(['POST'])
@@ -543,10 +589,94 @@ def deleteUser(request, pk):
         return Response({'success': False, 'error': str(e)})
 
 # =================================================== Device ======================================================
+@api_view(['POST'])
+@permission_classes((IsAuthenticated,))
+def setDeviceUID(request):
+    if not request.user.is_superuser:
+        return Response({'success': False, 'message': _('no.permission')})
+
+    mobiletime = float(request.data.get('mobiletime', '0'))
+    
+    allowedTimeDiff = getSystemParamValue('MAX_TIME_DIFF_ALLOW',  settings.MAX_TIME_DIFF_ALLOW)
+    
+    if abs(mobiletime - time()) > allowedTimeDiff:
+        return Response({
+            "success": False,
+            "message": _("incorrect.mobile.time")
+        })
+
+    uid = request.data.get('uid', '')
+    id1 = request.data.get('id1', '')
+    id2 = request.data.get('id2', '')
+
+    if uid == '':
+        return Response({
+            "success": False,
+            "message": _("invalid.uid.value")
+        })
+
+    device = Device.objects.filter(id1=id1, id2=id2).first()
+    
+    if not device:
+        return Response({
+            "success": False,
+            "message": _("no.device.with.provided.id")
+        })
+
+    device.uid = uid
+    device.save()
+
+    return Response({"success": True})
+
+@api_view(['POST'])
+@permission_classes((IsAuthenticated,))
+def updateDeviceCoordinator(request):
+    if not request.user.organization or not request.user.hasAnyRole(['ADMIN', 'INSTALLER']):
+        return Response({'success': False, 'message': _('no.permission')})
+
+    mobiletime = float(request.data.get('mobiletime', '0'))
+    
+    allowedTimeDiff = getTenantParamValue('MAX_TIME_DIFF_ALLOW', request.user.organization, settings.MAX_TIME_DIFF_ALLOW)
+    
+    if abs(mobiletime - time()) > allowedTimeDiff:
+        return Response({
+            "success": False,
+            "message": _("incorrect.mobile.time")
+        })
+
+    uid = request.data.get("uid", "")
+    position = request.data.get("position", {})
+    lat = position.get("lat")
+    lng = position.get("lng")
+
+    if not isValidLat(lat) or not isValidLng(lng):
+        return Response({
+            "success": False,
+            "message": _("invalid.position")
+        })
+
+    device = Device.objects.filter(organization=request.user.organization, uid=uid).first()
+    
+    if not device:
+        return Response({
+            "success": False,
+            "message": _("no.device.with.provided.uid")
+        })
+
+    device.lat = lat
+    device.lng = lng
+    device.save()
+
+    return Response({"success": True}) 
+
+
 @api_view(['GET'])
 @permission_classes((IsAuthenticated,))
 def getAllNFCTags(request):
-    devices = Device.objects.filter(uid__isnull=False)
+    if not request.user.organization:
+        return Response({'success': False, 'message': _('no.permission')})
+
+    devices = Device.objects.filter(uid__isnull=False, lat__isnull=False, lng__isnull=False)
     result = []
 
     for device in devices:
