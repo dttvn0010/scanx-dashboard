@@ -332,7 +332,7 @@ def logIn(request):
             "message": _('incorrect.username.or.password')
         })
 
-    allowedTimeDiff = getTenantParamValue('MAX_TIME_DIFF_ALLOW', user.organization, settings.MAX_TIME_DIFF_ALLOW)
+    allowedTimeDiff = getSystemParamValue('MAX_TIME_DIFF_ALLOW', settings.MAX_TIME_DIFF_ALLOW)
     
     if abs(mobiletime - time()) > allowedTimeDiff:
         return Response({
@@ -386,7 +386,7 @@ def userCheckIn(request):
     message_params = []
     status = CheckIn.Status.SUCCESS
 
-    allowedTimeDiff = getTenantParamValue('MAX_TIME_DIFF_ALLOW', request.user.organization, settings.MAX_TIME_DIFF_ALLOW)
+    allowedTimeDiff = getSystemParamValue('MAX_TIME_DIFF_ALLOW', settings.MAX_TIME_DIFF_ALLOW)
 
     if abs(scantime - time()) > allowedTimeDiff:
         status = CheckIn.Status.INCORRECT_MOBILE_TIME
@@ -486,7 +486,7 @@ def changeUserPassword(request):
 
     mobiletime = float(request.data.get('mobiletime', '0'))
     
-    allowedTimeDiff = getTenantParamValue('MAX_TIME_DIFF_ALLOW', request.user.organization, settings.MAX_TIME_DIFF_ALLOW)
+    allowedTimeDiff = getSystemParamValue('MAX_TIME_DIFF_ALLOW',  settings.MAX_TIME_DIFF_ALLOW)
     
     if abs(mobiletime - time()) > allowedTimeDiff:
         return Response({
@@ -636,7 +636,7 @@ def updateDeviceCoordinator(request):
 
     mobiletime = float(request.data.get('mobiletime', '0'))
     
-    allowedTimeDiff = getTenantParamValue('MAX_TIME_DIFF_ALLOW', request.user.organization, settings.MAX_TIME_DIFF_ALLOW)
+    allowedTimeDiff = getSystemParamValue('MAX_TIME_DIFF_ALLOW', settings.MAX_TIME_DIFF_ALLOW)
     
     if abs(mobiletime - time()) > allowedTimeDiff:
         return Response({
