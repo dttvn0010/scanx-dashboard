@@ -676,7 +676,8 @@ def getAllNFCTags(request):
     if not request.user.organization:
         return Response({'success': False, 'message': _('no.permission')})
 
-    devices = Device.objects.filter(uid__isnull=False, lat__isnull=False, lng__isnull=False)
+    devices = Device.objects.filter(organization=request.user.organization,
+                 uid__isnull=False, lat__isnull=False, lng__isnull=False)
     result = []
 
     for device in devices:
