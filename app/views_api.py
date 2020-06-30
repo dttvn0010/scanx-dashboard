@@ -6,6 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.hashers import make_password
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
+from django.utils.timezone import make_aware
 
 import json
 import requests
@@ -46,11 +47,11 @@ def searchLogIn(request):
         logIns = logIns.filter(user__id=int(userId))
 
     if startDate:
-        startDate = datetime.strptime(startDate, '%d/%m/%Y')
+        startDate = make_aware(datetime.strptime(startDate, '%d/%m/%Y'))
         logIns = logIns.filter(date__gte=startDate)
 
     if endDate:
-        endDate = datetime.strptime(endDate, '%d/%m/%Y') + timedelta(days=1)
+        endDate = make_aware(datetime.strptime(endDate, '%d/%m/%Y') + timedelta(days=1))
         logIns = logIns.filter(date__lt=endDate)                        
 
     logIns = logIns.order_by('-date')
@@ -98,7 +99,7 @@ def checkForNewCheckIn(request):
     newCheckIn = None
 
     if lastUpdated != '':
-        lastUpdatedTime = datetime.strptime(lastUpdated, '%d/%m/%Y %H:%M:%S')
+        lastUpdatedTime = make_aware(datetime.strptime(lastUpdated, '%d/%m/%Y %H:%M:%S'))
         lastCheckIn = CheckIn.objects.filter(organization=request.user.organization, status=CheckIn.Status.SUCCESS).order_by('-date').first()
 
         if lastCheckIn:
@@ -142,8 +143,8 @@ def searchCheckIn(request):
         
         if hour and minute:
             now = timezone.now()
-            flushTime = datetime(now.year, now.day, now.month, hour, minute)
-            if flushTimeParam >= now:
+            flushTime = timezone.now().replace(hour=hour, minute=minute, second=0, microsecond=0) 
+            if flushTime >= now:
                 flushTime -= timedelta(days=1)
 
             startDate = flushTime
@@ -151,8 +152,8 @@ def searchCheckIn(request):
         else:
             startDate = endDate = None
     else:
-        startDate = datetime.strptime(startDate, '%d/%m/%Y') if startDate else None
-        endDate = datetime.strptime(endDate, '%d/%m/%Y') + timedelta(days=1) if endDate else None
+        startDate = make_aware(datetime.strptime(startDate, '%d/%m/%Y')) if startDate else None
+        endDate = make_aware(datetime.strptime(endDate, '%d/%m/%Y') + timedelta(days=1)) if endDate else None
         
     start = int(request.query_params.get('start', 0))
     length = int(request.query_params.get('length', 0))
