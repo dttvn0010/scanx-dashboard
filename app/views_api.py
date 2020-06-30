@@ -300,6 +300,7 @@ def getUserData(user):
         'nfcEnabled': nfcEnabled,
         'qrScanEnabled': qrScanEnabled,
         'sharedLocation': sharedLocation,
+        'roles': user.role_names
     }
 
     if user.profilePicture:
