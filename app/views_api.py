@@ -857,7 +857,7 @@ def searchLocationByPostCode(request):
             items = [{
                         'addressLine1': item.get('addressline1', ''),
                         'addressLine2': item.get('addressline2', ''),
-                        'city': item.get('county', ''),
+                        'city': item.get('city', ''),
                         'postCode': item.get('postcode', ''),
                         
                     } for i,item in enumerate(items)]
