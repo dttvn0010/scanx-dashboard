@@ -104,7 +104,7 @@ def checkForNewCheckIn(request):
         if lastCheckIn:
             newCheckIn = CheckInSerializer(lastCheckIn).data
             lastCheckInDate = lastCheckIn.date
-            updated = datetime.timestamp(lastCheckInDate) > datetime.timestamp(lastUpdatedTime)
+            updated = int(datetime.timestamp(lastCheckInDate)) > int(datetime.timestamp(lastUpdatedTime))
 
             newCheckIn['user'] = newCheckIn["userFullName"]
             newCheckIn['geoLocation'] = {'lat': newCheckIn['lat'], 'lng': newCheckIn['lng']}
@@ -420,7 +420,6 @@ def userCheckIn(request):
             scanDelay = int(scanDelay)
 
         timediff = scantime - datetime.timestamp(lastCheckIn.date)
-        print('timediff=', timediff)
 
         if status == CheckIn.Status.SUCCESS and timediff < scanDelay * 60:
             status = CheckIn.Status.SCAN_NOT_TIME_OUT_YET
