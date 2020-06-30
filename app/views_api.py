@@ -109,7 +109,7 @@ def checkForNewCheckIn(request):
             newCheckIn['user'] = newCheckIn["userFullName"]
             newCheckIn['geoLocation'] = {'lat': newCheckIn['lat'], 'lng': newCheckIn['lng']}
                 
-    return Response({'updated': updated, 'lastUpdated': lastCheckInDate.strftime('%d/%m/%Y %H:%M:%S'),
+    return Response({'updated': updated, 'lastUpdated': newCheckIn['date'],
                          'newCheckIn': newCheckIn})
 
 def parseHourMin(flushTime):
