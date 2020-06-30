@@ -57,6 +57,10 @@ class User(AbstractUser):
         return ','.join([role.name for role in self.roles.all()])
 
     @property
+    def role_codes(self):
+        return ','.join([role.code for role in self.roles.all()])
+
+    @property
     def is_tenant_admin(self):
         return self.hasRole('ADMIN')
 
