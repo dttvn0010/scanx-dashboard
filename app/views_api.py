@@ -312,7 +312,7 @@ def getUserData(user):
         data['QRButtonText'] = getTenantParamValue('QR_BUTTON_TEXT', user.organization, settings.QR_BUTTON_TEXT)
 
     if user.hasAnyRole(['ADMIN', 'INSTALLER']):
-        data['UpdateDeviceCoordinatorButtonText'] = getTenantParamValue('UPDATE_DEVICE_COORDINATOR_BUTTON_TEXT', user.organization, settings.UPDATE_DEVICE_COORDINATOR_BUTTON_TEXT) 
+        data['UpdateDeviceCoordinatesButtonText'] = getTenantParamValue('UPDATE_DEVICE_COORDINATES_BUTTON_TEXT', user.organization, settings.UPDATE_DEVICE_COORDINATES_BUTTON_TEXT) 
 
     if user.is_superuser:
         data['SetDeviceUIDButtonText'] = getSystemParamValue('SET_DEVICE_UID_BUTTON_TEXT', settings.SET_DEVICE_UID_BUTTON_TEXT)        
@@ -631,7 +631,7 @@ def setDeviceUID(request):
 
 @api_view(['POST'])
 @permission_classes((IsAuthenticated,))
-def updateDeviceCoordinator(request):
+def updateDeviceCoordinates(request):
     if not request.user.organization or not request.user.hasAnyRole(['ADMIN', 'INSTALLER']):
         return Response({'success': False, 'message': _('no.permission')})
 

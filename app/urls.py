@@ -95,7 +95,7 @@ urlpatterns = [
     path('api/user/delete/<int:pk>', views_api.deleteUser),
 
     path('api/device/set_uid', views_api.setDeviceUID),
-    path('api/device/update_coordinator', views_api.updateDeviceCoordinator),
+    path('api/device/update_coordinates', views_api.updateDeviceCoordinates),
     path('api/device/get_all_nfc_tags', views_api.getAllNFCTags),
 
     path('api/device/unregistered/search', views_api.searchUnregisteredDevice),    
