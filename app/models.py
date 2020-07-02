@@ -184,3 +184,13 @@ class TenantParameter(models.Model):
             return float(self.value)
 
         return self.value        
+
+class MailTemplate(models.Model):
+    code = models.CharField(max_length=30, unique=True)
+    name = models.CharField(max_length=200)
+    subject = models.CharField(max_length=200)
+    body = models.TextField(blank=True)
+    customizedByTenants = models.BooleanField() 
+
+    def __str__(self):
+        return self.name

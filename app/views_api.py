@@ -867,3 +867,13 @@ def searchLocationByPostCode(request):
             return Response({'error': resp_text, 'success': False})
     else:
         return Response({'items': [], 'success': True})
+
+# =================================================== Mail Templates ======================================================
+@api_view(['GET'])
+@permission_classes((IsAuthenticated,))
+def getMailTemplateContent(request, pk):
+    template = MailTemplate.objects.filter(pk=pk).first()
+    if template:
+        return Response({'success': True, 'subject': template.subject, 'body': template.body})
+
+    return Response({'success': False})

@@ -47,3 +47,7 @@ class UnRegisteredDeviceForm(forms.ModelForm):
 
         return self.cleaned_data
 
+class MailTemplateChangeForm(forms.Form):
+    template_id = forms.IntegerField()
+    subject = forms.CharField()
+    body = forms.CharField()

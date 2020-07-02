@@ -156,9 +156,11 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
 }
 
-ADMIN_INVITATION_MAIL_TEMPLATE_PATH = "static/templates/admin_invitation_mail.tmpl"
-INVITATION_MAIL_TEMPLATE_PATH = "static/templates/invitation_mail.tmpl"
-RESET_PASSWORD_MAIL_TEMPLATE_PATH = "static/templates/reset_password_mail.tmpl"
+MAIL_TEMPLATE_CODES = {
+    'ADMIN_INVITATION': 'ADMIN_INVITATION',
+    'USER_INVITATION': 'USER_INVITATION',
+    'RESET_PASSWORD': 'RESET_PASSWORD'
+}
 
 ROLES = {
     'ADMIN': 'ADMIN',

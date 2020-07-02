@@ -34,10 +34,8 @@ urlpatterns = [
 
     path('_admin/devices/registered', views_admin.listRegisteredDevices, name='admin-registered-device'),
 
-    path('_admin/settings/mail_template/admin_invitation', views_admin.editAdminInvitationMailTemplate),
-    path('_admin/settings/mail_template/invitation', views_admin.editInvitationMailTemplate),
-    path('_admin/settings/mail_template/reset_password', views_admin.editResetPasswordMailTemplate),
     path('_admin/settings/system_params', views_admin.editSystemParams),
+    path('_admin/settings/mail_templates', views_admin.editMailTemplates),
 
     # Tenant pages
     path('staff', views_staff.tableView),
@@ -110,4 +108,6 @@ urlpatterns = [
     path('api/location/search', views_api.searchLocation),
     path('api/location/search_by_postcode', views_api.searchLocationByPostCode),
     path('api/location/delete/<int:pk>', views_api.deleteLocation),
+
+    path('api/mail_template/get_content/<int:pk>', views_api.getMailTemplateContent),
 ]

@@ -23,7 +23,7 @@ import numpy as np
 
 from .models import *
 from .forms import *
-from .mail_utils import sendAdminInvitationMail, sendInvitationMail, setResetPasswordMail
+from .mail_utils import sendAdminInvitationMail, sendInvitationMail, sendResetPasswordMail
 from .user_utils import genPassword
 
 def logInHook(sender, user, request, **kwargs):
@@ -109,7 +109,7 @@ def forgotPassword(request):
             user.tmpPassword = genPassword(20)
             user.tmpPasswordExpired = timezone.now() + timedelta(days=1)
             user.save()
-            setResetPasswordMail(user.fullname, user.email, user.tmpPassword)
+            sendResetPasswordMail(user.fullname, user.email, user.tmpPassword)
             return render(request, 'registration/forgot_password_sent.html', {'email': user.email})
 
     return render(request, 'registration/forgot_password.html', {'sent': sent, 'form': form})

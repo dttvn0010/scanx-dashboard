@@ -392,3 +392,28 @@ def editSystemParams(request):
 
     return render(request, "_admin/settings/system_params.html", 
                                 {"params": params, "saved": saved}) 
+
+def editMailTemplates(request):    
+    saved = False
+    template_id = subject = body = ''
+    form = MailTemplateChangeForm()
+    
+    if request.method == 'POST':
+        form = MailTemplateChangeForm(request.POST)
+        if form.is_valid():
+            template_id = form.cleaned_data.get('template_id')
+            template = MailTemplate.objects.filter(pk=template_id).first()
+            if template:
+                subject = template.subject = form.cleaned_data.get('subject')
+                body = template.body = form.cleaned_data.get('body')
+                template.save()
+                saved = True
+
+    return render(request, "_admin/settings/mail_templates.html", 
+            {
+                'templates': MailTemplate.objects.all(), 
+                'saved': saved, 
+                'subject': subject, 
+                'body': body, 
+                'template_id': template_id
+            }) 
