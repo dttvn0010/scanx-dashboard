@@ -51,6 +51,40 @@ class InitialSetupForm(forms.Form):
 
         return password2
 
+class ForgotPasswordForm(forms.Form):
+    email = forms.EmailField()
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(username=email).count() == 0:
+            raise forms.ValidationError(_('no.user.with.email.exist'))
+
+        return email
+
+class ResetPasswordForm(forms.Form):
+    email = forms.CharField()
+    password = forms.CharField()
+    password2 = forms.CharField()
+
+    def clean_password(self):
+        password = self.cleaned_data.get('password', '')
+        if len(password) < 8:
+            raise forms.ValidationError(_('password.too.short'))
+
+        if password.isdigit():
+            raise forms.ValidationError(_('password.cannot.be.all.digits'))
+
+        return password
+
+    def clean_password2(self):
+        password = self.cleaned_data.get('password')
+        password2 = self.cleaned_data.get('password2')
+
+        if password != password2:
+            raise forms.ValidationError(_('confirmed.password.not.match'))
+
+        return password2 
+
 class UpdateAccountForm(forms.Form):
     email = forms.EmailField()
     fullname = forms.CharField(max_length=30)

@@ -6,7 +6,8 @@ from email.mime.text import MIMEText
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
-INVITE_TITLE = str(_('join.invitation'))
+RESET_PASSWORD_TITLE = str(_('reset.password.title'))
+INVITE_TITLE = str(_('invite.title'))
 
 SMTP_PORT = 465 
 SMTP_SERVER = "smtp.gmail.com"
@@ -41,10 +42,10 @@ def sendMail(to, subject, body):
 
 def sendAdminInvitationMail(organization, fullname, email, password):
     try:
-        with open(settings.ADMIN_MAIL_TEMPLATE_PATH, encoding="utf-8") as fi:
-            ADMIN_INVITE_TEMPLATE = fi.read()
+        with open(settings.ADMIN_INVITATION_MAIL_TEMPLATE_PATH, encoding="utf-8") as fi:
+            adminIniteTemplate = fi.read()
 
-        html = ADMIN_INVITE_TEMPLATE.replace('${Link.ACCEPT_INVITATION}', settings.INVITE_URL + f'?email={email}')
+        html = adminIniteTemplate.replace('${Link.ACCEPT_INVITATION}', settings.INVITE_URL + f'?email={email}')
         html = html.replace('${User.ORGANIZATION}', organization)
         html = html.replace('${User.FULL_NAME}', fullname)
         html = html.replace('${User.PASSWORD}', password)
@@ -55,10 +56,10 @@ def sendAdminInvitationMail(organization, fullname, email, password):
 
 def sendInvitationMail(organization, fullname, email, password):
     try:
-        with open(settings.MAIL_TEMPLATE_PATH, encoding="utf-8") as fi:
-            INVITE_TEMPLATE = fi.read()
+        with open(settings.INVITATION_MAIL_TEMPLATE_PATH, encoding="utf-8") as fi:
+            inviteTemplate = fi.read()
 
-        html = INVITE_TEMPLATE.replace('${Link.ACCEPT_INVITATION}', settings.INVITE_URL + f'?email={email}')
+        html = inviteTemplate.replace('${Link.ACCEPT_INVITATION}', settings.INVITE_URL + f'?email={email}')
         html = html.replace('${User.ORGANIZATION}', organization)
         html = html.replace('${User.FULL_NAME}', fullname)
         html = html.replace('${User.PASSWORD}', password)
@@ -66,3 +67,15 @@ def sendInvitationMail(organization, fullname, email, password):
         sendMail(email, INVITE_TITLE, html)
     except:
         traceback.print_exc()
+
+def setResetPasswordMail(fullname, email, password):
+    try:
+        with open(settings.RESET_PASSWORD_MAIL_TEMPLATE_PATH, encoding="utf-8") as fi:
+            INVITE_TEMPLATE = fi.read()
+
+        html = INVITE_TEMPLATE.replace('${Link.RESET_PASSWORD}', settings.RESET_PASSWORD_URL + f'?email={email}&token={password}')
+        html = html.replace('${User.FULL_NAME}', fullname)
+
+        sendMail(email, RESET_PASSWORD_TITLE, html)
+    except:
+        traceback.print_exc()        

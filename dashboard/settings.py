@@ -156,8 +156,9 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
 }
 
-ADMIN_MAIL_TEMPLATE_PATH = "static/templates/admin_invitation_mail.tmpl"
-MAIL_TEMPLATE_PATH = "static/templates/invitation_mail.tmpl"
+ADMIN_INVITATION_MAIL_TEMPLATE_PATH = "static/templates/admin_invitation_mail.tmpl"
+INVITATION_MAIL_TEMPLATE_PATH = "static/templates/invitation_mail.tmpl"
+RESET_PASSWORD_MAIL_TEMPLATE_PATH = "static/templates/reset_password_mail.tmpl"
 
 ROLES = {
     'ADMIN': 'ADMIN',
@@ -167,6 +168,7 @@ ROLES = {
 
 HOST_URL = "https://scanx.cloud"
 INVITE_URL = HOST_URL + "/accounts/initial_setup"
+RESET_PASSWORD_URL = HOST_URL + "/accounts/reset_password"
 PROFILE_IMAGE_SIZE = 300
 
 POST_CODER_API_KEY = "PCWJ7-LXWC9-ZGHHK-LFD5B"

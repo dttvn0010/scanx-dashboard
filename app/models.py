@@ -38,6 +38,8 @@ class User(AbstractUser):
     sharedLocation = models.BooleanField(verbose_name=_('geolocation.enabled'), blank=True, null=True)
     profilePicture = models.ImageField(upload_to='static/images', blank=True, null=True) 
     status = models.IntegerField(blank=True, null=True)   
+    tmpPassword = models.CharField(max_length=30, blank=True, null=True)
+    tmpPasswordExpired = models.DateTimeField(null=True)
     createdDate = models.DateTimeField(null=True)
     
     def __str__(self):

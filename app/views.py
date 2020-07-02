@@ -11,7 +11,7 @@ from django.conf import settings
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.utils import timezone
 
-from datetime import datetime
+from datetime import datetime, timedelta
 import string
 import random
 import csv
@@ -23,7 +23,8 @@ import numpy as np
 
 from .models import *
 from .forms import *
-from .mail_utils import sendAdminInvitationMail, sendInvitationMail
+from .mail_utils import sendAdminInvitationMail, sendInvitationMail, setResetPasswordMail
+from .user_utils import genPassword
 
 def logInHook(sender, user, request, **kwargs):
     logIn = LogIn()
@@ -96,6 +97,55 @@ def signup(request):
             return redirect('home')
 
    return render(request, 'registration/signup.html', { 'form':  form})
+
+def forgotPassword(request):
+    sent = False
+    form = ForgotPasswordForm()
+    
+    if request.method == 'POST':
+        form = ForgotPasswordForm(request.POST)
+        if form.is_valid():
+            user = User.objects.get(username=form.cleaned_data.get('email'))
+            user.tmpPassword = genPassword(20)
+            user.tmpPasswordExpired = timezone.now() + timedelta(days=1)
+            user.save()
+            setResetPasswordMail(user.fullname, user.email, user.tmpPassword)
+            return render(request, 'registration/forgot_password_sent.html', {'email': user.email})
+
+    return render(request, 'registration/forgot_password.html', {'sent': sent, 'form': form})
+
+def resetPassword(request):
+    if request.method == 'GET':
+        form = ResetPasswordForm()
+        email = request.GET.get('email')
+        token = request.GET.get('token')
+        user = User.objects.filter(username=email).first()
+        if not user or user.tmpPassword != token or not user.tmpPassword:
+            return render(request, 'registration/reset_password.html', {'invalid': True, 'form': form})
+        
+        if timezone.now() > user.tmpPasswordExpired:
+            return render(request, 'registration/reset_password.html', {'expired': True, 'form': form})
+
+        return render(request, 'registration/reset_password.html', {'email': email, 'form': form})
+
+    else:
+        form = ResetPasswordForm(request.POST)
+        if form.is_valid():
+            user = User.objects.filter(username=form.cleaned_data['email']).first()
+            user.password = make_password(form.cleaned_data['password'])
+            user.tmpPassword = ''
+            user.tmpPasswordExpired = None
+            user.save()
+            
+            user = authenticate(username=user.username,
+                                    password=form.cleaned_data['password'])
+            login(request, user)
+
+            return HttpResponseRedirect("/")
+        else:
+            email = request.POST.get('email')
+            return render(request, 'registration/reset_password.html', {'email': email, 'form': form})
+
 
 def resizeProfileImage(imgField):
     imageFile = BytesIO(imgField.read())

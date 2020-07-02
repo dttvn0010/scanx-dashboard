@@ -313,41 +313,60 @@ def listRegisteredDevices(request):
 # ========================================== Settings ==========================================
 
 @login_required
-def editAdminMailTemplate(request):
+def editAdminInvitationMailTemplate(request):
     if not request.user.is_superuser:
         return redirect('login')
 
-    with open(settings.ADMIN_MAIL_TEMPLATE_PATH, encoding="utf-8") as fi:
-        admin_mail_template = fi.read()
-
-    saved = False
-
-    if request.method == 'POST':
-        admin_mail_template = request.POST["admin_mail_template"]
-        with open(settings.ADMIN_MAIL_TEMPLATE_PATH, 'w', encoding="utf-8", newline="") as fo:
-            fo.write(admin_mail_template.replace("\n\n", "\n"))
-            saved = True        
-    
-    return render(request, "_admin/settings/admin_mail_template.html", 
-            {"admin_mail_template": admin_mail_template, "saved": saved})   
-
-@login_required
-def editMailTemplate(request):
-    if not request.user.is_superuser:
-        return redirect('login')
-
-    with open(settings.MAIL_TEMPLATE_PATH, encoding="utf-8") as fi:
+    with open(settings.ADMIN_INVITATION_MAIL_TEMPLATE_PATH, encoding="utf-8") as fi:
         mail_template = fi.read()
 
     saved = False
 
     if request.method == 'POST':
         mail_template = request.POST["mail_template"]
-        with open(settings.MAIL_TEMPLATE_PATH, 'w', encoding="utf-8", newline="") as fo:
+        with open(settings.ADMIN_INVITATION_MAIL_TEMPLATE_PATH, 'w', encoding="utf-8", newline="") as fo:
             fo.write(mail_template.replace("\n\n", "\n"))
             saved = True        
     
-    return render(request, "_admin/settings/mail_template.html", 
+    return render(request, "_admin/settings/mail_templates/admin_invitation.html", 
+            {"mail_template": mail_template, "saved": saved})   
+
+@login_required
+def editInvitationMailTemplate(request):
+    if not request.user.is_superuser:
+        return redirect('login')
+
+    with open(settings.INVITATION_MAIL_TEMPLATE_PATH, encoding="utf-8") as fi:
+        mail_template = fi.read()
+
+    saved = False
+
+    if request.method == 'POST':
+        mail_template = request.POST["mail_template"]
+        with open(settings.INVITATION_MAIL_TEMPLATE_PATH, 'w', encoding="utf-8", newline="") as fo:
+            fo.write(mail_template.replace("\n\n", "\n"))
+            saved = True        
+    
+    return render(request, "_admin/settings/mail_templates/invitation.html", 
+            {"mail_template": mail_template, "saved": saved})    
+
+@login_required
+def editResetPasswordMailTemplate(request):
+    if not request.user.is_superuser:
+        return redirect('login')
+
+    with open(settings.RESET_PASSWORD_MAIL_TEMPLATE_PATH, encoding="utf-8") as fi:
+        mail_template = fi.read()
+
+    saved = False
+
+    if request.method == 'POST':
+        mail_template = request.POST["mail_template"]
+        with open(settings.RESET_PASSWORD_MAIL_TEMPLATE_PATH, 'w', encoding="utf-8", newline="") as fo:
+            fo.write(mail_template.replace("\n\n", "\n"))
+            saved = True        
+    
+    return render(request, "_admin/settings/mail_templates/reset_password.html", 
             {"mail_template": mail_template, "saved": saved})    
 
 @login_required

@@ -2,7 +2,7 @@
 {% load i18n %}
 
 {% block sidebar %}
-{% with group=3 page=6 %}
+{% with group=3 page=7 %}
 {{ block.super }}
 {% endwith %}
 {% endblock %}
@@ -15,7 +15,7 @@
     </div>
     <div class="card-body">
       {%if saved%}
-      <span class="badge badge-success mb-3">{% trans "parameters.successfully.saved" %}!</span>
+      <span class="badge badge-success mb-3">{% trans "successfully.saved" %}!</span>
       {%endif%}
       <form method="POST">
         {% csrf_token %}

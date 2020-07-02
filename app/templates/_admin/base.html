@@ -47,16 +47,37 @@
         <hr class="sidebar-divider">
 
         <li class="nav-item">
-          <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapse2" aria-expanded="true">
+          <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapse1" aria-expanded="true">
             <span>{% trans "devices" %}</span>
           </a>
-          <div id="collapse2" class="collapse {% if group == 2%}show{%endif%}" data-parent="#accordionSidebar">
+          <div id="collapse1" class="collapse {% if group == 1%}show{%endif%}" data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
               <a class="collapse-item {% if page == 2 %} active {%endif%}" href="/_admin/devices/unregistered">
                 {% trans "unregistered.devices" %}
               </a>
               <a class="collapse-item {% if page == 3 %} active {%endif%}" href="/_admin/devices/registered">
                 {% trans "registered.devices" %}
+              </a>
+            </div>
+          </div>
+        </li>
+        
+        <hr class="sidebar-divider">
+
+        <li class="nav-item">
+          <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapse2" aria-expanded="true">
+            <span>{% trans "mail.templates" %}</span>
+          </a>
+          <div id="collapse2" class="collapse {% if group == 2%}show{%endif%}" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+              <a class="collapse-item {% if page == 4 %} active {%endif%}" href="/_admin/settings/mail_template/admin_invitation">
+                {% trans "admin.invitation" %}
+              </a>
+              <a class="collapse-item {% if page == 5 %} active {%endif%}" href="/_admin/settings/mail_template/invitation">
+                {% trans "user.invitation" %}
+              </a>
+              <a class="collapse-item {% if page == 6 %} active {%endif%}" href="/_admin/settings/mail_template/reset_password">
+                {% trans "reset.password" %}
               </a>
             </div>
           </div>
@@ -70,13 +91,7 @@
           </a>
           <div id="collapse3" class="collapse {% if group == 3%}show{%endif%}" data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
-              <a class="collapse-item {% if page == 4 %} active {%endif%}" href="/_admin/settings/admin_mail_template">
-                {% trans "admin.mail.template" %}
-              </a>
-              <a class="collapse-item {% if page == 5 %} active {%endif%}" href="/_admin/settings/mail_template">
-                {% trans "mail.template" %}
-              </a>
-              <a class="collapse-item {% if page == 6 %} active {%endif%}" href="/_admin/settings/system_params">
+              <a class="collapse-item {% if page == 7 %} active {%endif%}" href="/_admin/settings/system_params">
                 {% trans "system.parameters" %}
               </a>
             </div>

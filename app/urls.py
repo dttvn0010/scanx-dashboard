@@ -7,6 +7,8 @@ urlpatterns = [
     path('support', views.support),
     path('accounts/initial_setup', views.initialSetup),
     path('accounts/signup', views.signup),
+    path('accounts/forgot_password', views.forgotPassword),
+    path('accounts/reset_password', views.resetPassword),
     path('profile/update', views.updateAccount),
     path('profile/change_password', views.changePassword),
 
@@ -32,8 +34,9 @@ urlpatterns = [
 
     path('_admin/devices/registered', views_admin.listRegisteredDevices, name='admin-registered-device'),
 
-    path('_admin/settings/admin_mail_template', views_admin.editAdminMailTemplate),
-    path('_admin/settings/mail_template', views_admin.editMailTemplate),
+    path('_admin/settings/mail_template/admin_invitation', views_admin.editAdminInvitationMailTemplate),
+    path('_admin/settings/mail_template/invitation', views_admin.editInvitationMailTemplate),
+    path('_admin/settings/mail_template/reset_password', views_admin.editResetPasswordMailTemplate),
     path('_admin/settings/system_params', views_admin.editSystemParams),
 
     # Tenant pages
