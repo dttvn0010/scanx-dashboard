@@ -29,8 +29,7 @@ class UnRegisteredDeviceForm(forms.ModelForm):
 
     def clean_uid(self):
         uid = self.cleaned_data.get('uid', '')
-
-        if uid != '':
+        if uid:
             device = Device.objects.filter(uid=uid).first()
             if device and (self.instance == None or self.instance.id != device.id):
                 raise forms.ValidationError(f'{_("device.with")} {_("uid")}={uid} {_("already.exists")}')
