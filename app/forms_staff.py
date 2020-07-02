@@ -54,6 +54,9 @@ class DeviceCreateForm(forms.Form):
         if not device:
             raise forms.ValidationError(_('this.device.does.not.exist'))
 
+        if device and not device.uid:
+            raise forms.ValidationError(_('this.device.not.set.uid.yet'))
+
         if device.organization:
             raise forms.ValidationError(_('this.device.is.already.registered'))
 

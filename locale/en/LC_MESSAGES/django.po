@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-02 11:23+0100\n"
+"POT-Creation-Date: 2020-07-02 16:13+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -68,14 +68,14 @@ msgstr "Full Name"
 msgid "email.address"
 msgstr "Email Address"
 
-#: .\app\forms_staff.py:12 .\app\forms_staff.py:29 .\app\forms_staff.py:78
+#: .\app\forms_staff.py:12 .\app\forms_staff.py:29 .\app\forms_staff.py:81
 #: .\app\models.py:9 .\app\models.py:36
 #: .\app\templates\_admin\organizations\details.html:41
 #: .\app\templates\staff\users\list.html:69 .\app\views_admin.py:131
 msgid "nfc.enabled"
 msgstr "NFC Enabled"
 
-#: .\app\forms_staff.py:13 .\app\forms_staff.py:30 .\app\forms_staff.py:79
+#: .\app\forms_staff.py:13 .\app\forms_staff.py:30 .\app\forms_staff.py:82
 #: .\app\models.py:10 .\app\models.py:37
 #: .\app\templates\_admin\organizations\details.html:47
 #: .\app\templates\staff\users\list.html:73 .\app\views_admin.py:131
@@ -105,11 +105,11 @@ msgstr "ID#1"
 msgid "id2"
 msgstr "ID#2"
 
-#: .\app\forms_staff.py:46 .\app\forms_staff.py:68
+#: .\app\forms_staff.py:46 .\app\forms_staff.py:71
 msgid "installation.location"
 msgstr "Installation Location"
 
-#: .\app\forms_staff.py:47 .\app\forms_staff.py:71 .\app\models.py:95
+#: .\app\forms_staff.py:47 .\app\forms_staff.py:74 .\app\models.py:95
 msgid "description"
 msgstr "Description"
 
@@ -118,14 +118,18 @@ msgid "this.device.does.not.exist"
 msgstr "This device does not exist"
 
 #: .\app\forms_staff.py:58
+msgid "this.device.not.set.uid.yet"
+msgstr "This device's UID has not been set yet."
+
+#: .\app\forms_staff.py:61
 msgid "this.device.is.already.registered"
 msgstr "This device is already registered"
 
-#: .\app\forms_staff.py:75 .\app\templates\_admin\organizations\details.html:21
+#: .\app\forms_staff.py:78 .\app\templates\_admin\organizations\details.html:21
 msgid "organization.name"
 msgstr "Organization Name"
 
-#: .\app\forms_staff.py:76
+#: .\app\forms_staff.py:79
 msgid "detail.information"
 msgstr "Detail Information"
 
@@ -279,53 +283,40 @@ msgstr "Unregistered Devices"
 msgid "registered.devices"
 msgstr "Registered Devices"
 
-#: .\app\templates\_admin\base.html:69 .\app\templates\_admin\base.html:98
-msgid "mail.templates"
-msgstr "Mail Templates"
-
-#: .\app\templates\_admin\base.html:74
-msgid "admin.invitation"
-msgstr "Admin Invitation"
-
-#: .\app\templates\_admin\base.html:77
-msgid "user.invitation"
-msgstr "User Invitation"
-
-#: .\app\templates\_admin\base.html:80
-#: .\app\templates\registration\reset_password.html:68
-msgid "reset.password"
-msgstr "Reset password"
-
-#: .\app\templates\_admin\base.html:90 .\app\templates\staff\base.html:90
+#: .\app\templates\_admin\base.html:69 .\app\templates\staff\base.html:90
 msgid "settings"
 msgstr "Settings"
 
-#: .\app\templates\_admin\base.html:95
+#: .\app\templates\_admin\base.html:74
 #: .\app\templates\_admin\settings\system_params.html:14
 msgid "system.parameters"
 msgstr "System Parameters"
 
-#: .\app\templates\_admin\base.html:120 .\app\templates\profile\base.html:38
+#: .\app\templates\_admin\base.html:77
+msgid "mail.templates"
+msgstr "Mail Templates"
+
+#: .\app\templates\_admin\base.html:99 .\app\templates\profile\base.html:38
 #: .\app\templates\staff\base.html:141 .\app\templates\users\index.html:39
 msgid "last.login"
 msgstr "Last Login"
 
-#: .\app\templates\_admin\base.html:137 .\app\templates\profile\base.html:54
+#: .\app\templates\_admin\base.html:116 .\app\templates\profile\base.html:54
 #: .\app\templates\staff\base.html:159 .\app\templates\users\index.html:54
 msgid "profile"
 msgstr "Profile"
 
-#: .\app\templates\_admin\base.html:142 .\app\templates\profile\base.html:59
+#: .\app\templates\_admin\base.html:121 .\app\templates\profile\base.html:59
 #: .\app\templates\staff\base.html:164 .\app\templates\users\index.html:59
 msgid "logout"
 msgstr "Logout"
 
-#: .\app\templates\_admin\base.html:156 .\app\templates\profile\base.html:71
+#: .\app\templates\_admin\base.html:135 .\app\templates\profile\base.html:71
 #: .\app\templates\staff\base.html:178 .\app\templates\users\index.html:101
 msgid "copyright"
 msgstr "Copyright &copy; ScanX 3.0 2020. All rights reserved."
 
-#: .\app\templates\_admin\base.html:158 .\app\templates\profile\base.html:73
+#: .\app\templates\_admin\base.html:137 .\app\templates\profile\base.html:73
 #: .\app\templates\staff\base.html:180 .\app\templates\users\index.html:103
 msgid "server.time"
 msgstr "Server time"
@@ -543,10 +534,7 @@ msgid "organization.details"
 msgstr "Organization Details"
 
 #: .\app\templates\_admin\organizations\form.html:26
-#: .\app\templates\_admin\settings\mail_templates.html:46
-#: .\app\templates\_admin\settings\mail_templates\admin_invitation.html:24
-#: .\app\templates\_admin\settings\mail_templates\invitation.html:24
-#: .\app\templates\_admin\settings\mail_templates\reset_password.html:24
+#: .\app\templates\_admin\settings\mail_templates.html:49
 #: .\app\templates\_admin\settings\system_params.html:39
 #: .\app\templates\profile\update_account.html:56
 #: .\app\templates\staff\devices\form.html:38
@@ -607,9 +595,6 @@ msgid "edit.mail.template"
 msgstr "Edit Mail Template"
 
 #: .\app\templates\_admin\settings\mail_templates.html:18
-#: .\app\templates\_admin\settings\mail_templates\admin_invitation.html:18
-#: .\app\templates\_admin\settings\mail_templates\invitation.html:18
-#: .\app\templates\_admin\settings\mail_templates\reset_password.html:18
 #: .\app\templates\_admin\settings\system_params.html:18
 #: .\app\templates\staff\settings\organization.html:18
 #: .\app\templates\staff\settings\tenant_params.html:18
@@ -620,25 +605,13 @@ msgstr "Successfully saved"
 msgid "choose.a.template"
 msgstr "Choose a template"
 
-#: .\app\templates\_admin\settings\mail_templates.html:35
+#: .\app\templates\_admin\settings\mail_templates.html:36
 msgid "subject"
 msgstr "Subject"
 
-#: .\app\templates\_admin\settings\mail_templates.html:41
+#: .\app\templates\_admin\settings\mail_templates.html:43
 msgid "body"
 msgstr "Body"
-
-#: .\app\templates\_admin\settings\mail_templates\admin_invitation.html:14
-msgid "admin.invitation.mail.template"
-msgstr "Admin Invitation Mail Template"
-
-#: .\app\templates\_admin\settings\mail_templates\invitation.html:14
-msgid "user.invitation.mail.template"
-msgstr "User Invitation Mail Template"
-
-#: .\app\templates\_admin\settings\mail_templates\reset_password.html:14
-msgid "reset.password.mail.template"
-msgstr "Reset Password Mail Template"
 
 #: .\app\templates\profile\change_password.html:16
 #: .\app\templates\profile\update_account.html:16
@@ -748,6 +721,10 @@ msgstr "The request is expired!"
 #: .\app\templates\registration\reset_password.html:52
 msgid "reset.your.password"
 msgstr "Reset your password"
+
+#: .\app\templates\registration\reset_password.html:68
+msgid "reset.password"
+msgstr "Reset password"
 
 #: .\app\templates\staff\app_link.html:15 .\app\templates\users\index.html:71
 msgid "please.use.the.below.links.to.download.the.mobile.app"

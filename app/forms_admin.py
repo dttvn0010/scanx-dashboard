@@ -25,7 +25,7 @@ class OrganizationChangeForm(forms.ModelForm):
 class UnRegisteredDeviceForm(forms.ModelForm):
     class Meta:
         model = Device
-        fields = ('id1', 'id2')
+        fields = ('id1', 'id2', 'uid')
 
     def clean_uid(self):
         uid = self.cleaned_data.get('uid', '')
