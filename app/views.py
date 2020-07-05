@@ -30,6 +30,7 @@ def logInHook(sender, user, request, **kwargs):
     logIn = LogIn()
     logIn.fromMobileApp = False
     logIn.user = user
+    logIn.organization = user.organization
     logIn.date = timezone.now()
     logIn.save()
 

@@ -17,23 +17,28 @@ from .param_utils import getSystemParamValue
 from .user_utils import genPassword
 from .import_utils import getPermutation, importPreview
 from .mail_utils import sendAdminInvitationMail
+from .log_utils import logAction
 
 def createTenantAdmin(request, organization, adminName, adminEmail):
     if adminEmail == "":
         return 
 
     password = genPassword()
-    user = User.objects.create_user(username=adminEmail, password='temp_' + password)
-    user.fullname = adminName
-    user.email = adminEmail
+    user = User()
+    user.username = user.email = adminEmail
+    user.password = make_password('temp_' + password)
+    user.fullname = adminName    
     user.nfcEnabled =  user.sharedLocation = True
     user.qrScanEnabled = False
     user.status = User.Status.INVITED
     user.createdDate = timezone.now()
-    user.organization = organization
+    user.organization = organization    
+    
+    user.save()
     user.roles.add(Role.objects.get(code=settings.ROLES['ADMIN']))
     user.save()
 
+    logAction('CREATE', request.user, None, user)
     sendAdminInvitationMail(organization.name, adminName, adminEmail, password)
 
 # ========================================== Organization ======================================================
@@ -86,6 +91,8 @@ def addOrganization(request):
             org.createdDate = timezone.now()
             org.adminUsername = form.cleaned_data['adminEmail']
             org.save()
+            
+            logAction('CREATE', request.user, None, org)
 
             adminEmail = form.cleaned_data['adminEmail']
             adminName = form.cleaned_data['adminName']
@@ -101,13 +108,15 @@ def updateOrganization(request, pk):
     if not request.user.is_superuser:
         return redirect('login')
 
+    old_org = get_object_or_404(Organization, pk=pk)
     org = get_object_or_404(Organization, pk=pk)
     form = OrganizationChangeForm(instance=org)
 
     if request.method == 'POST':
         form = OrganizationChangeForm(request.POST, instance=org)
-        if form.is_valid():
-            form.save()
+        if form.is_valid():                        
+            org = form.save(commit=True)
+            logAction('UPDATE', request.user, old_org, org)
             return redirect('admin-home')
 
     return render(request, '_admin/organizations/form.html', {'form': form})
@@ -212,8 +221,9 @@ def addUnregisteredDevice(request):
         if form.is_valid():            
             device = form.save(commit=False)
             device.createdDate = timezone.now()
-            device.status = Device.Status.ENABLED
+            device.status = Device.Status.ENABLED            
             device.save()
+            logAction('CREATE', request.user, None, device)
             return redirect('admin-unregistered-device')
 
     return render(request, '_admin/devices/unregistered/form.html', {'form': form})
@@ -223,14 +233,16 @@ def updateUnregisteredDevice(request, pk):
     if not request.user.is_superuser:
         return redirect('login')
 
+    old_device = get_object_or_404(Device, pk=pk)
     device = get_object_or_404(Device, pk=pk)
     form = UnRegisteredDeviceForm(instance=device)
 
     if request.method == 'POST':
         form = UnRegisteredDeviceForm(request.POST, instance=device)
 
-        if form.is_valid():
-            form.save()
+        if form.is_valid():            
+            device = form.save()
+            logAction('UPDATE', request.user, old_device, device)
             return redirect('admin-unregistered-device')
 
     return render(request, '_admin/devices/unregistered/form.html', {'form': form})
@@ -241,6 +253,7 @@ def deleteUnregisteredDevice(request, pk):
         return redirect('login')
 
     device = get_object_or_404(Device, pk=pk)
+    logAction('DELETE', request.user, device, None)
     device.delete()
     return redirect("admin-unregistered-device")
 
@@ -311,63 +324,6 @@ def listRegisteredDevices(request):
 
 
 # ========================================== Settings ==========================================
-
-@login_required
-def editAdminInvitationMailTemplate(request):
-    if not request.user.is_superuser:
-        return redirect('login')
-
-    with open(settings.ADMIN_INVITATION_MAIL_TEMPLATE_PATH, encoding="utf-8") as fi:
-        mail_template = fi.read()
-
-    saved = False
-
-    if request.method == 'POST':
-        mail_template = request.POST["mail_template"]
-        with open(settings.ADMIN_INVITATION_MAIL_TEMPLATE_PATH, 'w', encoding="utf-8", newline="") as fo:
-            fo.write(mail_template.replace("\n\n", "\n"))
-            saved = True        
-    
-    return render(request, "_admin/settings/mail_templates/admin_invitation.html", 
-            {"mail_template": mail_template, "saved": saved})   
-
-@login_required
-def editInvitationMailTemplate(request):
-    if not request.user.is_superuser:
-        return redirect('login')
-
-    with open(settings.INVITATION_MAIL_TEMPLATE_PATH, encoding="utf-8") as fi:
-        mail_template = fi.read()
-
-    saved = False
-
-    if request.method == 'POST':
-        mail_template = request.POST["mail_template"]
-        with open(settings.INVITATION_MAIL_TEMPLATE_PATH, 'w', encoding="utf-8", newline="") as fo:
-            fo.write(mail_template.replace("\n\n", "\n"))
-            saved = True        
-    
-    return render(request, "_admin/settings/mail_templates/invitation.html", 
-            {"mail_template": mail_template, "saved": saved})    
-
-@login_required
-def editResetPasswordMailTemplate(request):
-    if not request.user.is_superuser:
-        return redirect('login')
-
-    with open(settings.RESET_PASSWORD_MAIL_TEMPLATE_PATH, encoding="utf-8") as fi:
-        mail_template = fi.read()
-
-    saved = False
-
-    if request.method == 'POST':
-        mail_template = request.POST["mail_template"]
-        with open(settings.RESET_PASSWORD_MAIL_TEMPLATE_PATH, 'w', encoding="utf-8", newline="") as fo:
-            fo.write(mail_template.replace("\n\n", "\n"))
-            saved = True        
-    
-    return render(request, "_admin/settings/mail_templates/reset_password.html", 
-            {"mail_template": mail_template, "saved": saved})    
 
 @login_required
 def editSystemParams(request):

@@ -2,7 +2,7 @@
 {% load i18n %}
 
 {% block sidebar %}
-{% with group=1 page=1 %}
+{% with page=1 %}
 {{ block.super }}
 {% endwith %}
 {% endblock %}
@@ -151,7 +151,7 @@
 
             return html;
           },
-          sClass: "text-center"
+          //sClass: "text-center"
         }
       ],
     });

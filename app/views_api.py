@@ -17,11 +17,7 @@ from datetime import datetime, timedelta
 from. param_utils import getTenantParamValue, getSystemParamValue
 from .models import *
 from .serializers import *
-
-@api_view(['GET'])
-@permission_classes((IsAuthenticated,))
-def test(request):
-    return Response({'success': True})
+from .log_utils import logAction
 
 
 # ================================================ LogIn ========================================================
@@ -262,6 +258,7 @@ def deleteOrganization(request, pk):
 
         if request.user.check_password(password):
             organization = Organization.objects.get(pk=pk)  
+            logAction('DELETE', request.user, organization, None)
             organization.delete()  
             return Response({'success': True})    
         else:
@@ -427,8 +424,9 @@ def userCheckIn(request):
             status = CheckIn.Status.SCAN_NOT_TIME_OUT_YET
             message_params = [scanDelay]
 
-    checkIn.status = status    
+    checkIn.status = status        
     checkIn.save()
+    logAction('CREATE', request.user, None, checkIn)
 
     if status == CheckIn.Status.SUCCESS:
         location = str(device.installationLocation)
@@ -580,6 +578,7 @@ def deleteUser(request, pk):
 
         if request.user.check_password(password):
             user = User.objects.get(pk=pk)    
+            logAction('DELETE', request.user, user, None)
             user.delete() 
             return Response({'success': True})    
         else:
@@ -656,6 +655,7 @@ def updateDeviceCoordinates(request):
             "message": _("invalid.position")
         })
 
+    old_device = Device.objects.filter(organization=request.user.organization, uid=uid).first()
     device = Device.objects.filter(organization=request.user.organization, uid=uid).first()
     
     if not device:
@@ -666,6 +666,7 @@ def updateDeviceCoordinates(request):
 
     device.lat = lat
     device.lng = lng
+    logAction('UPDATE', request.user, old_device, device)
     device.save()
 
     return Response({"success": True}) 
@@ -723,6 +724,7 @@ def deleteDevice(request, pk):
 
         if request.user.check_password(password):
             device = Device.objects.get(pk=pk)    
+            logAction('DELETE', request.user, device, None)
             device.delete()  
             return Response({'success': True})    
         else:
@@ -739,10 +741,12 @@ def deleteDeviceFromOrg(request, pk):
         password = request.data.get('password', '')
 
         if request.user.check_password(password):
+            old_device = Device.objects.get(pk=pk)
             device = Device.objects.get(pk=pk)
             device.organization = None
-            device.installationLocation = None
+            device.installationLocation = None            
             device.save()
+            logAction('RELEASE', request.user, old_device, device)
             return Response({'success': True})    
         else:
             return Response({'success': False, 'error': _('wrong.password')})    
@@ -836,6 +840,7 @@ def deleteLocation(request, pk):
 
         if request.user.check_password(password):
             location = Location.objects.get(pk=pk)
+            logAction('DELETE', request.user, location, None)
             location.delete()
             return Response({'success': True})    
         else:

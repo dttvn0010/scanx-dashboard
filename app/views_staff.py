@@ -15,6 +15,7 @@ from .forms_staff import *
 from .user_utils import genPassword
 from .import_utils import getPermutation, importPreview
 from .mail_utils import sendInvitationMail
+from .log_utils import logAction
 
 @login_required
 def tableView(request):
@@ -75,6 +76,7 @@ def addUser(request):
             user.sharedLocation = form.cleaned_data['sharedLocation']
             user.roles.add(*form.cleaned_data['roles'])
             user.save()
+            logAction('CREATE', request.user, None, user)
             return redirect('staff-user')
 
     return render(request, 'staff/users/form.html', {'form': form})
@@ -84,6 +86,7 @@ def updateUser(request, pk):
     if not request.user.organization:
         return redirect('login')
 
+    old_user = get_object_or_404(User, pk=pk)
     user = get_object_or_404(User, pk=pk)
     
     form = UserChangeForm(instance=user)
@@ -93,8 +96,9 @@ def updateUser(request, pk):
     if request.method == 'POST':
         form = UserChangeForm(request.POST, instance=user)
 
-        if form.is_valid():
-            form.save()
+        if form.is_valid():            
+            user = form.save()
+            logAction('UPDATE', request.user, old_user, user)
             return redirect('staff-user')
 
     return render(request, 'staff/users/form.html', {'form': form, 'edit_user': user, 'lockAdmin': lockAdmin})
@@ -105,6 +109,7 @@ def deleteUser(request, pk):
         return redirect('login')
 
     user = get_object_or_404(User, pk=pk)
+    logAction('DELETE', request.user, user, None)
     user.delete()
     return redirect("staff-user")
 
@@ -223,6 +228,7 @@ def addLocation(request):
             location.createdDate = timezone.now()
             location.organization = request.user.organization
             location.save()
+            logAction('CREATE', request.user, None, location)
             return redirect('staff-location')
 
     return render(request, 'staff/locations/form.html', {'form': form})
@@ -232,13 +238,15 @@ def updateLocation(request, pk):
     if not request.user.organization:
         return redirect('login')
 
+    old_location = get_object_or_404(Location, pk=pk)
     location = get_object_or_404(Location, pk=pk)
     form = LocationForm(instance=location)
 
     if request.method == 'POST':
         form = LocationForm(request.POST, instance=location)
-        if form.is_valid():
-            form.save()
+        if form.is_valid():            
+            location = form.save()
+            logAction('UPDATE', request.user, old_location, location)
             return redirect('staff-location')
 
     return render(request, 'staff/locations/form.html', {'form': form})
@@ -302,6 +310,7 @@ def importLocation(request):
             location.organization = request.user.organization
             location.createdDate = timezone.now()
             location.save()
+            logAction('CREATE', request.user, None, location)
         
         del request.session['records']
     
@@ -337,13 +346,15 @@ def addDevice(request):
             id1 = form.cleaned_data['id1']
             id2 = form.cleaned_data['id2']
             
+            old_device = Device.objects.filter(id1=id1).filter(id2=id2).first()
             device = Device.objects.filter(id1=id1).filter(id2=id2).first()
             if device:
                 device.installationLocation = form.cleaned_data['installationLocation']
                 device.description = form.cleaned_data['description']
                 device.organization = request.user.organization
-                device.registeredDate = timezone.now()
+                device.registeredDate = timezone.now()                
                 device.save()
+                logAction('ACQUIRE', request.user, old_device, device)
 
             return redirect('staff-device')
 
@@ -354,6 +365,7 @@ def updateDevice(request, pk):
     if not request.user.organization:
         return redirect('login')
 
+    old_device = get_object_or_404(Device, pk=pk)
     device = get_object_or_404(Device, pk=pk)
     form = DeviceChangeForm(organization=request.user.organization, 
             initial={'installationLocation': device.installationLocation, 'description': device.description})
@@ -363,8 +375,9 @@ def updateDevice(request, pk):
 
         if form.is_valid():
             device.installationLocation = form.cleaned_data['installationLocation']
-            device.description = form.cleaned_data['description']
+            device.description = form.cleaned_data['description']            
             device.save()
+            logAction('UPDATE', request.user, old_device, device)
             return redirect('staff-device')
 
     return render(request, 'staff/devices/form.html', {'form': form, 'edit_device': device})

@@ -7,8 +7,8 @@ class OrganizationCreationForm(forms.ModelForm):
         model = Organization
         fields = ('name', 'nfcEnabled', 'qrScanEnabled', 'active')
 
-    adminName = forms.CharField(max_length=30, label=_("admin.name") + " * ")
-    adminEmail = forms.EmailField(max_length=50, label=_("admin.email") + " * ")
+    adminName = forms.CharField(max_length=30, label=_("admin.name") + " (*)")
+    adminEmail = forms.EmailField(max_length=50, label=_("admin.email") + " (*)")
 
     def clean_adminEmail(self):
         email = self.cleaned_data.get('adminEmail')

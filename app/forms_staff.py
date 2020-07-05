@@ -7,8 +7,8 @@ class UserCreateForm(forms.ModelForm):
         model = User
         fields = ('fullname', 'email', 'nfcEnabled', 'qrScanEnabled', 'sharedLocation', 'roles')
 
-    fullname = forms.CharField(max_length=30, label=_("fullname") + " * ")
-    email = forms.EmailField(max_length=50, label=_("email.address") + " * ")
+    fullname = forms.CharField(max_length=30, label=_("fullname") + " (*)")
+    email = forms.EmailField(max_length=50, label=_("email.address") + " (*)")
     nfcEnabled = forms.BooleanField(label=_('nfc.enabled'), required=False)
     qrScanEnabled = forms.BooleanField(label=_('qr.scanning.enabled'), required=False)
     sharedLocation = forms.BooleanField(label=_('geolocation.enabled'), required=False)
@@ -41,9 +41,9 @@ class DeviceCreateForm(forms.Form):
         super().__init__(*args, **kwargs)  
         self.fields['installationLocation'].queryset = Location.objects.filter(organization=organization)
 
-    id1 = forms.CharField(label=_('id1') + " * ")
-    id2 = forms.CharField(label=_('id2') + " * ")
-    installationLocation = forms.ModelChoiceField(label=_("installation.location") + " * ", queryset=Location.objects.all())
+    id1 = forms.CharField(label=_('id1') + " (*)")
+    id2 = forms.CharField(label=_('id2') + " (*)")
+    installationLocation = forms.ModelChoiceField(label=_("installation.location") + " (*)", queryset=Location.objects.all())
     description = forms.CharField(label=_('description'), required=False, widget=forms.Textarea(attrs={'rows':2}))
 
     def clean(self):
@@ -68,14 +68,14 @@ class DeviceChangeForm(forms.Form):
         super().__init__(*args, **kwargs)  
         self.fields['installationLocation'].queryset = Location.objects.filter(organization=organization)
 
-    installationLocation = forms.ModelChoiceField(label=_("installation.location") + " * ",
+    installationLocation = forms.ModelChoiceField(label=_("installation.location") + " (*)",
                                 queryset=Location.objects.all())
 
     description = forms.CharField(label=_('description'), required=False, widget=forms.Textarea(attrs={'rows':2}))
 
 
 class OrganizationChangeForm(forms.Form):
-    name = forms.CharField(label=_("organization.name") + " * ")
+    name = forms.CharField(label=_("organization.name") + " (*)")
     description = forms.CharField(label=_("detail.information"), required=False, 
                         widget=forms.Textarea(attrs={'rows':4}))
     nfcEnabled = forms.BooleanField(label=_('nfc.enabled'), required=False)

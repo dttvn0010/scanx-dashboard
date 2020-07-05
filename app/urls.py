@@ -73,7 +73,6 @@ urlpatterns = [
     path('staff/app_info', views_staff.appInfo),
 
     # API
-    path('api/test', views_api.test),
     path('api/login', views_api.logIn),
     path('api/login/search', views_api.searchLogIn),
 
