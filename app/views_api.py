@@ -638,6 +638,8 @@ def addDevice(request):
     device.uid = uid
     device.id1 = id1
     device.id2 = id2
+    device.createdDate = timezone.now()
+    device.status = Device.Status.ENABLED  
     device.save()
     logAction('CREATE', request.user, None, device)
 
