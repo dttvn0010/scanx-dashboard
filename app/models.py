@@ -57,10 +57,16 @@ class User(AbstractUser):
 
     @property
     def role_names(self):
+        if self.is_superuser:
+            return 'Super Admin'
+            
         return ','.join([role.name for role in self.roles.all()])
 
     @property
     def role_codes(self):
+        if self.is_superuser:
+            return 'SUPER_ADMIN'
+
         return ','.join([role.code for role in self.roles.all()])
 
     @property

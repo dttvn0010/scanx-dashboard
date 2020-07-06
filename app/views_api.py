@@ -591,7 +591,7 @@ def deleteUser(request, pk):
 # =================================================== Device ======================================================
 @api_view(['POST'])
 @permission_classes((IsAuthenticated,))
-def setDeviceUID(request):
+def addDevice(request):
     if not request.user.is_superuser:
         return Response({'success': False, 'message': _('no.permission')})
 
@@ -606,8 +606,7 @@ def setDeviceUID(request):
         })
 
     uid = request.data.get('uid', '')
-    id1 = request.data.get('id1', '')
-    id2 = request.data.get('id2', '')
+    code = request.data.get('scanCode', '')
 
     if uid == '':
         return Response({
@@ -615,16 +614,32 @@ def setDeviceUID(request):
             "message": _("invalid.uid.value")
         })
 
-    device = Device.objects.filter(id1=id1, id2=id2).first()
-    
-    if not device:
+    if Device.objects.filter(uid=uid).count() > 0:
         return Response({
             "success": False,
-            "message": _("no.device.with.provided.id")
+            "message": f'{_("device.with")} {_("uid")}={uid} {_("already.exists")}'
         })
 
+    arr = code.split('-')
+    if len(arr) != 3 or arr[0] != settings.SCAN_CODE_PREFIX or arr[1] == '' or arr[2] == '':
+        return Response({
+            "success": False,
+            "message": _("invalid.scan.code")
+        })        
+    
+    id1, id2 = arr[1:]
+    if Device.objects.filter(id1=id1, id2=id2).count > 0:    
+        return Response({
+            "success": False,
+            "message": f'{_("device.with")} {_("id1")}={id1} & {_("id2")}={id2} {_("already.exists")}'
+        })
+    
+    device = Device()
     device.uid = uid
+    device.id1 = id1
+    device.id2 = id2
     device.save()
+    logAction('CREATE', request.user, None, device)
 
     return Response({"success": True})
 
