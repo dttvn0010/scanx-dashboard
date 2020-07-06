@@ -628,7 +628,7 @@ def addDevice(request):
         })        
     
     id1, id2 = arr[1:]
-    if Device.objects.filter(id1=id1, id2=id2).count > 0:    
+    if Device.objects.filter(id1=id1, id2=id2).count() > 0:    
         return Response({
             "success": False,
             "message": f'{_("device.with")} {_("id1")}={id1} & {_("id2")}={id2} {_("already.exists")}'
