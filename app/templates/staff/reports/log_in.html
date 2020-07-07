@@ -26,9 +26,9 @@
           <div class="col-3">
             <label>{% trans "user" %}:</label>
             <select name="userId" class="form-control">
-              <option value="">{% trans "all.users" %}</option>
+              <option value="">{% trans "all" %}</option>
               {% for u in users %}
-                <option value="{{u.id}}" {% if userId|add:0 == u.id %}selected{%endif%}>{{u.fullname}}</option>
+                <option value="{{u.id}}" {% if userId == u.id %}selected{%endif%}>{{u.fullname}}</option>
               {% endfor %}
             </select>
           </div>

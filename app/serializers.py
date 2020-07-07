@@ -48,3 +48,11 @@ class LogInSerializer(ModelSerializer):
     class Meta:
         model = CheckIn
         fields = ('username', 'userFullName', 'date',)        
+
+class LogSerializer(ModelSerializer):    
+    performUser = CharField(source='performUser.display', default="")
+    action = CharField(source='action.name', default="")    
+    actionDate = DateTimeField(format="%d/%m/%Y %H:%M:%S", required=False, read_only=True)
+    class Meta:
+        model = Log
+        fields = ('id', 'performUser', 'action', 'modelName', 'actionDate')

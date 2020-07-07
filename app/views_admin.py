@@ -373,3 +373,35 @@ def editMailTemplates(request):
                 'body': body, 
                 'template_id': template_id
             }) 
+
+# ========================================== Logs ==========================================            
+
+@login_required
+def listLogs(request):
+    actions = CRUDAction.objects.all()
+    logConfigs = LogConfig.objects.all()
+    modelNames = [logConfig.modelName for logConfig in logConfigs]
+    
+    organizations = Organization.objects.all()
+    context = {
+        'actions': actions,
+        'organizations': organizations,
+        'modelNames': modelNames
+    }
+    return render(request, '_admin/logs/list.html', context)
+
+@login_required
+def viewLogDetail(request, pk):
+    log = get_object_or_404(Log, pk=pk)
+    logConfig = LogConfig.objects.filter(modelName=log.modelName).first()
+    logFields = logConfig.logFields.split(',') if logConfig and logConfig.logFields else []
+    preContent = json.loads(log.preContent) if log.preContent else {}
+    postContent = json.loads(log.postContent) if log.postContent else {}
+
+    return render(request, '_admin/logs/details.html', 
+            {
+                'log':log, 
+                'logFields': logFields,
+                'preContent': preContent,
+                'postContent': postContent
+            })    

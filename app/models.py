@@ -43,11 +43,15 @@ class User(AbstractUser):
     tmpPasswordExpired = models.DateTimeField(null=True)
     createdDate = models.DateTimeField(null=True)
     
-    def __str__(self):
+    @property
+    def display(self):
         if self.fullname:
             return self.fullname
         else:
             return self.username
+
+    def __str__(self):
+        return self.display        
 
     def hasRole(self, roleCode):
         return any(role.code == roleCode for role in self.roles.all())
@@ -213,16 +217,17 @@ class LogConfig(models.Model):
     modelName = models.CharField(max_length=100, unique=True)
     logFields = models.CharField(max_length=1000, blank=True, null=True)
     displayFields = models.CharField(max_length=1000, blank=True, null=True)
-    createNotifyTemplate = models.CharField(max_length=200, default='')
-    acquireNotifyTemplate = models.CharField(max_length=200, default='')
-    updateNotifyTemplate = models.CharField(max_length=200, default='')
-    releaseNotifyTemplate = models.CharField(max_length=200, default='')
-    deleteNotifyTemplate = models.CharField(max_length=200, default='')
+    createNotifyTemplate = models.CharField(max_length=200, default='', blank=True)
+    acquireNotifyTemplate = models.CharField(max_length=200, default='', blank=True)
+    updateNotifyTemplate = models.CharField(max_length=200, default='', blank=True)
+    releaseNotifyTemplate = models.CharField(max_length=200, default='', blank=True)
+    deleteNotifyTemplate = models.CharField(max_length=200, default='', blank=True)
 
     def __str__(self):
         return self.modelName
 
 class Log(models.Model):
+    organization = models.ForeignKey(Organization, null=True, on_delete=models.CASCADE)
     modelName = models.CharField(max_length=100, default='')
     performUser = models.ForeignKey(User, on_delete=models.CASCADE)
     action = models.ForeignKey(CRUDAction, on_delete=models.PROTECT)

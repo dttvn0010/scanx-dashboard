@@ -33,6 +33,7 @@ def logAction(actionCode, user, oldObj, newObj):
         log = Log()
         log.modelName = modelName
         log.performUser = user
+        log.organization = user.organization
         log.action = CRUDAction.objects.get(code=actionCode)
         log.actionDate = timezone.now()
         log.preContent = dumpObject(oldObj, logFields) if oldObj else ''

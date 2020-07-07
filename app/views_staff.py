@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password
 from django.conf import settings
 from django.utils import timezone
+from django.template.defaulttags import register
 
 import csv
 import json
@@ -16,6 +17,10 @@ from .user_utils import genPassword
 from .import_utils import getPermutation, importPreview
 from .mail_utils import sendInvitationMail
 from .log_utils import logAction
+
+@register.filter
+def get_item(d, key):
+    return d.get(key, '') or ''
 
 @login_required
 def tableView(request):
@@ -354,7 +359,7 @@ def addDevice(request):
                 device.organization = request.user.organization
                 device.registeredDate = timezone.now()                
                 device.save()
-                logAction('ACQUIRE', request.user, old_device, device)
+                logAction('UPDATE', request.user, old_device, device)
 
             return redirect('staff-device')
 
@@ -412,8 +417,13 @@ def reportCheckIn(request):
 
     query_params = request.GET
     reported = query_params.get('reported', '')
-    userId = query_params.get('userId', '')
-    locationId = query_params.get('locationId', '')
+    
+    userId = query_params.get('userId')
+    userId = int(userId) if userId else  None
+
+    locationId = query_params.get('locationId')
+    locationId = int(locationId) if locationId else None
+
     startDate = query_params.get('startDate', '')
     endDate = query_params.get('endDate', '')
 
@@ -439,8 +449,9 @@ def reportCheckInExportPdf(request):
         return redirect('login')
 
     query_params = request.GET
-    userId = query_params.get('userId', '')
-    locationId = query_params.get('locationId', '')
+    userId = query_params.get('userId')
+    locationId = query_params.get('locationId')
+
     startDate = query_params.get('startDate', '')
     endDate = query_params.get('endDate', '')
 
@@ -484,7 +495,9 @@ def reportLogIn(request):
 
     query_params = request.GET
     reported = query_params.get('reported', '')
-    userId = query_params.get('userId', '')
+    userId = query_params.get('userId')
+    userId = int(userId) if userId else None
+
     startDate = query_params.get('startDate', '')
     endDate = query_params.get('endDate', '')
 
@@ -507,7 +520,7 @@ def reportLogInExportPdf(request):
         return redirect('login')
 
     query_params = request.GET
-    userId = query_params.get('userId', '')
+    userId = query_params.get('userId')
     startDate = query_params.get('startDate', '')
     endDate = query_params.get('endDate', '')
 
@@ -590,3 +603,35 @@ def editCustomParams(request):
 
     return render(request, "staff/settings/tenant_params.html", 
                                 {"tenant_params": tenant_params, "saved": saved})     
+
+
+#================================= Logs  ====================================================================
+@login_required
+def listLogs(request):
+    actions = CRUDAction.objects.all()
+    logConfigs = LogConfig.objects.all()
+    modelNames = [logConfig.modelName for logConfig in logConfigs]
+    
+    users = User.objects.filter(organization=request.user.organization)
+    context = {
+        'actions': actions,
+        'users': users,
+        'modelNames': modelNames
+    }
+    return render(request, 'staff/logs/list.html', context)
+
+@login_required
+def viewLogDetail(request, pk):
+    log = get_object_or_404(Log, pk=pk)
+    logConfig = LogConfig.objects.filter(modelName=log.modelName).first()
+    logFields = logConfig.logFields.split(',') if logConfig and logConfig.logFields else []
+    preContent = json.loads(log.preContent) if log.preContent else {}
+    postContent = json.loads(log.postContent) if log.postContent else {}
+
+    return render(request, 'staff/logs/details.html', 
+            {
+                'log':log, 
+                'logFields': logFields,
+                'preContent': preContent,
+                'postContent': postContent
+            })    

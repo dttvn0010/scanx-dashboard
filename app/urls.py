@@ -37,6 +37,9 @@ urlpatterns = [
     path('_admin/settings/system_params', views_admin.editSystemParams),
     path('_admin/settings/mail_templates', views_admin.editMailTemplates),
 
+    path('_admin/logs', views_admin.listLogs, name='admin-log'),
+    path('_admin/logs/details/<int:pk>', views_admin.viewLogDetail),
+
     # Tenant pages
     path('staff', views_staff.tableView),
     path('staff/map_view', views_staff.mapView),
@@ -68,6 +71,9 @@ urlpatterns = [
     path('staff/reports/log_in', views_staff.reportLogIn),
     path('staff/reports/log_in/export_pdf', views_staff.reportLogInExportPdf),
 
+    path('staff/logs', views_staff.listLogs, name='staff-log'),
+    path('staff/logs/details/<int:pk>', views_staff.viewLogDetail),
+
     path('staff/settings/organization', views_staff.configureOranization),
     path('staff/settings/custom_params', views_staff.editCustomParams),
     path('staff/app_info', views_staff.appInfo),
@@ -91,6 +97,7 @@ urlpatterns = [
     path('api/user/change_password', views_api.changeUserPassword),
 
     path('api/user/search', views_api.searchUser),
+    path('api/user/get_by_organization', views_api.getUsersByOrganization),
     path('api/user/details/<int:pk>', views_api.viewUserDetails),
     path('api/user/delete/<int:pk>', views_api.deleteUser),
 
@@ -109,4 +116,6 @@ urlpatterns = [
     path('api/location/delete/<int:pk>', views_api.deleteLocation),
 
     path('api/mail_template/get_content/<int:pk>', views_api.getMailTemplateContent),
+
+    path('api/log/search', views_api.searchLog),
 ]

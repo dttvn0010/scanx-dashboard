@@ -524,6 +524,14 @@ def changeUserPassword(request):
 
 @api_view(['GET'])
 @permission_classes((IsAuthenticated,))
+def getUsersByOrganization(request):
+    organizationId = request.query_params.get('organizationId')
+    users = User.objects.filter(organization__id=organizationId)
+    data = [{'id': user.id, 'fullname': user.fullname} for user in users]
+    return Response({'users': data})
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticated,))
 def searchUser(request):
     draw = request.query_params.get('draw', 1)    
     keyword = request.query_params.get('search[value]', '')
@@ -763,7 +771,7 @@ def deleteDeviceFromOrg(request, pk):
             device.organization = None
             device.installationLocation = None            
             device.save()
-            logAction('RELEASE', request.user, old_device, device)
+            logAction('UPDATE', request.user, old_device, device)
             return Response({'success': True})    
         else:
             return Response({'success': False, 'error': _('wrong.password')})    
@@ -899,3 +907,66 @@ def getMailTemplateContent(request, pk):
         return Response({'success': True, 'subject': template.subject, 'body': template.body})
 
     return Response({'success': False})
+
+# =================================================== Log ======================================================
+@api_view(['GET'])
+@permission_classes((IsAuthenticated,))
+def searchLog(request):
+    draw = request.query_params.get('draw', 1)    
+    keyword = request.query_params.get('search[value]', '') 
+    
+    fromSuperAdmin = request.query_params.get('fromSuperAdmin')
+    organizationId = request.query_params.get('organizationId')
+    userId = request.query_params.get("userId")    
+    actionId = request.query_params.get("actionId")
+
+    modelName = request.query_params.get("modelName")
+    startDate = request.query_params.get("startDate")
+    endDate = request.query_params.get("endDate")
+
+    start = int(request.query_params.get('start', 0))
+    length = int(request.query_params.get('length', 0))
+    
+    logs = Log.objects.all()
+
+    if not fromSuperAdmin:
+        logs = logs.filter(organization=request.user.organization)
+    elif organizationId:
+        logs = logs.filter(organization=organizationId)
+            
+    if userId:
+        logs = logs.filter(performUser__id=userId)
+
+    if actionId:
+        logs = logs.filter(action__id=actionId)
+
+    if modelName:
+        logs = logs.filter(modelName=modelName)
+
+    if startDate:
+        startDate = datetime.strptime(startDate, '%d/%m/%Y')
+        logs = logs.filter(actionDate__gte=startDate)
+
+    if endDate:
+        endDate = datetime.strptime(endDate, '%d/%m/%Y') + timedelta(days=1)
+        logs = logs.filter(actionDate__lt=endDate) 
+
+    logs = logs.order_by('-actionDate')
+
+    recordsTotal = logs.count()
+
+    if keyword != '':
+        logs = logs.filter(Q(performUser__fullname__contains=keyword) 
+                    | Q(modelName__contains=keyword) 
+                    | Q(action__name__contains=keyword))
+
+    recordsFiltered  = logs.count()
+
+    data = LogSerializer(logs, many=True).data
+
+    return Response({
+        "draw": draw,
+        "recordsTotal": recordsTotal,
+        "recordsFiltered": recordsFiltered,
+        "data": data
+    })

@@ -26,18 +26,18 @@
           <div class="col-3">
             <label>{% trans "user" %}:</label>
             <select name="userId" class="form-control">
-              <option value="">{% trans "all.userss" %}</option>
+              <option value="">{% trans "all" %}</option>
               {% for u in users %}
-                <option value="{{u.id}}" {% if userId|add:0 == u.id %}selected{%endif%}>{{u.fullname}}</option>
+                <option value="{{u.id}}" {% if userId == u.id %}selected{%endif%}>{{u.fullname}}</option>
               {% endfor %}
             </select>
           </div>
           <div class="col-3">
             <label>Location:</label>
             <select name="locationId" class="form-control">
-              <option value="">{% trans "all.locations" %}</option>
+              <option value="">{% trans "all" %}</option>
               {% for l in locations %}
-                <option value="{{l.id}}" {% if locationId|add:0 == l.id %}selected{%endif%}>{{l}}</option>
+                <option value="{{l.id}}" {% if locationId == l.id %}selected{%endif%}>{{l}}</option>
               {% endfor %}
             </select>
           </div>
