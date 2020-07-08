@@ -1070,6 +1070,7 @@ def searchLog(request):
     keyword = request.query_params.get('search[value]', '') 
     
     fromSuperAdmin = request.query_params.get('fromSuperAdmin')
+    viewStatus = request.query_params.get('viewStatus')
     organizationId = request.query_params.get('organizationId')
     userId = request.query_params.get("userId")    
     actionId = request.query_params.get("actionId")
@@ -1087,6 +1088,11 @@ def searchLog(request):
         logs = logs.filter(organization=request.user.organization)
     elif organizationId:
         logs = logs.filter(organization=organizationId)
+
+    if viewStatus == '1':
+        logs = logs.filter(~Q(viewUsers=request.user))
+    elif viewStatus == '2':
+        logs = logs.filter(viewUsers=request.user)
             
     if userId:
         logs = logs.filter(performUser__id=userId)

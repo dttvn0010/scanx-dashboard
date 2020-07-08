@@ -24,6 +24,16 @@
         </div>
         <div class="row mt-2">
           <div class="col-4">
+            <label>{% trans "perform.user" %}:</label>
+            <select id="userId" onchange="updateData()" class="form-control">
+              <option value="">{% trans "all" %}</option>
+              {% for u in users %}
+              <option value="{{u.id}}">{{u.fullname}}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-4">
             <label>{% trans "action" %}:</label>
             <select id="actionId" onchange="updateData()" class="form-control">
               <option value="">{% trans "all" %}</option>
@@ -41,24 +51,24 @@
               <option value="{{m}}" {% if m  == modelName %}selected{%endif%}>{{m}}</option>
               {% endfor %}
             </select>
-          </div>    
-          
-          <div class="col-4">
-            <label>{% trans "perform.user" %}:</label>
-            <select id="userId" onchange="updateData()" class="form-control">
-              <option value="">{% trans "all" %}</option>
-              {% for u in users %}
-              <option value="{{u.id}}">{{u.fullname}}</option>
-              {% endfor %}
-            </select>
-          </div>
+          </div>   
         </div>
         <div class="row mt-3">
+          <div class="col-4">
+            <label>{% trans "status" %}:</label> 
+            <select id="viewStatus" onchange="updateData()" class="form-control">
+              <option value="">{% trans "all" %}</option>
+              <option value="1">Unviewed</option>
+              <option value="2">Viewed</option>
+            </select>
+          </div>
+
           <div class="col-4">
             <label>{% trans "from.date" %}:</label>
             <input id="startDate" onblur="updateData()" value="{{startDate|default:''}}" class="form-control date"
               placeholder='{% trans "select.a.date" %}'>
           </div>
+
           <div class="col-4">
             <label>{% trans "to.date" %}:</label>
             <input id="endDate" onblur="updateData()" value="{{endDate|default:''}}" class="form-control date"
@@ -96,6 +106,7 @@
     "ajax":{
       "url": "/api/log/search",
       "data": function(data) {
+        data.viewStatus = $('#viewStatus').val();
         data.userId = $('#userId').val();
         data.actionId = $('#actionId').val();
         data.modelName = $('#modelName').val();
@@ -107,21 +118,19 @@
       { "data": "action" },      
       { "data": "modelName" },
       { "data": "performUser" },
-      { "data": "actionDate",
-        "render": function(data, type, row) {
-          if(row.unviewed) {
-            return data + '&nbsp;<small style="color:red">New!</small>';
-          }
-          return data;
-        }
-      },
+      { "data": "actionDate" },
       {
         render: function (data, type, row) {
           return `<a title='{% trans "view.details" %}' href="/staff/logs/details/${row['id']}"><i class="fas fa-eye"></i></a>`;               
         },
         sClass: "text-center"
       }
-    ]
+    ],
+    createdRow: function (row, data, dataIndex) {
+      if(data.unviewed) {
+        $(row).css("font-weight", "bold");
+      }
+    }
   });
 
   function updateData() {

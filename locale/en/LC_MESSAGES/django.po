@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-08 07:13+0100\n"
+"POT-Creation-Date: 2020-07-08 07:47+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -346,8 +346,8 @@ msgid "server.time"
 msgstr "Server time"
 
 #: .\app\templates\_admin\base.html:184 .\app\templates\staff\base.html:216
-msgid "mark.all.as.read"
-msgstr "Mark all as read"
+msgid "mark.all.as.viewed"
+msgstr "Mark all as viewed"
 
 #: .\app\templates\_admin\base.html:189 .\app\templates\staff\base.html:221
 msgid "view.all"
@@ -479,36 +479,36 @@ msgid "log.details"
 msgstr "Log Details"
 
 #: .\app\templates\_admin\logs\details.html:22
-#: .\app\templates\_admin\logs\list.html:36
-#: .\app\templates\_admin\logs\list.html:79
+#: .\app\templates\_admin\logs\list.html:42
+#: .\app\templates\_admin\logs\list.html:87
 #: .\app\templates\staff\logs\details.html:22
-#: .\app\templates\staff\logs\list.html:27
-#: .\app\templates\staff\logs\list.html:74
+#: .\app\templates\staff\logs\list.html:37
+#: .\app\templates\staff\logs\list.html:84
 msgid "action"
 msgstr "Action"
 
 #: .\app\templates\_admin\logs\details.html:26
-#: .\app\templates\_admin\logs\list.html:46
-#: .\app\templates\_admin\logs\list.html:80
+#: .\app\templates\_admin\logs\list.html:52
+#: .\app\templates\_admin\logs\list.html:88
 #: .\app\templates\staff\logs\details.html:26
-#: .\app\templates\staff\logs\list.html:37
-#: .\app\templates\staff\logs\list.html:75
+#: .\app\templates\staff\logs\list.html:47
+#: .\app\templates\staff\logs\list.html:85
 msgid "object"
 msgstr "Object"
 
 #: .\app\templates\_admin\logs\details.html:30
-#: .\app\templates\_admin\logs\list.html:57
-#: .\app\templates\_admin\logs\list.html:81
+#: .\app\templates\_admin\logs\list.html:36
+#: .\app\templates\_admin\logs\list.html:89
 #: .\app\templates\staff\logs\details.html:30
-#: .\app\templates\staff\logs\list.html:47
-#: .\app\templates\staff\logs\list.html:76
+#: .\app\templates\staff\logs\list.html:27
+#: .\app\templates\staff\logs\list.html:86
 msgid "perform.user"
 msgstr "Perform User"
 
 #: .\app\templates\_admin\logs\details.html:34
-#: .\app\templates\_admin\logs\list.html:82
+#: .\app\templates\_admin\logs\list.html:90
 #: .\app\templates\staff\logs\details.html:34
-#: .\app\templates\staff\logs\list.html:77
+#: .\app\templates\staff\logs\list.html:87
 #: .\app\templates\staff\reports\check_in.html:72
 #: .\app\templates\staff\reports\check_in_pdf.html:104
 #: .\app\templates\staff\reports\log_in.html:62
@@ -563,21 +563,23 @@ msgstr "Organization"
 
 #: .\app\templates\_admin\logs\list.html:29
 #: .\app\templates\_admin\logs\list.html:38
-#: .\app\templates\_admin\logs\list.html:48
-#: .\app\templates\_admin\logs\list.html:59
-#: .\app\templates\_admin\logs\list.html:144
-#: .\app\templates\_admin\logs\list.html:148
+#: .\app\templates\_admin\logs\list.html:44
+#: .\app\templates\_admin\logs\list.html:54
+#: .\app\templates\_admin\logs\list.html:65
+#: .\app\templates\_admin\logs\list.html:151
+#: .\app\templates\_admin\logs\list.html:155
 #: .\app\templates\staff\logs\list.html:29
 #: .\app\templates\staff\logs\list.html:39
 #: .\app\templates\staff\logs\list.html:49
+#: .\app\templates\staff\logs\list.html:60
 #: .\app\templates\staff\reports\check_in.html:29
 #: .\app\templates\staff\reports\check_in.html:38
 #: .\app\templates\staff\reports\log_in.html:29
 msgid "all"
 msgstr "All"
 
-#: .\app\templates\_admin\logs\list.html:63
-#: .\app\templates\staff\logs\list.html:58
+#: .\app\templates\_admin\logs\list.html:71
+#: .\app\templates\staff\logs\list.html:67
 #: .\app\templates\staff\reports\check_in.html:45
 #: .\app\templates\staff\reports\check_in_pdf.html:80
 #: .\app\templates\staff\reports\log_in.html:36
@@ -585,17 +587,17 @@ msgstr "All"
 msgid "from.date"
 msgstr "From Date"
 
-#: .\app\templates\_admin\logs\list.html:65
-#: .\app\templates\_admin\logs\list.html:70
-#: .\app\templates\staff\logs\list.html:60
-#: .\app\templates\staff\logs\list.html:65
+#: .\app\templates\_admin\logs\list.html:73
+#: .\app\templates\_admin\logs\list.html:78
+#: .\app\templates\staff\logs\list.html:69
+#: .\app\templates\staff\logs\list.html:75
 #: .\app\templates\staff\reports\check_in.html:46
 #: .\app\templates\staff\reports\check_in.html:50
 msgid "select.a.date"
 msgstr "Select a date"
 
-#: .\app\templates\_admin\logs\list.html:68
-#: .\app\templates\staff\logs\list.html:63
+#: .\app\templates\_admin\logs\list.html:76
+#: .\app\templates\staff\logs\list.html:73
 #: .\app\templates\staff\reports\check_in.html:49
 #: .\app\templates\staff\reports\check_in_pdf.html:91
 #: .\app\templates\staff\reports\log_in.html:40
@@ -603,9 +605,9 @@ msgstr "Select a date"
 msgid "to.date"
 msgstr "To Date"
 
-#: .\app\templates\_admin\logs\list.html:127
+#: .\app\templates\_admin\logs\list.html:129
 #: .\app\templates\_admin\organizations\list.html:143
-#: .\app\templates\staff\logs\list.html:120
+#: .\app\templates\staff\logs\list.html:124
 #: .\app\templates\staff\users\list.html:222
 msgid "view.details"
 msgstr "View details"
@@ -1133,7 +1135,6 @@ msgstr "Device has been disabled"
 #: .\app\views_api.py:869
 msgid "device.locked.by.super.admin"
 msgstr "Device has been locked by super admin"
-
 
 msgid "already.exists"
 msgstr "already exists"

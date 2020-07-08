@@ -23,7 +23,7 @@
           </div>
         </div>
         <div class="row mt-2">
-          <div class="col-4">
+          <div class="col-3">
             <label>{% trans "organization" %}:</label>
             <select id="organizationId" onchange="updateOrganization()" class="form-control">
               <option value="">{% trans "all" %}</option>
@@ -32,7 +32,13 @@
               {% endfor %}
             </select>
           </div>
-          <div class="col-4">
+          <div class="col-3">
+            <label>{% trans "perform.user" %}:</label>
+            <select id="userId" onchange="updateData()" class="form-control">
+              <option value="">{% trans "all" %}</option>              
+            </select>
+          </div>
+          <div class="col-3">
             <label>{% trans "action" %}:</label>
             <select id="actionId" onchange="updateData()" class="form-control">
               <option value="">{% trans "all" %}</option>
@@ -42,7 +48,7 @@
             </select>
           </div>
 
-          <div class="col-4">
+          <div class="col-3">
             <label>{% trans "object" %}:</label>
             <select id="modelName" onchange="updateData()" class="form-control">
               <option value="">{% trans "all" %}</option>
@@ -53,18 +59,20 @@
           </div>          
         </div>
         <div class="row mt-3">
-          <div class="col-4">
-            <label>{% trans "perform.user" %}:</label>
-            <select id="userId" onchange="updateData()" class="form-control">
-              <option value="">{% trans "all" %}</option>              
+          <div class="col-3">
+            <label>{% trans "status" %}:</label> 
+            <select id="viewStatus" onchange="updateData()" class="form-control">
+              <option value="">{% trans "all" %}</option>
+              <option value="1">Unviewed</option>
+              <option value="2">Viewed</option>
             </select>
           </div>
-          <div class="col-4">
+          <div class="col-3">
             <label>{% trans "from.date" %}:</label>
             <input id="startDate" onblur="updateData()" value="{{startDate|default:''}}" class="form-control date"
               placeholder='{% trans "select.a.date" %}'>
           </div>
-          <div class="col-4">
+          <div class="col-3">
             <label>{% trans "to.date" %}:</label>
             <input id="endDate" onblur="updateData()" value="{{endDate|default:''}}" class="form-control date"
               placeholder='{% trans "select.a.date" %}'>
@@ -103,6 +111,7 @@
       "data": function(data) {
         data.userId = $('#userId').val();
         data.organizationId = $('#organizationId').val();
+        data.viewStatus = $('#viewStatus').val();
         data.actionId = $('#actionId').val();
         data.modelName = $('#modelName').val();
         data.startDate = $('#startDate').val();
@@ -114,21 +123,19 @@
       { "data": "action"},      
       { "data": "modelName" },
       { "data": "performUser" },
-      { "data": "actionDate",
-        "render": function(data, type, row) {
-          if(row.unviewed) {
-            return data + '&nbsp;<small style="color:red">New!</small>';
-          }
-          return data;
-        }
-      },
+      { "data": "actionDate" },
       {
         render: function (data, type, row) {
           return `<a title='{% trans "view.details" %}' href="/_admin/logs/details/${row['id']}"><i class="fas fa-eye"></i></a>`;               
         },
         sClass: "text-center"
       }
-    ]
+    ],
+    createdRow: function (row, data, dataIndex) {
+      if(data.unviewed) {
+        $(row).css("font-weight", "bold");
+      }
+    }
   });
 
   function updateData() {
