@@ -228,13 +228,25 @@ class MailTemplate(models.Model):
     def __str__(self):
         return self.name
 
-class CRUDAction(models.Model):
+class LogAction(models.Model):
     code = models.CharField(max_length=30, unique=True)
     name = models.CharField(max_length=200)
     description = models.CharField(max_length=500, blank=True, null=True)
 
     def __str__(self):
         return self.name
+
+    @property
+    def is_crud(self):
+        return self.code in ['CREATE', 'UPDATE', 'DELETE']
+
+    @property
+    def is_login(self):
+        return self.code == 'LOG_IN'
+
+    @property
+    def is_checkin(self):
+        return self.code == 'CHECK_IN'
 
 class LogConfig(models.Model):
     modelName = models.CharField(max_length=100, unique=True)
@@ -254,17 +266,17 @@ class Log(models.Model):
     modelName = models.CharField(max_length=100, default='')
     objectId = models.IntegerField(null=True)
     performUser = models.ForeignKey(User, on_delete=models.CASCADE)
-    action = models.ForeignKey(CRUDAction, on_delete=models.PROTECT)
+    action = models.ForeignKey(LogAction, on_delete=models.PROTECT)
     actionDate = models.DateTimeField()
     preContent = models.TextField(null=True)
     postContent = models.TextField(null=True)
     viewUsers = models.ManyToManyField(User, related_name='view_users')
     
     def __str__(self):
-        if self.modelName == 'CheckIn' and self.action.code == 'CREATE':
+        if self.action.code == 'CHECK_IN':
             return _('log.view.checkin.template') % (self.performUser.display)
 
-        if self.modelName == 'LogIn' and self.action.code == 'CREATE':
+        if self.action.code == 'LOG_IN':
             return _('log.view.login.template') % (self.performUser.display)
 
         return _('log.view.template') % (self.performUser.display, self.action.name, self.modelName)

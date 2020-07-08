@@ -429,7 +429,7 @@ def userCheckIn(request):
 
     checkIn.status = status        
     checkIn.save()
-    logAction('CREATE', request.user, None, checkIn)
+    logAction('CHECK_IN', request.user, None, checkIn)
 
     if status == CheckIn.Status.SUCCESS:
         location = str(device.installationLocation)

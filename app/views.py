@@ -34,7 +34,7 @@ def logInHook(sender, user, request, **kwargs):
     logIn.organization = user.organization
     logIn.date = timezone.now()
     logIn.save()
-    logAction('CREATE', user, None, logIn)
+    logAction('LOG_IN', user, None, logIn)
 
 user_logged_in.connect(logInHook)
 

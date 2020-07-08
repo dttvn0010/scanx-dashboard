@@ -594,7 +594,7 @@ def listLogs(request):
     if not request.user.organization:
         return redirect('login')
 
-    actions = CRUDAction.objects.all()
+    actions = LogAction.objects.all()
     logConfigs = LogConfig.objects.all()
     modelNames = [logConfig.modelName for logConfig in logConfigs]
     

@@ -267,7 +267,7 @@ msgstr "User %s has just logged in"
 
 #: .\app\models.py:270
 msgid "log.view.template"
-msgstr "User %s has performed an action %s of  %s"
+msgstr "User '%s' has performed action '%s %s'"
 
 #: .\app\templates\_admin\base.html:7 .\app\templates\profile\base.html:3
 #: .\app\templates\staff\base.html:5
