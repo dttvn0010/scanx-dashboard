@@ -9,8 +9,10 @@ def dumpObject(obj, fields):
     data = {}
     for key in fields:
         value = getattr(obj, key)
-        if value and value.__class__.__name__ in  ['int', 'bool', 'float', 'str', 'datetime']:
+        if value and value.__class__.__name__ in  ['int', 'bool', 'float', 'str']:
             data[key] = value
+        elif value and value.__class__.__name__ == 'datetime':
+            data[key] = value.strftime('%d/%m/%Y %H:%M:%S')
         else:
             data[key] = str(value) if value else None
 
@@ -31,6 +33,12 @@ def logAction(actionCode, user, oldObj, newObj):
             return
 
         log = Log()
+
+        if oldObj and hasattr(oldObj, 'id'):
+            log.objectId = oldObj.id
+        elif newObj and hasattr(newObj, 'id'):
+            log.objectId = newObj.id
+
         log.modelName = modelName
         log.performUser = user
         log.organization = user.organization

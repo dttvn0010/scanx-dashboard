@@ -92,7 +92,7 @@ def getLastCheckInTime(request):
 def checkForNewCheckIn(request):
     lastUpdated = request.GET.get('last_updated', '')
     updated = False
-    newCheckIn = None
+    newCheckIn = {}
 
     if lastUpdated != '':
         lastUpdatedTime = make_aware(datetime.strptime(lastUpdated, '%d/%m/%Y %H:%M:%S'))
@@ -106,7 +106,7 @@ def checkForNewCheckIn(request):
             newCheckIn['user'] = newCheckIn["userFullName"]
             newCheckIn['geoLocation'] = {'lat': newCheckIn['lat'], 'lng': newCheckIn['lng']}
                 
-    return Response({'updated': updated, 'lastUpdated': newCheckIn['date'],
+    return Response({'updated': updated, 'lastUpdated': newCheckIn.get('date'),
                          'newCheckIn': newCheckIn})
 
 def parseHourMin(flushTime):
@@ -911,6 +911,19 @@ def getMailTemplateContent(request, pk):
 # =================================================== Log ======================================================
 @api_view(['GET'])
 @permission_classes((IsAuthenticated,))
+def checkForNewLogs(request):
+    currentCount = int(request.query_params.get('currentCount', 0))
+    log_count = request.user.count_new_logs
+    print(log_count)
+    if log_count > currentCount:
+        logs = request.user.get_new_logs
+        logs = [{'id': log.id, 'content': str(log)} for log in logs]
+        return Response({'logs': logs, 'log_count': log_count, 'updated': True})
+    else:
+        return Response({'updated': False, 'log_count': 0})
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticated,))
 def searchLog(request):
     draw = request.query_params.get('draw', 1)    
     keyword = request.query_params.get('search[value]', '') 
@@ -963,6 +976,8 @@ def searchLog(request):
     recordsFiltered  = logs.count()
 
     data = LogSerializer(logs, many=True).data
+    for i,item in enumerate(data):
+        item['unviewed'] = request.user not in logs[i].viewUsers.all()
 
     return Response({
         "draw": draw,

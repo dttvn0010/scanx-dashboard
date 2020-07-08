@@ -25,6 +25,7 @@ from .models import *
 from .forms import *
 from .mail_utils import sendAdminInvitationMail, sendInvitationMail, sendResetPasswordMail
 from .user_utils import genPassword
+from .log_utils import logAction
 
 def logInHook(sender, user, request, **kwargs):
     logIn = LogIn()
@@ -33,6 +34,8 @@ def logInHook(sender, user, request, **kwargs):
     logIn.organization = user.organization
     logIn.date = timezone.now()
     logIn.save()
+    print('=====================')
+    logAction('CREATE', user, None, logIn)
 
 user_logged_in.connect(logInHook)
 

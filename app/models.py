@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
+from django.db.models import Q
 
 class Organization(models.Model):
     name = models.CharField(verbose_name=_('company.name') + ' * ', max_length=200, unique=True)
@@ -76,6 +77,24 @@ class User(AbstractUser):
     @property
     def is_tenant_admin(self):
         return self.hasRole('ADMIN')
+
+    @property   
+    def count_new_logs(self):
+        if self.is_superuser:
+            return Log.objects.filter(~Q(viewUsers=self)).count()
+        elif self.hasRole('ADMIN'):
+            return Log.objects.filter(organization=self.organization).filter(~Q(viewUsers=self)).count()
+        
+        return 0
+
+    @property 
+    def get_new_logs(self):
+        if self.is_superuser:
+            return Log.objects.filter(~Q(viewUsers=self)).order_by('-actionDate')[:5]
+        elif self.hasRole('ADMIN'):
+            return Log.objects.filter(organization=self.organization).filter(~Q(viewUsers=self)).order_by('-actionDate')[:5]
+        
+        return []
        
 class Location(models.Model):
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE,  blank=True, null=True)
@@ -229,8 +248,19 @@ class LogConfig(models.Model):
 class Log(models.Model):
     organization = models.ForeignKey(Organization, null=True, on_delete=models.CASCADE)
     modelName = models.CharField(max_length=100, default='')
+    objectId = models.IntegerField(null=True)
     performUser = models.ForeignKey(User, on_delete=models.CASCADE)
     action = models.ForeignKey(CRUDAction, on_delete=models.PROTECT)
     actionDate = models.DateTimeField()
     preContent = models.TextField(null=True)
     postContent = models.TextField(null=True)
+    viewUsers = models.ManyToManyField(User, related_name='view_users')
+    
+    def __str__(self):
+        if self.modelName == 'CheckIn' and self.action.code == 'CREATE':
+            return _('log.view.checkin.template') % (self.performUser.display)
+
+        if self.modelName == 'LogIn' and self.action.code == 'CREATE':
+            return _('log.view.login.template') % (self.performUser.display)
+
+        return _('log.view.template') % (self.performUser.display, self.action.name, self.modelName)

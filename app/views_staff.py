@@ -608,6 +608,9 @@ def editCustomParams(request):
 #================================= Logs  ====================================================================
 @login_required
 def listLogs(request):
+    if not request.user.organization:
+        return redirect('login')
+
     actions = CRUDAction.objects.all()
     logConfigs = LogConfig.objects.all()
     modelNames = [logConfig.modelName for logConfig in logConfigs]
@@ -622,11 +625,18 @@ def listLogs(request):
 
 @login_required
 def viewLogDetail(request, pk):
+    if not request.user.organization:
+        return redirect('login')
+        
     log = get_object_or_404(Log, pk=pk)
     logConfig = LogConfig.objects.filter(modelName=log.modelName).first()
     logFields = logConfig.logFields.split(',') if logConfig and logConfig.logFields else []
     preContent = json.loads(log.preContent) if log.preContent else {}
     postContent = json.loads(log.postContent) if log.postContent else {}
+
+    if request.user not in log.viewUsers.all():
+        log.viewUsers.add(request.user)
+        log.save()
 
     return render(request, 'staff/logs/details.html', 
             {

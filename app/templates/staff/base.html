@@ -134,6 +134,19 @@
             </li>            
           </ul>
           <ul class="navbar-nav ml-auto">
+            <!-- Nav Item - Alerts -->
+            {% if user.is_tenant_admin %}
+            <li class="nav-item dropdown no-arrow mx-1">
+              <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">                
+                <span id="log_count" style="display: none;" class="badge badge-danger badge-counter">-1</span>
+                <i class="fas fa-bell fa-fw"></i>
+              </a>
+              
+              <div id="logs" class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="alertsDropdown">                
+              </div>
+            </li>
+            {%endif%}
+
             <li class="nav-item d-flex mr-4">
               <span class="align-self-center">
                 {% trans "last.login" %}: 
@@ -183,4 +196,46 @@
   </div> <!-- End of Page Wrapper -->  
   <script src="/static/vendor/sb-admin/sb-admin-2.js"></script>
   <script src="/static/js/main.js"></script>
+  <script>
+    async function getLogs() {
+      var resp = await fetch('/api/log/check_for_update?currentCount=' + $('#log_count').html());
+      var result = await resp.json();
+      if(result.updated) {
+        var html = `
+          <h6 class="dropdown-header">Logs</h6>`
+          + result.logs.map(log => (
+            `<a class="dropdown-item d-flex align-items-center" href="/staff/logs/details/${log.id}">
+              <div>${log.content}</div>
+            </a>`
+          )).join('')
+          + (result.log_count > 5?
+            `<a class="dropdown-item d-flex align-items-center" href="/staff/logs">
+              <div>
+                More ...
+              </div>
+            </a>`: ''
+          )
+          + (result.log_count == 0?
+            `<a class="dropdown-item d-flex align-items-center" href="#"> 
+              <div>
+                No new logs!
+              </div>
+            </a>`: ''
+          );
+        $('#logs').html(html);
+        $('#log_count').html(result.log_count);
+        if(result.log_count > 0) {
+          $('#log_count').show();
+        }else {
+          $('#log_count').hide();
+        }
+      }
+    }
+    $(document).ready(async function() {
+      await getLogs();
+      setInterval(async function() {
+        await getLogs();
+      }, 3000);
+    });
+  </script>
 </body>

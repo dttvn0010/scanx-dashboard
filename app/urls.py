@@ -117,5 +117,6 @@ urlpatterns = [
 
     path('api/mail_template/get_content/<int:pk>', views_api.getMailTemplateContent),
 
+    path('api/log/check_for_update', views_api.checkForNewLogs),
     path('api/log/search', views_api.searchLog),
 ]
