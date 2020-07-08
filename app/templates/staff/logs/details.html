@@ -51,7 +51,17 @@
               </tr>
               <tr>
                 <td>{% trans "location" %}:</td>
-                <th>{{postContent|get_item:"lat"}},{{postContent|get_item:"lng"}}</span></th>
+                <th>
+                  {% with lat=postContent|get_item:"lat" lng=postContent|get_item:"lng" %}
+                    {%if lat and lng %}
+                      <span>{{lat}},{{lng}}</span>
+                    {%endif%}
+                  {% endwith %}
+                </th>
+              </tr>
+              <tr>
+                <td>{% trans "status" %}:</td>
+                <th>{{postContent|get_item:"status"}}</span></th>
               </tr>
             </tbody>
           </table>
@@ -118,15 +128,18 @@
 
 <script> 
   function initMap() {
-    var lat = parseFloat('{{postContent|get_item:"lat"}}');
-    var lng = parseFloat('{{postContent|get_item:"lng"}}');
+    var lat = '{{postContent|get_item:"lat"}}';
+    var lng = '{{postContent|get_item:"lng"}}';
+    if(lat == '' || lng == '') {
+      $('#map').hide();
+    }
 
-    var position = { lat: lat, lng: lng };
+    var position = { lat: parseFloat(lat), lng: parseFloat(lng) };
     
     var map = new google.maps.Map(document.getElementById('map'), { zoom: 16, center: position });
     new google.maps.Marker({ 
       position: position, map: map
-    })   
+    });
   }
 </script>
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBR8gU4Te36NCYlc2ZdynsOWQOS03lzWKc&callback=initMap"></script>

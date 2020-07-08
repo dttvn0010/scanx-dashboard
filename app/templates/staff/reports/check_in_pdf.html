@@ -32,7 +32,7 @@
       </div>
       <div class="row">
         <div class="col-10 offset-2">
-          <label>{{request.user.organization.description}}</label>
+          <label>{{request.user.organization.description|default:''}}</label>
         </div>
       </div>
       <div class="row">
@@ -100,17 +100,25 @@
     <table class="table mt-4">
       <thead>
         <tr>
-          <th style="width: 50%;">{% trans "location" %}</th>
-          <th style="width: 30%;">{% trans "date.time" %}</th>
-          <th style="width: 20%;">{% trans "user" %}</th>
+          <th style="width: 35%;">{% trans "location" %}</th>
+          <th style="width: 25%;">{% trans "date.time" %}</th>
+          <th style="width: 17%;">{% trans "user" %}</th>
+          <th style="width: 23%;">{% trans "status" %}</th>
         </tr>
       </thead>
       <tbody>
         {% for checkIn in checkIns %}
         <tr>
-          <td>{{checkIn.location}}</td>
+          <td>{{checkIn.location|default:''}}</td>
           <td>{{checkIn.date|date:"d/m/Y H:i:s"}}</td>
           <td>{{checkIn.user.fullname}}</td>
+          <td>
+            {%if checkIn.status == 1 %}
+              {% trans "successful" %}
+            {%else%}
+              {{ checkIn.error_message }}
+            {%endif%}
+          </td>
         </tr>
         {% endfor %}
         {% if not checkIns %}

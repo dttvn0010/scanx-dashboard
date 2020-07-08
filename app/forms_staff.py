@@ -5,14 +5,15 @@ from django.utils.translation import gettext_lazy as _
 class UserCreateForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ('fullname', 'email', 'nfcEnabled', 'qrScanEnabled', 'sharedLocation', 'roles')
+        fields = ('fullname', 'email', 'nfcEnabled', 'qrScanEnabled', 'sharedLocation')
 
     fullname = forms.CharField(max_length=30, label=_("fullname") + " (*)")
     email = forms.EmailField(max_length=50, label=_("email.address") + " (*)")
     nfcEnabled = forms.BooleanField(label=_('nfc.enabled'), required=False)
     qrScanEnabled = forms.BooleanField(label=_('qr.scanning.enabled'), required=False)
     sharedLocation = forms.BooleanField(label=_('geolocation.enabled'), required=False)
-
+    roleIds = forms.CharField(widget=forms.HiddenInput(), required=False)
+    
     def clean_email(self):
         email = self.cleaned_data.get('email')
         if User.objects.filter(email=email):
@@ -24,11 +25,12 @@ class UserCreateForm(forms.ModelForm):
 class UserChangeForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ( 'nfcEnabled', 'qrScanEnabled', 'sharedLocation', 'roles')
+        fields = ( 'nfcEnabled', 'qrScanEnabled', 'sharedLocation')
 
     nfcEnabled = forms.BooleanField(label=_('nfc.enabled'), required=False)
     qrScanEnabled = forms.BooleanField(label=_('qr.scanning.enabled'), required=False)
     sharedLocation = forms.BooleanField(label=_('geolocation.enabled'), required=False)
+    roleIds = forms.CharField(widget=forms.HiddenInput(), required=False)
 
 class LocationForm(forms.ModelForm):
     class Meta:

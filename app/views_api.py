@@ -128,6 +128,7 @@ def searchCheckIn(request):
     draw = request.query_params.get('draw', 1)    
     keyword = request.query_params.get('search[value]', '')    
     userId = request.query_params.get("userId")
+    status = request.query_params.get("status")
     locationId = request.query_params.get("locationId")
     startDate = request.query_params.get("startDate")
     endDate = request.query_params.get("endDate")
@@ -135,9 +136,10 @@ def searchCheckIn(request):
     mapView = request.query_params.get("mapView")
     if mapView:
         flushTime = getTenantParamValue('MAP_VIEW_FLUSH_TIME', request.user.organization, settings.MAP_VIEW_FLUSH_TIME)
+        
         hour, minute = parseHourMin(flushTime)
         
-        if hour and minute:
+        if hour != None and minute != None:
             now = timezone.now()
             flushTime = timezone.now().replace(hour=hour, minute=minute, second=0, microsecond=0) 
             if flushTime >= now:
@@ -164,6 +166,11 @@ def searchCheckIn(request):
 
     if userId:
         checkIns = checkIns.filter(user__id=int(userId))
+
+    if status == '1':
+        checkIns = checkIns.filter(status=CheckIn.Status.SUCCESS)
+    elif status == '2':
+        checkIns = checkIns.filter(~Q(status=CheckIn.Status.SUCCESS)) 
 
     if locationId:
         checkIns = checkIns.filter(location__id=int(locationId))
@@ -209,14 +216,6 @@ def searchCheckIn(request):
         "recordsFiltered": recordsFiltered,
         "data": data
     })
-
-# =================================================== Role ==============================================================
-@api_view(['GET'])
-@permission_classes((IsAuthenticated,))
-def getAdminRoleId(request):
-    adminRole = Role.objects.filter(code='ADMIN').first()
-    adminRoleId = adminRole.id if adminRole else -1
-    return Response({'adminRoleId' : adminRoleId})
 
 # =================================================== Organization ======================================================
 
@@ -1055,7 +1054,6 @@ def markAllLogsAsRead(request):
 def checkForNewLogs(request):
     currentCount = int(request.query_params.get('currentCount', 0))
     log_count = request.user.count_new_logs
-    print(log_count)
     if log_count > currentCount:
         logs = request.user.get_new_logs
         logs = [{'id': log.id, 'content': str(log)} for log in logs]

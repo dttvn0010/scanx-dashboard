@@ -89,7 +89,7 @@
 
   async function exportPDF() {
     var url = "/staff/reports/log_in/export_pdf"
-              + "?userId={{userId}}"
+              + "?userId={{userId|default:''}}"
               + "&startDate={{startDate|default:''}}"
               + "&endDate={{endDate|default:''}}";
 

@@ -19,7 +19,7 @@
         <table class="table table-form mb-2">
           {% if edit_user %}
             <tr>
-              <th>{% trans "fullname" %}:</th>
+              <th style="width: 30%;">{% trans "fullname" %}:</th>
               <td>{{ edit_user.fullname }}</td>              
             </tr>
             <tr>
@@ -28,37 +28,72 @@
             </tr>         
           {%endif%}
           {{ form }}
+          <tr>
+            <th>Roles (*):</th>
+            <td>
+              {% if lockAdmin %}
+                <span title="{{roleAdmin.description}}" data-toggle="tooltip" data-placement="top">
+                  <input type="checkbox" 
+                    onclick="return false;" checked class="role-chkbox" value="{{roleAdmin.id}}"> {{roleAdmin.name}}
+                </span>
+              {% else %}
+                {% for role in allRoles %}
+                  <span title="{{role.description}}" data-toggle="tooltip" data-placement="top" class="mr-4">
+                    <input {% if edit_user|has_role:role.code %} checked {%endif%}
+                      class="role-chkbox" value="{{role.id}}" type="checkbox" code="{{role.code}}"> {{role.name}}
+                  </span>
+                {%endfor%}
+              {%endif%}
+            </td>
+          </tr>
         </table>
         <a class="btn btn-sm btn-secondary mr-1" href='/staff/users'>
           <i class="fas fa-arrow-left text-white-50"></i> {% trans "back" %}
         </a>
-        <button class="btn btn-sm btn-primary" id="btn_save" onclick="save()" type="button">
+        <button onclick="save()" class="btn btn-sm btn-primary" type="button">
           <i class="fas fa-save text-white-50"></i> {% trans "save" %}
         </button>        
       </form>
     </div>
   </div>
 </div>
-<script>
-  async function save() {
-    var resp = await fetch('/api/get_admin_role_id');
-    var result = await resp.json();
-    var adminRoleId = result.adminRoleId;
-    var roleIds = $('#id_roles').val();
-    var containRoleAdmin = roleIds.find(x => x == adminRoleId);
-
-    if('{{lockAdmin}}' === 'True') {
-      if(!containRoleAdmin) {
-        alert('{% trans "cannot.remove.role.admin" %}');
-        return;
-      }
+<script> 
+  function save() {
+    var roleIds = [];
+    $('.role-chkbox:checked').each(function() {
+      roleIds.push($(this).val());
+    });
+    $('#id_roleIds').val(roleIds.join(','));
+    if($('#id_roleIds').val() == '') {
+      alert('{% trans "please.select.a.role" %}');
+      return;
     }
-
-    if('{{edit_user.is_tenant_admin}}' == 'False' && containRoleAdmin) {
-      alert('{% trans "role.admin.warning" %}')
-    }
-
     $('#fmt').submit();
   }
+
+  $(document).ready(function(){
+    
+    $('.role-chkbox').change(function() {
+      var code = $(this).attr('code');
+      var checked = $(this).prop('checked');
+      if(code == 'ADMIN') {
+        if(checked) {
+          alert('{% trans "role.admin.warning" %}');
+          $('.role-chkbox').attr('disabled', 'disabled');
+          $('.role-chkbox').prop('checked', false);
+          $(this).removeAttr('disabled');
+          $(this).prop('checked', true);
+        }else {
+          $('.role-chkbox').removeAttr('disabled');
+        }
+      }      
+    });
+
+    if('{{edit_user|has_role:"ADMIN"}}' == 'True') {
+      $('.role-chkbox:not(":checked")').attr('disabled', 'disabled');
+    }
+
+    $('[data-toggle="tooltip"]').tooltip();
+  })
 </script>
 {% endblock %}

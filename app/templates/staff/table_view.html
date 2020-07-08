@@ -20,13 +20,33 @@
         <table id="table"  class="table table-bordered" width="100%" cellspacing="0">
           <thead>
             <tr>
-              <th style="width: 40%;">{% trans "location" %}</th>
-              <th style="width: 30%;">{% trans "date.time" %}</th>
-              <th style="width: 20%;">{% trans "user" %}</th>
+              <th style="width: 30%;">{% trans "location" %}</th>
+              <th style="width: 25%;">{% trans "date.time" %}</th>
+              <th style="width: 18%;">{% trans "user" %}</th>
+              <th style="width: 17%;">{% trans "geoLocation" %}</th>
               <th style="width: 10%;">{% trans "status" %}</th>
             </tr>
           </thead>     
         </table>
+      </div>
+    </div>
+
+    <div class="modal fade" id="locationModal">      
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Checkin Location</h5>
+            <button type="button" class="close" data-dismiss="modal">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+  
+          <div class="modal-body">
+            <input type="hidden" id="lat">
+            <input type="hidden" id="lng">
+            <div id="map" style="width: 100%; height: 500px;"></div>
+          </div>       
+        </div>
       </div>
     </div>
   </div>
@@ -37,47 +57,84 @@
 </div>
 
 <script>
-$(document).ready(function() {
-  var lastUpdated = "";
-  var table = $('#table').DataTable({
-    "ordering": false,
-    "processing": true,
-    "serverSide": true,
-    "language": {
-      "processing": "<div class='spinner-border'></div>"
-    },
-    "ajax": "/api/checkin/search",
-    "columns": [
-      { "data": "location" },
-      { render: function (data, type, row) { return `${row.date} (${row.datediff} {% trans "ago" %})` }},
-      { "data": "user" },
-      { "data": "status",
-        "render": function(data, type, row) {
-          if(data == 1) {
-            return `<i style='color:green' class="fas fa-check"></i>`;
-          }else {
-            return `<i title='${row["statusText"]}' style='color:red' class="fas fa-exclamation-triangle"></i>`;
-          }
-        },        
-        sClass: "text-center"
-      }
-    ],
-  });
+  var map;
+  var marker;
+  var ref_position = { lat: 52.479865, lng: -1.911067 };
 
-  $.get('/api/checkin/last_updated', (data, status) => {
-    lastUpdated = data.time;    
-  });
-
-  setInterval(function(){
-    var url = '/api/checkin/check_for_update?last_updated=' + lastUpdated;
-    $.get(url, function(data, status){
-      if(data.updated) {
-        lastUpdated = data.lastUpdated;
-        document.getElementById("dingAudio").play();
-        table.ajax.reload();
-      }
+  $(document).ready(function() {
+    var lastUpdated = "";
+    var table = $('#table').DataTable({
+      "ordering": false,
+      "processing": true,
+      "serverSide": true,
+      "language": {
+        "processing": "<div class='spinner-border'></div>"
+      },
+      "drawCallback": function (settings) {
+        $('[data-toggle="tooltip"]').tooltip();
+      },
+      "ajax": "/api/checkin/search",
+      "columns": [
+        { "data": "location" },
+        { render: function (data, type, row) { return `${row.date} (${row.datediff} {% trans "ago" %})` }},
+        { "data": "user" },
+        { render: function(data, type, row) {
+            if(!row.lat || !row.lng) return '';
+            return `<a href='javascript:openLocationModal(${row.lat},${row.lng})'>&nbsp;${row.lat},${row.lng}</a>`;
+          }         
+        },
+        { "data": "status",
+          "render": function(data, type, row) {
+            if(data == 1) {
+              return `<i style='color:green' class="fas fa-check"></i>`;
+            }else {
+              return `<span data-toggle="tooltip" data-placement="top" title='${row["statusText"]}'><i style='color:red' class="fas fa-exclamation-triangle"></i></span>`;
+            }
+          },        
+          sClass: "text-center"
+        }
+      ],
     });
-  }, 3000);
-});
+
+    $.get('/api/checkin/last_updated', (data, status) => {
+      lastUpdated = data.time;    
+    });
+
+    setInterval(function(){
+      var url = '/api/checkin/check_for_update?last_updated=' + lastUpdated;
+      $.get(url, function(data, status){
+        if(data.updated) {
+          lastUpdated = data.lastUpdated;
+          document.getElementById("dingAudio").play();
+          table.ajax.reload();
+        }
+      });
+    }, 3000);
+    
+  });
+
+  function openLocationModal(lat, lng) {
+    $('#lat').val(lat);
+    $('#lng').val(lng);
+    $('#locationModal').modal();
+  }
+
+  $('#locationModal').on('shown.bs.modal', function() {
+    var lat = parseFloat($('#lat').val());
+    var lng = parseFloat($('#lng').val());
+    var position = {lat:lat, lng:lng};
+    
+    if(marker) {
+      marker.setMap(null);
+    }
+
+    marker = new google.maps.Marker({ position: position, map: map });
+    map.setCenter(position);    
+  });
+
+  function initMap() {  
+    map = new google.maps.Map(document.getElementById('map'), { zoom: 16, center: ref_position });  
+  }  
 </script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBR8gU4Te36NCYlc2ZdynsOWQOS03lzWKc&callback=initMap"></script>
 {% endblock %}

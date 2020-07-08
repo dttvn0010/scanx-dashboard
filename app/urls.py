@@ -80,8 +80,6 @@ urlpatterns = [
     path('api/login', views_api.logIn),
     path('api/login/search', views_api.searchLogIn),
 
-    path('api/get_admin_role_id', views_api.getAdminRoleId),
-
     path('api/checkin/search', views_api.searchCheckIn),
     path('api/checkin/last_updated', views_api.getLastCheckInTime),
     path('api/checkin/check_for_update', views_api.checkForNewCheckIn),

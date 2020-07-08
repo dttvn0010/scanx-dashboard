@@ -15,7 +15,7 @@ from .forms_staff import *
 
 from .user_utils import genPassword
 from .import_utils import getPermutation, importPreview
-from .mail_utils import sendInvitationMail
+from .mail_utils import sendInvitationMail, sendAdminCreateNotificationMail
 from .log_utils import logAction
 
 @register.filter
@@ -24,6 +24,17 @@ def get_item(d, key):
     if val == None:
         return ''
     return val
+
+@register.filter
+def has_role(user, roleCode):
+    return user and user.hasRole(roleCode)
+
+@register.filter
+def get_checkin_status_str(code):
+    if code == CheckIn.Status.SUCCESS:
+        return _('successful')
+    else:
+        return CheckIn.Status.messages.get(code, '')
 
 @login_required
 def tableView(request):
@@ -72,6 +83,8 @@ def addUser(request):
         return redirect('login')
 
     form = UserCreateForm(initial={'nfcEnabled': True, 'qrScanEnabled': False, 'sharedLocation': True})
+    allRoles = Role.objects.all()
+    roleAdmin = allRoles.filter(code='ADMIN').first()
 
     if request.method == 'POST':
         form = UserCreateForm(request.POST)
@@ -82,12 +95,24 @@ def addUser(request):
             user.nfcEnabled = form.cleaned_data['nfcEnabled']
             user.qrScanEnabled = form.cleaned_data['qrScanEnabled']
             user.sharedLocation = form.cleaned_data['sharedLocation']
-            user.roles.add(*form.cleaned_data['roles'])
+            roleIds = form.cleaned_data.get('roleIds', '')
+            
+            for roleId in roleIds.split(','):
+                user.roles.add(Role.objects.get(pk=roleId))
+
             user.save()
+            
+            if user.is_tenant_admin:
+                adminUsers = User.objects.filter(organization=request.user.organization, roles__code='ADMIN')
+                for adminUser in adminUsers:
+                    if adminUser.username == user.username:
+                        continue
+                    sendAdminCreateNotificationMail(adminUser.fullname, adminUser.email, user.fullname, user.email)
+                
             logAction('CREATE', request.user, None, user)
             return redirect('staff-user')
 
-    return render(request, 'staff/users/form.html', {'form': form})
+    return render(request, 'staff/users/form.html', {'form': form, 'allRoles': allRoles, 'roleAdmin': roleAdmin})
 
 @login_required
 def updateUser(request, pk):
@@ -98,18 +123,32 @@ def updateUser(request, pk):
     user = get_object_or_404(User, pk=pk)
     
     form = UserChangeForm(instance=user)
+    allRoles = Role.objects.all()
+    roleAdmin = allRoles.filter(code='ADMIN').first()
 
     lockAdmin = request.user.username == user.username and user.hasRole('ADMIN')
 
     if request.method == 'POST':
         form = UserChangeForm(request.POST, instance=user)
 
-        if form.is_valid():            
-            user = form.save()
+        if form.is_valid():
+            user = form.save(commit=False)
+            roleIds = form.cleaned_data.get('roleIds', '')
+            user.roles.clear()
+            
+            for roleId in roleIds.split(','):
+                user.roles.add(Role.objects.get(pk=roleId))
+
+            user.save()
+
             logAction('UPDATE', request.user, old_user, user)
             return redirect('staff-user')
 
-    return render(request, 'staff/users/form.html', {'form': form, 'edit_user': user, 'lockAdmin': lockAdmin})
+    return render(request, 'staff/users/form.html', 
+        {
+            'form': form, 'edit_user': user, 'lockAdmin': lockAdmin,
+            'allRoles': allRoles, 'roleAdmin': roleAdmin
+        })
 
 @login_required
 def deleteUser(request, pk):
@@ -372,8 +411,13 @@ def updateDevice(request, pk):
 
 #================================= Reports  ====================================================================
 
-def getCheckInReport(organization, userId, locationId, startDate, endDate):
-    checkIns = CheckIn.objects.filter(user__organization=organization, status=CheckIn.Status.SUCCESS)
+def getCheckInReport(organization, status, userId, locationId, startDate, endDate):
+    checkIns = CheckIn.objects.filter(user__organization=organization)
+
+    if status == 1:
+        checkIns = checkIns.filter(status=CheckIn.Status.SUCCESS)
+    elif status == 2:
+        checkIns = checkIns.filter(~Q(status=CheckIn.Status.SUCCESS))    
 
     if userId:
         checkIns = checkIns.filter(user__id=int(userId))
@@ -401,6 +445,9 @@ def reportCheckIn(request):
     query_params = request.GET
     reported = query_params.get('reported', '')
     
+    status = query_params.get('status')
+    status = int(status) if status else None
+
     userId = query_params.get('userId')
     userId = int(userId) if userId else  None
 
@@ -412,7 +459,7 @@ def reportCheckIn(request):
 
     users = User.objects.filter(organization=request.user.organization)
     locations = Location.objects.filter(organization=request.user.organization)
-    checkIns = getCheckInReport(request.user.organization, userId, locationId, startDate, endDate)
+    checkIns = getCheckInReport(request.user.organization, status, userId, locationId, startDate, endDate)
 
     return render(request, 'staff/reports/check_in.html', 
         {
@@ -435,13 +482,16 @@ def reportCheckInExportPdf(request):
     userId = query_params.get('userId')
     locationId = query_params.get('locationId')
 
+    status = query_params.get('status')
+    status = int(status) if status else None
+
     startDate = query_params.get('startDate', '')
     endDate = query_params.get('endDate', '')
 
     reportedUser = User.objects.get(pk=userId) if userId else None
     reportedLocation = Location.objects.get(pk=locationId) if locationId else None
 
-    checkIns = getCheckInReport(request.user.organization, userId, locationId, startDate, endDate)
+    checkIns = getCheckInReport(request.user.organization, status, userId, locationId, startDate, endDate)
     resp = render(request, 'staff/reports/check_in_pdf.html', 
                 {
                     'checkIns': checkIns, 

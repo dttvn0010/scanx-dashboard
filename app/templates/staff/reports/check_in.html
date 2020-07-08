@@ -23,7 +23,7 @@
           </div>
         </div>    
         <div class="row mt-2">
-          <div class="col-3">
+          <div class="col-4">
             <label>{% trans "user" %}:</label>
             <select name="userId" class="form-control">
               <option value="">{% trans "all" %}</option>
@@ -32,8 +32,8 @@
               {% endfor %}
             </select>
           </div>
-          <div class="col-3">
-            <label>Location:</label>
+          <div class="col-4">
+            <label>{% trans "location" %}:</label>
             <select name="locationId" class="form-control">
               <option value="">{% trans "all" %}</option>
               {% for l in locations %}
@@ -41,11 +41,21 @@
               {% endfor %}
             </select>
           </div>
-          <div class="col-3">
+          <div class="col-4">
+            <label>{% trans "status" %}:</label>
+            <select name="status" class="form-control">
+              <option value="">{% trans "all" %}</option>
+              <option value="1">{% trans "successful" %}</option>
+              <option value="2">{% trans "failed" %}</option>              
+            </select>
+          </div>          
+        </div>
+        <div class="row mt-2">
+          <div class="col-4">
             <label>{% trans "from.date" %}:</label>
             <input name="startDate" value="{{startDate|default:''}}" class="form-control date" placeholder='{% trans "select.a.date" %}'>
           </div>
-          <div class="col-3">
+          <div class="col-4">
             <label>{% trans "to.date" %}:</label>
             <input name="endDate" value="{{endDate|default:''}}" class="form-control date" placeholder='{% trans "select.a.date" %}'>
           </div>
@@ -68,16 +78,24 @@
       <table class="table">
         <thead>
           <tr>
-            <th style="width: 50%;">{% trans "location" %}</th>
-            <th style="width: 30%;">{% trans "date.time" %}</th>
-            <th style="width: 20%;">{% trans "user" %}</th>
+            <th style="width: 35%;">{% trans "location" %}</th>
+            <th style="width: 25%;">{% trans "date.time" %}</th>
+            <th style="width: 17%;">{% trans "user" %}</th>
+            <th style="width: 23%;">{% trans "status" %}</th>
           </tr>
         </thead>
         {% for checkIn in checkIns %}
           <tr>
-            <td>{{checkIn.location}}</td>
+            <td>{{checkIn.location|default:''}}</td>
             <td>{{checkIn.date|date:"d/m/Y H:i:s"}}</td>
             <td>{{checkIn.user.fullname}}</td>
+            <td>
+              {%if checkIn.status == 1 %}
+                {% trans "successful" %}
+              {%else%}
+                {{ checkIn.error_message }}
+              {%endif%}
+            </td>
           </tr>
         {% endfor %}
         {% if not checkIns %}
@@ -96,8 +114,8 @@
   $('.date').datetimepicker({format: 'DD/MM/yyyy'});
   async function exportPDF() {
     var url = "/staff/reports/check_in/export_pdf"
-              + "?userId={{userId}}"
-              + "&locationId={{locationId}}"
+              + "?userId={{userId|default:''}}"
+              + "&locationId={{locationId|default:''}}"
               + "&startDate={{startDate|default:''}}"
               + "&endDate={{endDate|default:''}}";
 

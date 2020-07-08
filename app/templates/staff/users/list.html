@@ -209,7 +209,7 @@ $(document).ready(function() {
             return '{% trans "pending" %}';
           }
           var id = row.id;
-          var locked = row.locked
+          var locked = row.locked;
           if(data) {
             return `<input id="status_${id}" type="checkbox" ${locked?'disabled':''} onChange="disableItem(${id})" checked class="toggle-button">`;
           }else {

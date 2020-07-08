@@ -11,10 +11,10 @@
       <a href="/staff/map_view" class="nav-link active">{% trans "map.view" %}</a>
     </li>
   </ul>
-  <div id="map" class="flex-column" style="flex:1; width: 100%;min-height: 600px;"></div>
   <audio id="dingAudio">
     <source src="/static/audio/ding.mp3" type="audio/mpeg">
   </audio>
+  <div id="map" class="flex-column" style="flex:1; width: 100%;min-height: 600px;"></div>  
 </div>
 
 <script>
@@ -34,12 +34,12 @@
         position: item.geoLocation, map: map, 
         title: `${item.user}` 
       });
-    
+
     var infowindow = new google.maps.InfoWindow({
       content: 
       `<div>
         <div class="d-flex justify-content-center"><div class="flex-column">${item.user}</div></div>
-        <div class="mt-2 d-flex"><div class="flex-column">${item.date} (${item.datediff} ago)</div></div>
+        <div class="mt-2 d-flex"><div class="flex-column">${item.date}</div></div>
       </div>`
     });
 
@@ -50,7 +50,7 @@
   }
   
   async function initMap() {
-    var response = await fetch('/api/checkin/search?start=0&length=20&mapView=1');
+    var response = await fetch('/api/checkin/search?start=0&length=20&mapView=1&status=1');
     var result = await response.json();
     var items = result.data;
 
@@ -78,12 +78,12 @@
 
     setInterval(function(){
       var url = '/api/checkin/check_for_update?last_updated=' + lastUpdated;
-      $.get(url, async function(data, status){
+      $.get(url, function(data, status){
         if(data.updated) {
-          lastUpdated = data.lastUpdated;
-          newCheckIn = data.newCheckIn;
+          lastUpdated = data.lastUpdated;          
+          addMarker(data.newCheckIn);
+          map.setCenter(data.newCheckIn.geoLocation);
           document.getElementById("dingAudio").play();
-          addMarker(newCheckIn);
         }
       });
     }, 3000);

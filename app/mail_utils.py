@@ -83,3 +83,16 @@ def sendResetPasswordMail(fullname, email, password):
         traceback.print_exc()        
 
 
+def sendAdminCreateNotificationMail(fullname, email, newFullname, newEmail):
+    try:
+        subject, body = getMailTemplate(settings.MAIL_TEMPLATE_CODES['ADMIN_CREATE_NOTIFICATION'])
+
+        html = body.replace('${User.FULL_NAME}', fullname)
+        html = html.replace('${NewUser.FULL_NAME}', newFullname)
+        html = html.replace('${NewUser.EMAIL}', newEmail)
+
+        sendMail(email, subject, html)
+    except:
+        traceback.print_exc()        
+
+

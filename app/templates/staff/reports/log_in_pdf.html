@@ -25,7 +25,7 @@
       </div>
       <div class="row">
         <div class="col-10 offset-2">
-          <label>{{request.user.organization.description}}</label>
+          <label>{{request.user.organization.description|default:''}}</label>
         </div>
       </div>
       <div class="row">

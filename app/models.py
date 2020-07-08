@@ -180,6 +180,10 @@ class CheckIn(models.Model):
     date = models.DateTimeField()
     status = models.IntegerField(null=True)
 
+    @property
+    def error_message(self):
+        return CheckIn.Status.messages.get(self.status, '')
+
 class LogIn(models.Model):
     organization = models.ForeignKey(Organization, null=True, on_delete=models.SET_NULL)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
