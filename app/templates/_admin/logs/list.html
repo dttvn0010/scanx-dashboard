@@ -1,0 +1,153 @@
+{% extends "../base.html" %}
+{% load i18n %}
+
+{% block sidebar %}
+{% with page=6 %}
+{{ block.super }}
+{% endwith %}
+{% endblock %}
+
+
+{% block content %}
+<div class="content p-3">
+  <div class="card shadow mb-4">
+    <div class="card-header py-3">
+      <h6 class="m-0 font-weight-bold text-primary">{% trans "logs" %}</h6>
+    </div>
+    <div class="card-body">
+      <form>
+        <input type="hidden" name="reported" value="1">
+        <div class="row">
+          <div class="col">
+            <label><b>{% trans "show.by" %}:</b></label>
+          </div>
+        </div>
+        <div class="row mt-2">
+          <div class="col-4">
+            <label>{% trans "organization" %}:</label>
+            <select id="organizationId" onchange="updateOrganization()" class="form-control">
+              <option value="">{% trans "all" %}</option>
+              {% for o in organizations %}
+              <option value="{{o.id}}">{{o.name}}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-4">
+            <label>{% trans "action" %}:</label>
+            <select id="actionId" onchange="updateData()" class="form-control">
+              <option value="">{% trans "all" %}</option>
+              {% for a in actions %}
+              <option value="{{a.id}}">{{a.name}}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-4">
+            <label>{% trans "object" %}:</label>
+            <select id="modelName" onchange="updateData()" class="form-control">
+              <option value="">{% trans "all" %}</option>
+              {% for m in modelNames %}
+              <option value="{{m}}" {% if m  == modelName %}selected{%endif%}>{{m}}</option>
+              {% endfor %}
+            </select>
+          </div>          
+        </div>
+        <div class="row mt-3">
+          <div class="col-4">
+            <label>{% trans "perform.user" %}:</label>
+            <select id="userId" onchange="updateData()" class="form-control">
+              <option value="">{% trans "all" %}</option>              
+            </select>
+          </div>
+          <div class="col-4">
+            <label>{% trans "from.date" %}:</label>
+            <input id="startDate" onblur="updateData()" value="{{startDate|default:''}}" class="form-control date"
+              placeholder='{% trans "select.a.date" %}'>
+          </div>
+          <div class="col-4">
+            <label>{% trans "to.date" %}:</label>
+            <input id="endDate" onblur="updateData()" value="{{endDate|default:''}}" class="form-control date"
+              placeholder='{% trans "select.a.date" %}'>
+          </div>
+        </div>       
+      </form>
+
+      <hr/>
+      <table id="table" class="table table-bordered">
+        <thead>
+          <tr>
+            <th style="width: 22%;">{% trans "action" %}</th>            
+            <th style="width: 22%;">{% trans "object" %}</th>
+            <th style="width: 24%;">{% trans "perform.user" %}</th>
+            <th style="width: 22%;">{% trans "date.time" %}</th>  
+            <th style="width: 8%;" class="text-center"></th>     
+          </tr>
+        </thead>       
+      </table>
+    </div>
+  </div>
+</div>
+<script>
+  $('.date').datetimepicker({format: 'DD/MM/yyyy'});
+
+  var table = $('#table').DataTable({
+    "ordering": false,
+    "searching": false,
+    "processing": true,
+    "serverSide": true,
+    "language": {
+      "processing": "<div class='spinner-border'></div>"
+    },
+    "ajax":{
+      "url": "/api/log/search",
+      "data": function(data) {
+        data.userId = $('#userId').val();
+        data.organizationId = $('#organizationId').val();
+        data.actionId = $('#actionId').val();
+        data.modelName = $('#modelName').val();
+        data.startDate = $('#startDate').val();
+        data.endDate = $('#endDate').val();
+        data.fromSuperAdmin = 1;
+      }
+    },
+    "columns": [
+      { "data": "action"},      
+      { "data": "modelName" },
+      { "data": "performUser" },
+      { "data": "actionDate",
+        "render": function(data, type, row) {
+          if(row.unviewed) {
+            return data + '&nbsp;<small style="color:red">New!</small>';
+          }
+          return data;
+        }
+      },
+      {
+        render: function (data, type, row) {
+          return `<a title='{% trans "view.details" %}' href="/_admin/logs/details/${row['id']}"><i class="fas fa-eye"></i></a>`;               
+        },
+        sClass: "text-center"
+      }
+    ]
+  });
+
+  function updateData() {
+    table.ajax.reload();
+  }
+
+  async function updateOrganization() {
+    var orgId = $('#organizationId').val();
+    if(orgId != '') {
+      var resp = await fetch('/api/user/get_by_organization?organizationId=' + orgId);
+      var result = await resp.json();
+      var users = result['users'];
+      var html = `<option value="">{% trans "all" %}</option>`
+                 + users.map(u => `<option value='${u.id}'>${u.fullname}</option>`).join();
+      $('#userId').html(html);      
+    }else{
+      $('#userId').html(`<option value="">{% trans "all" %}</option>`);
+    }
+    updateData();
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends "../base.html" %}
+{% load i18n %}
+
+{% block sidebar %}
+{% with page=6 %}
+{{ block.super }}
+{% endwith %}
+{% endblock %}
+
+
+{% block content %}
+<div class="content p-3">
+  <div class="card shadow mb-4">
+    <div class="card-header py-3">
+      <h6 class="m-0 font-weight-bold text-primary">{% trans "log.details" %}</h6>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table">
+          <tbody>
+            <tr>
+              <td style="width: 40%;">{% trans "action" %}:</td>
+              <th>{{log.action.name}}</th>
+            </tr>
+            <tr>
+              <td>{% trans "object" %}:</td>
+              <th>{{log.modelName}}</th>
+            </tr>
+            <tr>
+              <td>{% trans "perform.user" %}:</td>
+              <th>{{log.performUser}}</th>
+            </tr>
+            <tr>
+              <td>{% trans "date.time" %}:</td>
+              <th>{{log.actionDate|date:"d/m/Y H:i:s"}}</span></th>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="card shadow mb-4">
+    <div class="card-header py-3">
+      <h6 class="m-0 font-weight-bold text-primary">{% trans "list.of.fields" %}</h6>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th style="width: 30%;">{% trans "filed.name" %}</th>
+              <th style="width: 35%;">{% trans "content.before.action" %}</th>
+              <th style="width: 35%;">{% trans "content.after.action" %}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for field in logFields %}
+            <tr>
+              <td>{{field}}</td>
+              <td>{{preContent|get_item:field}}</td>
+              <td>{{postContent|get_item:field}}</td>              
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <a href="/_admin/logs" class="mt-2 btn btn-sm btn-secondary">
+    <i class="fas fa-arrow-left text-white-50"></i> {% trans "back" %}
+  </a>
+</div>
+
+
+{% endblock %}

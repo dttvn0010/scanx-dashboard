@@ -183,6 +183,9 @@ $(document).ready(function() {
     "language": {
       "processing": "<div class='spinner-border'></div>"
     },
+    "drawCallback": function( settings ) {
+      $('.toggle-button').bootstrapToggle({size: "xs"});
+    },
     "ajax": "/api/user/search",
     "columns": [
       { "data": "fullname",
@@ -199,11 +202,21 @@ $(document).ready(function() {
       },
       { "data": "email" },
       { "data": "role_names" },
-      { "data": "status", "render": function(data, type, row) {
-          if(data == 0) return '{% trans "pending" %}';
-          return row.is_active? '{% trans "active" %}': '{% trans "inactive" %}';
+      
+      { "data": "is_active",
+        render: function (data, type, row){
+          if(row.status == 0) {
+            return '{% trans "pending" %}';
+          }
+          var id = row.id;
+          var locked = row.locked
+          if(data) {
+            return `<input id="status_${id}" type="checkbox" ${locked?'disabled':''} onChange="disableItem(${id})" checked class="toggle-button">`;
+          }else {
+            return `<input id="status_${id}" type="checkbox" ${locked?'disabled':''} onChange="enableItem(${id})" class="toggle-button">`;
+          }
         } 
-      },      
+      },
       {
         render: function (data, type, row) { 
           var html = `<a title='{% trans "view.details" %}' href="#" onclick="viewInfo(${row['id']})"><i class="fas fa-eye"></i></a>&nbsp;&nbsp;`
@@ -215,12 +228,6 @@ $(document).ready(function() {
           
           if(row.status == 0) {
             html += `&nbsp;&nbsp;<a title='{% trans "resend.mail" %}' href="#" onclick="resendMail(${row['id']})" ><i class="fas fa-envelope"></i></a>`;
-          }else if(!row.locked) {
-            if(row.is_active) {
-              html += `&nbsp;&nbsp;<a title='{% trans "deactivate.this.user" %}' href="#" onclick="lockUser(${row['id']})" ><i class="fas fa-ban"></i></a>`;
-            }else {
-              html += `&nbsp;&nbsp;<a title='{% trans "activate.this.user" %}' href="#" onclick="unlockUser(${row['id']})" ><i class="fas fa-toggle-on"></i></a>`;
-            }
           }
 
           return html;
@@ -266,22 +273,35 @@ async function deleteUser() {
   }
 }
 
+async function disableItem(id) {
+  if($('#status_'+id).prop('checked')) {
+    return;
+  }
+
+  var resp = await fetch('/api/user/disable/' + id);
+  var result = await resp.json();
+  if(!result.success) {
+    $('#status_'+id).bootstrapToggle('on');
+    alert(result.error);
+  }
+}
+
+async function enableItem(id) {
+  if(!$('#status_'+id).prop('checked')) {
+    return;
+  }
+
+  var resp = await fetch('/api/user/enable/' + id);
+  var result = await resp.json();
+  if(!result.success) {
+    $('#status_'+id).bootstrapToggle('off');
+    alert(result.error);
+  }
+}
 
 async function resendMail(id) {
   if (confirm('{% trans "confirm.resend.mail" %}')) {
     location.href = "/staff/users/resend_mail/" + id;
-  }
-}
-
-function lockUser(id) {
-  if(confirm('{% trans "deactivate.this.user" %}?')) {
-    location.href = "/staff/users/lock/" + id;
-  }
-}
-
-function unlockUser(id) {
-  if(confirm('{% trans "activate.this.user" %}?')) {
-    location.href = "/staff/users/unlock/" + id;
   }
 }
 

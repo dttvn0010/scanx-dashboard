@@ -9,9 +9,9 @@ def dumpObject(obj, fields):
     data = {}
     for key in fields:
         value = getattr(obj, key)
-        if value and value.__class__.__name__ in  ['int', 'bool', 'float', 'str']:
+        if value != None and value.__class__.__name__ in  ['int', 'bool', 'float', 'str']:
             data[key] = value
-        elif value and value.__class__.__name__ == 'datetime':
+        elif value != None and value.__class__.__name__ == 'datetime':
             data[key] = value.strftime('%d/%m/%Y %H:%M:%S')
         else:
             data[key] = str(value) if value else None

@@ -20,6 +20,7 @@
 <link href="/static/vendor/sb-admin/sb-admin-2.css" rel="stylesheet">
 <link href="/static/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/pc-bootstrap4-datetimepicker@4.17/build/css/bootstrap-datetimepicker.min.css" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css" rel="stylesheet">
 <link href="/static/css/main.css" rel="stylesheet">
 
 <script src="/static/vendor/jquery/jquery.min.js"></script>
@@ -30,6 +31,7 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.26.0/moment.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/pc-bootstrap4-datetimepicker@4.17/build/js/bootstrap-datetimepicker.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js"></script>
 
 <body id="page-top">
   <div id="wrapper">
@@ -208,19 +210,22 @@
               <div>${log.content}</div>
             </a>`
           )).join('')
-          + (result.log_count > 5?
-            `<a class="dropdown-item d-flex align-items-center" href="/staff/logs">
+          + (result.log_count > 0? 
+            `<a class="dropdown-item d-flex align-items-center" href="javascript:markAllRead()">
               <div>
-                More ...
+                <b>{% trans "mark.all.as.read" %}</b>
               </div>
-            </a>`: ''
-          )
-          + (result.log_count == 0?
+            </a>
+            <a class="dropdown-item d-flex align-items-center" href="/staff/logs">
+              <div>
+                <b>{% trans "view.all" %}</b>
+              </div>
+            </a>`: 
             `<a class="dropdown-item d-flex align-items-center" href="#"> 
               <div>
-                No new logs!
+                {% trans "no.new.logs" %}!
               </div>
-            </a>`: ''
+            </a>`
           );
         $('#logs').html(html);
         $('#log_count').html(result.log_count);
@@ -231,6 +236,14 @@
         }
       }
     }
+
+    async function markAllRead() {
+      await fetch('/api/log/mark_all_as_read');
+      $('#log_count').hide();
+      $('#log_count').html(-1);
+      await getLogs();
+    }
+    
     $(document).ready(async function() {
       await getLogs();
       setInterval(async function() {

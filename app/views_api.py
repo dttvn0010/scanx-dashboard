@@ -411,6 +411,9 @@ def userCheckIn(request):
     if status == CheckIn.Status.SUCCESS and device.uid != uid:
         status = CheckIn.Status.INCORRECT_DEVICE_UID
 
+    if status == CheckIn.Status.SUCCESS and not device.enabled:
+        status = CheckIn.Status.DEVICE_DISABLED
+
     lastCheckIn = CheckIn.objects.filter(user=request.user,status=CheckIn.Status.SUCCESS).order_by('-date').first()
     scanDelay = getTenantParamValue('SCAN_TIME_DELAY', request.user.organization, settings.SCAN_TIME_DELAY)
 
@@ -596,6 +599,63 @@ def deleteUser(request, pk):
         traceback.print_exc()
         return Response({'success': False, 'error': str(e)})
 
+@api_view(['GET'])
+@permission_classes((IsAuthenticated,))
+def disableUser(request, pk):
+    try:
+        old_user = User.objects.get(pk=pk)  
+        user = User.objects.get(pk=pk)  
+
+        if request.user.is_superuser:
+            user.status = User.Status.LOCK_BY_SUPER_ADMIN
+            user.is_active = False
+
+        elif request.user.is_tenant_admin:
+            user.status = User.Status.LOCK_BY_TENANT_ADMIN
+            user.is_active = False
+
+        else:
+            return Response({'success': False, 'error': _('no.permission')})
+            
+        user.save()
+        logAction('UPDATE', request.user, old_user, user)
+
+        return Response({'success': True})
+
+    except Exception as e:
+        traceback.print_exc()
+        return Response({'success': False, 'error': str(e)})
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticated,))
+def enableUser(request, pk):
+    try:
+        old_user = User.objects.get(pk=pk) 
+        user = User.objects.get(pk=pk)  
+
+        if request.user.is_superuser:
+            user.status = User.Status.ACTIVE
+            user.is_active = True
+
+        elif request.user.is_tenant_admin:
+            if user.status == User.Status.LOCK_BY_SUPER_ADMIN:
+                return Response({'success': False, 'error': _('user.locked.by.super.admin')})
+            else:
+                user.status = User.Status.ACTIVE
+                user.is_active = True
+
+        else:
+            return Response({'success': False, 'error': _('no.permission')})
+            
+        user.save()
+        logAction('UPDATE', request.user, old_user, user)
+        
+        return Response({'success': True})
+
+    except Exception as e:
+        traceback.print_exc()
+        return Response({'success': False, 'error': str(e)})
+
 # =================================================== Device ======================================================
 @api_view(['POST'])
 @permission_classes((IsAuthenticated,))
@@ -647,6 +707,7 @@ def addDevice(request):
     device.id1 = id1
     device.id2 = id2
     device.createdDate = timezone.now()
+    device.enabled = True
     device.status = Device.Status.ENABLED  
     device.save()
     logAction('CREATE', request.user, None, device)
@@ -687,6 +748,12 @@ def updateDeviceCoordinates(request):
         return Response({
             "success": False,
             "message": _("no.device.with.provided.uid")
+        })
+
+    if not device.enabled:
+        return Response({
+            "success": False,
+            "message": _("device.has.been.disabled")
         })
 
     device.lat = lat
@@ -754,6 +821,63 @@ def deleteDevice(request, pk):
             return Response({'success': True})    
         else:
             return Response({'success': False, 'error': _('wrong.password')})    
+
+    except Exception as e:
+        traceback.print_exc()
+        return Response({'success': False, 'error': str(e)})
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticated,))
+def disableDevice(request, pk):
+    try:
+        old_device = Device.objects.get(pk=pk)  
+        device = Device.objects.get(pk=pk)  
+
+        if request.user.is_superuser:
+            device.status = Device.Status.LOCK_BY_SUPER_ADMIN
+            device.enabled = False
+
+        elif request.user.is_tenant_admin:
+            device.status = Device.Status.LOCK_BY_TENANT_ADMIN
+            device.enabled = False
+
+        else:
+            return Response({'success': False, 'error': _('no.permission')})
+            
+        device.save()
+        logAction('UPDATE', request.user, old_device, device)
+
+        return Response({'success': True})
+
+    except Exception as e:
+        traceback.print_exc()
+        return Response({'success': False, 'error': str(e)})
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticated,))
+def enableDevice(request, pk):
+    try:
+        old_device = Device.objects.get(pk=pk) 
+        device = Device.objects.get(pk=pk)  
+
+        if request.user.is_superuser:
+            device.status = Device.Status.ENABLED
+            device.enabled = True
+
+        elif request.user.is_tenant_admin:
+            if device.status == Device.Status.LOCK_BY_SUPER_ADMIN:
+                return Response({'success': False, 'error': _('device.locked.by.super.admin')})
+            else:
+                device.status = Device.Status.ENABLED
+                device.enabled = True
+
+        else:
+            return Response({'success': False, 'error': _('no.permission')})
+            
+        device.save()
+        logAction('UPDATE', request.user, old_device, device)
+        
+        return Response({'success': True})
 
     except Exception as e:
         traceback.print_exc()
@@ -911,6 +1035,23 @@ def getMailTemplateContent(request, pk):
 # =================================================== Log ======================================================
 @api_view(['GET'])
 @permission_classes((IsAuthenticated,))
+def markAllLogsAsRead(request):
+    logs = []
+
+    if request.user.is_superuser:
+        logs = Log.objects.filter(~Q(viewUsers=request.user))
+
+    elif request.user.hasRole('ADMIN'):
+        logs = Log.objects.filter(organization=request.user.organization).filter(~Q(viewUsers=request.user))
+
+    for log in logs:
+        log.viewUsers.add(request.user)
+        log.save()
+
+    return Response({'success': True})
+
+@api_view(['GET'])
+@permission_classes((IsAuthenticated,))
 def checkForNewLogs(request):
     currentCount = int(request.query_params.get('currentCount', 0))
     log_count = request.user.count_new_logs
@@ -964,8 +1105,6 @@ def searchLog(request):
         endDate = datetime.strptime(endDate, '%d/%m/%Y') + timedelta(days=1)
         logs = logs.filter(actionDate__lt=endDate) 
 
-    logs = logs.order_by('-actionDate')
-
     recordsTotal = logs.count()
 
     if keyword != '':
@@ -974,6 +1113,10 @@ def searchLog(request):
                     | Q(action__name__contains=keyword))
 
     recordsFiltered  = logs.count()
+
+    logs = logs.order_by('-actionDate')
+    
+    logs = logs[start:start+length]
 
     data = LogSerializer(logs, many=True).data
     for i,item in enumerate(data):

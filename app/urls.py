@@ -51,8 +51,6 @@ urlpatterns = [
     path('staff/users/import_preview', views_staff.importUserPreview),
     path('staff/users/import', views_staff.importUser),
     path('staff/users/resend_mail/<int:pk>', views_staff.resendMail),
-    path('staff/users/lock/<int:pk>', views_staff.lockUser),
-    path('staff/users/unlock/<int:pk>', views_staff.unlockUser),
 
     path('staff/locations', views_staff.listLocations, name='staff-location'),
     path('staff/locations/add', views_staff.addLocation),
@@ -100,6 +98,8 @@ urlpatterns = [
     path('api/user/get_by_organization', views_api.getUsersByOrganization),
     path('api/user/details/<int:pk>', views_api.viewUserDetails),
     path('api/user/delete/<int:pk>', views_api.deleteUser),
+    path('api/user/disable/<int:pk>', views_api.disableUser),    
+    path('api/user/enable/<int:pk>', views_api.enableUser),
 
     path('api/device/add_device', views_api.addDevice),
     path('api/device/update_coordinates', views_api.updateDeviceCoordinates),
@@ -109,6 +109,8 @@ urlpatterns = [
     path('api/device/registered/search', views_api.searchRegisteredDevice),
     path('api/device/search_by_org', views_api.searchDeviceByOrganization),
     path('api/device/delete/<int:pk>', views_api.deleteDevice),    
+    path('api/device/disable/<int:pk>', views_api.disableDevice),    
+    path('api/device/enable/<int:pk>', views_api.enableDevice),    
     path('api/device/delete_from_org/<int:pk>', views_api.deleteDeviceFromOrg),    
 
     path('api/location/search', views_api.searchLocation),
@@ -118,5 +120,6 @@ urlpatterns = [
     path('api/mail_template/get_content/<int:pk>', views_api.getMailTemplateContent),
 
     path('api/log/check_for_update', views_api.checkForNewLogs),
+    path('api/log/mark_all_as_read', views_api.markAllLogsAsRead),
     path('api/log/search', views_api.searchLog),
 ]

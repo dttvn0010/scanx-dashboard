@@ -221,7 +221,8 @@ def addUnregisteredDevice(request):
         if form.is_valid():            
             device = form.save(commit=False)
             device.createdDate = timezone.now()
-            device.status = Device.Status.ENABLED            
+            device.status = Device.Status.ENABLED           
+            device.enabled = True 
             device.save()
             logAction('CREATE', request.user, None, device)
             return redirect('admin-unregistered-device')
@@ -400,7 +401,7 @@ def listLogs(request):
 def viewLogDetail(request, pk):
     if not request.user.is_superuser:
         return redirect('login')
-        
+
     log = get_object_or_404(Log, pk=pk)
     logConfig = LogConfig.objects.filter(modelName=log.modelName).first()
     logFields = logConfig.logFields.split(',') if logConfig and logConfig.logFields else []

@@ -73,6 +73,9 @@ $(document).ready(function() {
     "language": {
       "processing": "<div class='spinner-border'></div>"
     },
+    "drawCallback": function( settings ) {
+      $('.toggle-button').bootstrapToggle({size: "xs"});
+    },
     "ajax": "/api/device/registered/search",
     "columns": [      
       { "data": "id1" },
@@ -80,11 +83,14 @@ $(document).ready(function() {
       { "data": "uid" },
       { "data": "organizationName"},
       { "data": "registeredDate"}    ,
-      { "data": "status",
+      { "data": "enabled",
         render: function (data, type, row){
-          if(data == 1) return '{% trans "enabled" %}';
-          if(data > 1) return '{% trans "disabled" %}';
-          return '';          
+          var id = row['id'];
+          if(data) {
+            return `<input id="status_${id}" type="checkbox" onChange="disableItem(${id})" checked class="toggle-button">`;
+          }else {
+            return `<input id="status_${id}" type="checkbox" onChange="enableItem(${id})" class="toggle-button">`;
+          }
         } 
       },
       {
@@ -119,5 +125,30 @@ async function deleteDevice() {
   }
 }
 
+async function disableItem(id) {
+  if($('#status_'+id).prop('checked')) {
+    return;
+  }
+
+  var resp = await fetch('/api/device/disable/' + id);
+  var result = await resp.json();
+  if(!result.success) {
+    $('#status_'+id).bootstrapToggle('on');
+    alert(result.error);
+  }
+}
+
+async function enableItem(id) {
+  if(!$('#status_'+id).prop('checked')) {
+    return;
+  }
+
+  var resp = await fetch('/api/device/enable/' + id);
+  var result = await resp.json();
+  if(!result.success) {
+    $('#status_'+id).bootstrapToggle('off');
+    alert(result.error);
+  }
+}
 </script>
 {% endblock %}

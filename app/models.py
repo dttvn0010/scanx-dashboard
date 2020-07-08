@@ -123,6 +123,7 @@ class Device(models.Model):
     description = models.CharField(max_length=500, verbose_name=_("description"), blank=True, null=True)
     registeredDate = models.DateTimeField(blank=True, null=True)
     status = models.IntegerField(blank=True, null=True)   
+    enabled = models.BooleanField(default=True)
     createdDate = models.DateTimeField(null=True)    
 
     def __str__(self):
@@ -141,6 +142,7 @@ class CheckIn(models.Model):
         INVALID_DEVICE_CODE = 5
         INCORRECT_DEVICE_UID = 6
         DEVICE_NOT_REGISTERED = 7
+        DEVICE_DISABLED = 8
         SCAN_NOT_TIME_OUT_YET = 10
 
         messages =  {
@@ -151,6 +153,7 @@ class CheckIn(models.Model):
             INVALID_DEVICE_CODE : _('check_in.status.invalid.device.code'),
             INCORRECT_DEVICE_UID: _('check_in.status.incorrect.device.uid'),
             DEVICE_NOT_REGISTERED : _('check_in.status.device.not.registered'),
+            DEVICE_DISABLED: _('check_in.status.device.disabled'),
             SCAN_NOT_TIME_OUT_YET : _('check_in.status.scan.not.time.out.yet'),
         }
 
@@ -162,6 +165,7 @@ class CheckIn(models.Model):
             INVALID_DEVICE_CODE : _('check_in.mobile.message.invalid.device.code'),
             INCORRECT_DEVICE_UID: _('check_in.mobile.message.incorrect.device.uid'),
             DEVICE_NOT_REGISTERED : _('check_in.mobile.message.device.not.registered'),
+            DEVICE_DISABLED : _('check_in.mobile.message.device.disabled'),
             SCAN_NOT_TIME_OUT_YET : _('check_in.mobile.message.scan.not.time.out.yet'),
         }
 

@@ -22,7 +22,7 @@ class DeviceSerializer(ModelSerializer):
     
     class Meta:
         model = Device
-        fields = ('id', 'addressLine1', 'addressLine2', 'postCode', 'city', 'organizationName', 'id1', 'id2', 'uid', 'status', 'registeredDate') 
+        fields = ('id', 'addressLine1', 'addressLine2', 'postCode', 'city', 'organizationName', 'id1', 'id2', 'uid', 'enabled', 'registeredDate') 
 
 class LocationSerializer(ModelSerializer):
     class Meta:

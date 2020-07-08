@@ -20,7 +20,10 @@ from .log_utils import logAction
 
 @register.filter
 def get_item(d, key):
-    return d.get(key, '') or ''
+    val = d.get(key)
+    if val == None:
+        return ''
+    return val
 
 @login_required
 def tableView(request):
@@ -190,26 +193,6 @@ def resendMail(request, pk):
         sendInvitationMail(user.organization.name, user.fullname, user.email, password)
     
     return redirect('staff-user')
-
-@login_required
-def lockUser(request, pk):
-    if not request.user.organization:
-        return redirect('login')
-
-    user = get_object_or_404(User, pk=pk)
-    user.is_active = False
-    user.save()
-    return redirect('staff-user')
-
-@login_required
-def unlockUser(request, pk):
-    if not request.user.organization:
-        return redirect('login')
-
-    user = get_object_or_404(User, pk=pk)
-    user.is_active = True
-    user.save()
-    return redirect('staff-user')    
 
 #================================= Locations  ====================================================================
 @login_required
@@ -627,7 +610,7 @@ def listLogs(request):
 def viewLogDetail(request, pk):
     if not request.user.organization:
         return redirect('login')
-        
+
     log = get_object_or_404(Log, pk=pk)
     logConfig = LogConfig.objects.filter(modelName=log.modelName).first()
     logFields = logConfig.logFields.split(',') if logConfig and logConfig.logFields else []

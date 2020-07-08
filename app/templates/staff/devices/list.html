@@ -27,8 +27,9 @@
           <tr>
             <th style="width: 15%;">{% trans "id1" %}</th>
             <th style="width: 15%;">{% trans "id2" %}</th>
-            <th style="width: 30%;">{% trans "uid" %}</th>
-            <th style="width: 30%;">{% trans "location" %}</th>
+            <th style="width: 25%;">{% trans "uid" %}</th>
+            <th style="width: 25%;">{% trans "location" %}</th>
+            <th style="width: 10%;">{% trans "status" %}</th>
             <th style="width: 10%;"></th>
           </tr>
         </thead>
@@ -80,12 +81,25 @@ $(document).ready(function() {
     "language": {
       "processing": "<div class='spinner-border'></div>"
     },
+    "drawCallback": function( settings ) {
+      $('.toggle-button').bootstrapToggle({size: "xs"});
+    },
     "ajax": "/api/device/search_by_org",
     "columns": [
       { "data": "id1" },
       { "data": "id2" },
       { "data": "uid" },
       { "data": "location" },
+      { "data": "enabled",
+        render: function (data, type, row){
+          var id = row['id'];
+          if(data) {
+            return `<input id="status_${id}" type="checkbox" onChange="disableItem(${id})" checked class="toggle-button">`;
+          }else {
+            return `<input id="status_${id}" type="checkbox" onChange="enableItem(${id})" class="toggle-button">`;
+          }
+        } 
+      },
       {
         render: function (data, type, row) {
           return `<a title='{% trans "edit" %}' href="/staff/devices/update/${row['id']}"><i class="fas fa-edit"></i></a>&nbsp;&nbsp;`
@@ -116,6 +130,32 @@ async function deleteDevice() {
     location.href = "/staff/devices";
   } else {
     $("#errorLabel").html(result.error || '{% trans "error.occured" %}');
+  }
+}
+
+async function disableItem(id) {
+  if($('#status_'+id).prop('checked')) {
+    return;
+  }
+
+  var resp = await fetch('/api/device/disable/' + id);
+  var result = await resp.json();
+  if(!result.success) {
+    $('#status_'+id).bootstrapToggle('on');
+    alert(result.error);
+  }
+}
+
+async function enableItem(id) {
+  if(!$('#status_'+id).prop('checked')) {
+    return;
+  }
+
+  var resp = await fetch('/api/device/enable/' + id);
+  var result = await resp.json();
+  if(!result.success) {
+    $('#status_'+id).bootstrapToggle('off');
+    alert(result.error);
   }
 }
 
