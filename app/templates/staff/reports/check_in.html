@@ -45,8 +45,8 @@
             <label>{% trans "status" %}:</label>
             <select name="status" class="form-control">
               <option value="">{% trans "all" %}</option>
-              <option value="1">{% trans "successful" %}</option>
-              <option value="2">{% trans "failed" %}</option>              
+              <option {%if status == 1 %}selected {%endif%} value="1">{% trans "successful" %}</option>
+              <option {%if status == 2 %}selected {%endif%} value="2">{% trans "failed" %}</option>              
             </select>
           </div>          
         </div>

@@ -467,6 +467,7 @@ def reportCheckIn(request):
             'locations': locations,
             'reported': reported,
             'userId': userId,
+            'status': status,
             'locationId': locationId,
             'startDate': startDate,
             'endDate': endDate,
