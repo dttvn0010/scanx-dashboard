@@ -279,6 +279,7 @@ async function disableItem(id) {
   }
 
   if (!confirm('{% trans "confirm.disable.user" %}')) {
+    $('#status_'+id).bootstrapToggle('on');
     return;
   }
 
@@ -296,6 +297,7 @@ async function enableItem(id) {
   }
 
   if (!confirm('{% trans "confirm.enable.user" %}')) {
+    $('#status_'+id).bootstrapToggle('off');
     return;
   }
 

@@ -131,6 +131,7 @@ async function disableItem(id) {
   }
 
   if (!confirm('{% trans "confirm.disable.device" %}')) {
+    $('#status_'+id).bootstrapToggle('on');
     return;
   }
 
@@ -148,6 +149,7 @@ async function enableItem(id) {
   }
 
   if (!confirm('{% trans "confirm.enable.device" %}')) {
+    $('#status_'+id).bootstrapToggle('off');
     return;
   }
 

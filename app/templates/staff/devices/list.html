@@ -180,6 +180,7 @@
     }
 
     if (!confirm('{% trans "confirm.disable.device" %}')) {
+      $('#status_'+id).bootstrapToggle('on');
       return
     }
 
@@ -197,6 +198,7 @@
     }
 
     if (!confirm('{% trans "confirm.enable.device" %}')) {
+      $('#status_'+id).bootstrapToggle('off');
       return
     }
 
