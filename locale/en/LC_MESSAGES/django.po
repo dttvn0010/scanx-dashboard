@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-09 09:29+0100\n"
+"POT-Creation-Date: 2020-07-09 11:00+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -345,15 +345,15 @@ msgstr "Copyright &copy; ScanX 3.0 2020. All rights reserved."
 msgid "server.time"
 msgstr "Server time"
 
-#: .\app\templates\_admin\base.html:184 .\app\templates\staff\base.html:216
+#: .\app\templates\_admin\base.html:184 .\app\templates\staff\base.html:217
 msgid "mark.all.as.viewed"
 msgstr "Mark all as viewed"
 
-#: .\app\templates\_admin\base.html:189 .\app\templates\staff\base.html:221
+#: .\app\templates\_admin\base.html:189 .\app\templates\staff\base.html:222
 msgid "view.all"
 msgstr "View all"
 
-#: .\app\templates\_admin\base.html:194 .\app\templates\staff\base.html:226
+#: .\app\templates\_admin\base.html:194 .\app\templates\staff\base.html:227
 msgid "no.new.logs"
 msgstr "No new logs"
 
@@ -426,6 +426,18 @@ msgstr "Delete"
 #: .\app\templates\staff\users\list.html:272
 msgid "error.occured"
 msgstr "Error Occured"
+
+#: .\app\templates\_admin\devices\registered\list.html:133
+#: .\app\templates\_admin\devices\unregistered\list.html:181
+#: .\app\templates\staff\devices\list.html:182
+msgid "confirm.disable.device"
+msgstr "Do you want to disable this device?"
+
+#: .\app\templates\_admin\devices\registered\list.html:150
+#: .\app\templates\_admin\devices\unregistered\list.html:198
+#: .\app\templates\staff\devices\list.html:199
+msgid "confirm.enable.device"
+msgstr "Do you want to enable this device?"
 
 #: .\app\templates\_admin\devices\unregistered\list.html:14
 msgid "list.of.unregistered.devices"
@@ -756,7 +768,7 @@ msgid "resend.mail"
 msgstr "Resend invitation email"
 
 #: .\app\templates\_admin\organizations\list.html:183
-#: .\app\templates\staff\users\list.html:303
+#: .\app\templates\staff\users\list.html:311
 msgid "confirm.resend.mail"
 msgstr "Resend an invitation email to this user?"
 
@@ -1030,7 +1042,7 @@ msgstr "User"
 
 #: .\app\templates\staff\reports\check_in.html:48
 #: .\app\templates\staff\reports\check_in.html:94
-#: .\app\templates\staff\reports\check_in_pdf.html:117 .\app\views_staff.py:35
+#: .\app\templates\staff\reports\check_in_pdf.html:117 .\app\views_staff.py:36
 msgid "successful"
 msgstr "Successful"
 
@@ -1113,6 +1125,14 @@ msgstr "Import Users"
 #: .\app\templates\staff\users\list.html:142
 msgid "delete.this.user"
 msgstr "Delete this User"
+
+#: .\app\templates\staff\users\list.html:281
+msgid "confirm.disable.user"
+msgstr "Do you want to disable this user?"
+
+#: .\app\templates\staff\users\list.html:298
+msgid "confirm.enable.user"
+msgstr "Do you want to enable this user?"
 
 #: .\app\templates\users\base.html:53
 msgid "checkin.history"
