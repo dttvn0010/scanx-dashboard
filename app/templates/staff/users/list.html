@@ -278,6 +278,10 @@ async function disableItem(id) {
     return;
   }
 
+  if (!confirm('{% trans "confirm.disable.user" %}')) {
+    return;
+  }
+
   var resp = await fetch('/api/user/disable/' + id);
   var result = await resp.json();
   if(!result.success) {
@@ -288,6 +292,10 @@ async function disableItem(id) {
 
 async function enableItem(id) {
   if(!$('#status_'+id).prop('checked')) {
+    return;
+  }
+
+  if (!confirm('{% trans "confirm.enable.user" %}')) {
     return;
   }
 

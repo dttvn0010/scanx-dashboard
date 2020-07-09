@@ -179,6 +179,10 @@
       return;
     }
 
+    if (!confirm('{% trans "confirm.disable.device" %}')) {
+      return
+    }
+
     var resp = await fetch('/api/device/disable/' + id);
     var result = await resp.json();
     if (!result.success) {
@@ -190,6 +194,10 @@
   async function enableItem(id) {
     if (!$('#status_' + id).prop('checked')) {
       return;
+    }
+
+    if (!confirm('{% trans "confirm.enable.device" %}')) {
+      return
     }
 
     var resp = await fetch('/api/device/enable/' + id);

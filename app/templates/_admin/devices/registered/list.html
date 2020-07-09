@@ -110,7 +110,7 @@ function openDeleteConfirmation(id) {
     $("#deleteConfirmModal").modal();
   }
 
-async function deleteDevice() {
+async function deleteDevice() {  
   $("#errorLabel").html('');
   var formData = new FormData(document.getElementById("fmt3"));
   var response = await fetch("/api/device/delete/" + $('#deviceId').val(), {
@@ -130,6 +130,10 @@ async function disableItem(id) {
     return;
   }
 
+  if (!confirm('{% trans "confirm.disable.device" %}')) {
+    return;
+  }
+
   var resp = await fetch('/api/device/disable/' + id);
   var result = await resp.json();
   if(!result.success) {
@@ -140,6 +144,10 @@ async function disableItem(id) {
 
 async function enableItem(id) {
   if(!$('#status_'+id).prop('checked')) {
+    return;
+  }
+
+  if (!confirm('{% trans "confirm.enable.device" %}')) {
     return;
   }
 
