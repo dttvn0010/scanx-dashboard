@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-08 19:52+0100\n"
+"POT-Creation-Date: 2020-07-09 09:29+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -270,7 +270,7 @@ msgid "log.view.template"
 msgstr "User '%s' has performed action '%s %s'"
 
 #: .\app\templates\_admin\base.html:7 .\app\templates\profile\base.html:3
-#: .\app\templates\staff\base.html:5
+#: .\app\templates\staff\base.html:5 .\app\templates\users\base.html:5
 msgid "scanx.cloud.dashboard"
 msgstr "ScanX Cloud Dashboard"
 
@@ -280,7 +280,7 @@ msgstr "ScanX Cloud Dashboard"
 #: .\app\templates\registration\initial_setup.html:3
 #: .\app\templates\registration\login.html:3
 #: .\app\templates\registration\reset_password.html:3
-#: .\app\templates\staff\base.html:41 .\app\templates\users\index.html:5
+#: .\app\templates\staff\base.html:41 .\app\templates\users\base.html:46
 msgid "scanx"
 msgstr "ScanX"
 
@@ -321,27 +321,27 @@ msgid "logs"
 msgstr "Logs"
 
 #: .\app\templates\_admin\base.html:123 .\app\templates\profile\base.html:38
-#: .\app\templates\staff\base.html:154 .\app\templates\users\index.html:39
+#: .\app\templates\staff\base.html:154 .\app\templates\users\base.html:78
 msgid "last.login"
 msgstr "Last Login"
 
 #: .\app\templates\_admin\base.html:140 .\app\templates\profile\base.html:54
-#: .\app\templates\staff\base.html:172 .\app\templates\users\index.html:54
+#: .\app\templates\staff\base.html:172 .\app\templates\users\base.html:96
 msgid "profile"
 msgstr "Profile"
 
 #: .\app\templates\_admin\base.html:145 .\app\templates\profile\base.html:59
-#: .\app\templates\staff\base.html:177 .\app\templates\users\index.html:59
+#: .\app\templates\staff\base.html:177 .\app\templates\users\base.html:101
 msgid "logout"
 msgstr "Logout"
 
 #: .\app\templates\_admin\base.html:159 .\app\templates\profile\base.html:71
-#: .\app\templates\staff\base.html:191 .\app\templates\users\index.html:101
+#: .\app\templates\staff\base.html:191 .\app\templates\users\base.html:115
 msgid "copyright"
 msgstr "Copyright &copy; ScanX 3.0 2020. All rights reserved."
 
 #: .\app\templates\_admin\base.html:161 .\app\templates\profile\base.html:73
-#: .\app\templates\staff\base.html:193 .\app\templates\users\index.html:103
+#: .\app\templates\staff\base.html:193 .\app\templates\users\base.html:117
 msgid "server.time"
 msgstr "Server time"
 
@@ -385,7 +385,7 @@ msgstr "Registered Date"
 #: .\app\templates\staff\reports\check_in_pdf.html:106
 #: .\app\templates\staff\table_view.html:27
 #: .\app\templates\staff\users\list.html:37
-#: .\app\templates\staff\users\list.html:81
+#: .\app\templates\staff\users\list.html:81 .\app\templates\users\index.html:17
 msgid "status"
 msgstr "Status"
 
@@ -523,7 +523,7 @@ msgstr "Perform User"
 #: .\app\templates\staff\reports\check_in_pdf.html:104
 #: .\app\templates\staff\reports\log_in.html:62
 #: .\app\templates\staff\reports\log_in_pdf.html:85
-#: .\app\templates\staff\table_view.html:24
+#: .\app\templates\staff\table_view.html:24 .\app\templates\users\index.html:15
 msgid "date.time"
 msgstr "Date Time"
 
@@ -535,7 +535,7 @@ msgstr "Date Time"
 #: .\app\templates\staff\reports\check_in.html:81
 #: .\app\templates\staff\reports\check_in_pdf.html:69
 #: .\app\templates\staff\reports\check_in_pdf.html:103
-#: .\app\templates\staff\table_view.html:23
+#: .\app\templates\staff\table_view.html:23 .\app\templates\users\index.html:14
 msgid "location"
 msgstr "Location"
 
@@ -876,7 +876,7 @@ msgid "choose.profile.picture"
 msgstr "Choose a profile picture"
 
 #: .\app\templates\registration\login.html:33
-#: .\app\templates\staff\app_link.html:14 .\app\templates\users\index.html:70
+#: .\app\templates\staff\app_link.html:14
 msgid "welcome.to.scanx"
 msgstr "Welcome to ScanX"
 
@@ -900,15 +900,15 @@ msgstr "Reset your password"
 msgid "reset.password"
 msgstr "Reset password"
 
-#: .\app\templates\staff\app_link.html:15 .\app\templates\users\index.html:71
+#: .\app\templates\staff\app_link.html:15
 msgid "please.use.the.below.links.to.download.the.mobile.app"
 msgstr "Please use the below links to download the mobile app"
 
-#: .\app\templates\staff\app_link.html:20 .\app\templates\users\index.html:76
+#: .\app\templates\staff\app_link.html:20
 msgid "iOS"
 msgstr "iOS"
 
-#: .\app\templates\staff\app_link.html:30 .\app\templates\users\index.html:86
+#: .\app\templates\staff\app_link.html:30
 msgid "android"
 msgstr "Android"
 
@@ -929,7 +929,7 @@ msgstr "Reports"
 #: .\app\templates\staff\reports\check_in_pdf.html:58
 #: .\app\templates\staff\reports\check_in_pdf.html:69
 #: .\app\templates\staff\reports\log_in_pdf.html:51
-#: .\app\templates\staff\table_view.html:17
+#: .\app\templates\staff\table_view.html:17 .\app\templates\users\index.html:8
 msgid "check_in"
 msgstr "Check-In"
 
@@ -1075,15 +1075,15 @@ msgstr "ScanX Log-In Report"
 msgid "organization.info"
 msgstr "Organization Info"
 
-#: .\app\templates\staff\table_view.html:17
+#: .\app\templates\staff\table_view.html:17 .\app\templates\users\index.html:8
 msgid "history"
 msgstr "History"
 
-#: .\app\templates\staff\table_view.html:26
+#: .\app\templates\staff\table_view.html:26 .\app\templates\users\index.html:16
 msgid "geoLocation"
 msgstr "GeoLocation"
 
-#: .\app\templates\staff\table_view.html:76
+#: .\app\templates\staff\table_view.html:79
 msgid "ago"
 msgstr "ago"
 
@@ -1093,7 +1093,6 @@ msgid "user.details"
 msgstr "User details"
 
 #: .\app\templates\staff\users\form.html:68
-#, fuzzy
 msgid "please.select.a.role"
 msgstr "Please select at least one role!"
 
@@ -1115,79 +1114,80 @@ msgstr "Import Users"
 msgid "delete.this.user"
 msgstr "Delete this User"
 
+#: .\app\templates\users\base.html:53
+msgid "checkin.history"
+msgstr "Checkin History"
+
 #: .\app\views_admin.py:140
 msgid "name"
 msgstr "Name"
 
-#: .\app\views_api.py:264 .\app\views_api.py:595 .\app\views_api.py:822
-#: .\app\views_api.py:900 .\app\views_api.py:995
+#: .\app\views_api.py:268 .\app\views_api.py:599 .\app\views_api.py:826
+#: .\app\views_api.py:904 .\app\views_api.py:999
 msgid "wrong.password"
 msgstr "Wrong Password!"
 
-#: .\app\views_api.py:330
+#: .\app\views_api.py:334
 msgid "incorrect.username.or.password"
 msgstr "Incorrect username or password"
 
-#: .\app\views_api.py:338 .\app\views_api.py:495 .\app\views_api.py:672
-#: .\app\views_api.py:729
+#: .\app\views_api.py:342 .\app\views_api.py:499 .\app\views_api.py:676
+#: .\app\views_api.py:733
 msgid "incorrect.mobile.time"
 msgstr "Incorrect mobile time"
 
-#: .\app\views_api.py:365 .\app\views_api.py:617 .\app\views_api.py:647
-#: .\app\views_api.py:663 .\app\views_api.py:720 .\app\views_api.py:770
-#: .\app\views_api.py:844 .\app\views_api.py:874
+#: .\app\views_api.py:369 .\app\views_api.py:621 .\app\views_api.py:651
+#: .\app\views_api.py:667 .\app\views_api.py:724 .\app\views_api.py:774
+#: .\app\views_api.py:848 .\app\views_api.py:878
 msgid "no.permission"
 msgstr "You do not have permission to perform this action!"
 
-#: .\app\views_api.py:501
+#: .\app\views_api.py:505
 msgid "incorrect.old.password"
 msgstr "Incorrect Old Password"
 
-#: .\app\views_api.py:507
+#: .\app\views_api.py:511
 msgid "new.password.empty"
 msgstr "New Password is empty"
 
-#: .\app\views_api.py:513
+#: .\app\views_api.py:517
 msgid "new.password.too.short"
 msgstr "New Password is too short"
 
-#: .\app\views_api.py:519
+#: .\app\views_api.py:523
 msgid "new.password.cannot.be.all.digits"
 msgstr "New Password cannot be all digits"
 
-#: .\app\views_api.py:641
+#: .\app\views_api.py:645
 msgid "user.locked.by.super.admin"
 msgstr "User has been locked by super admin"
 
-#: .\app\views_api.py:681
+#: .\app\views_api.py:685
 msgid "invalid.uid.value"
 msgstr "Invalid UID value"
 
-#: .\app\views_api.py:694
+#: .\app\views_api.py:698
 msgid "invalid.scan.code"
 msgstr "Invalid scan code!"
 
-#: .\app\views_api.py:740
+#: .\app\views_api.py:744
 msgid "invalid.position"
 msgstr "Invalid position!"
 
-#: .\app\views_api.py:749
+#: .\app\views_api.py:753
 msgid "no.device.with.provided.uid"
 msgstr "No device with provided UID exists"
 
-#: .\app\views_api.py:755
+#: .\app\views_api.py:759
 msgid "device.has.been.disabled"
 msgstr "Device has been disabled"
 
-#: .\app\views_api.py:868
+#: .\app\views_api.py:872
 msgid "device.locked.by.super.admin"
 msgstr "Device has been locked by super admin"
 
-#~ msgid "cannot.remove.role.admin"
-#~ msgstr "Cannot remove role admin"
+msgid "already.exists"
+msgstr "already exists"
 
-#~ msgid "already.exists"
-#~ msgstr "already exists"
-
-#~ msgid "device.with"
-#~ msgstr "Device with"
+msgid "device.with"
+msgstr "Device with"

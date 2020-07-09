@@ -1,110 +1,111 @@
-{% load tz %}
+{% extends "./base.html" %}
 {% load i18n %}
 
-<meta charset="utf-8">
-<title>{% trans "scanx" %}</title>
-<link rel="/static/img/apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=XBb4w6pr3a">
-<link rel="icon" type="image/png" sizes="32x32" href="/static/img/favicon-32x32.png?v=XBb4w6pr3a">
-<link rel="icon" type="image/png" sizes="16x16" href="/static/img/favicon-16x16.png?v=XBb4w6pr3a">
-<link rel="manifest" href="/static/img/site.webmanifest?v=XBb4w6pr3a">
-<link rel="mask-icon" href="/static/img/safari-pinned-tab.svg?v=XBb4w6pr3a" color="#5bbad5">
-<link rel="shortcut icon" href="/static/img/favicon.ico?v=XBb4w6pr3a">
-<meta name="apple-mobile-web-app-title" content="ScanX">
-<meta name="application-name" content="ScanX">
-<meta name="msapplication-TileColor" content="#da532c">
-<meta name="msapplication-TileImage" content="/static/img/mstile-144x144.png?v=XBb4w6pr3a">
-<meta name="theme-color" content="#000000">
+{% block content %}
+<div class="content p-3">
+  <div class="card shadow mb-4">
+    <div class="card-header py-3">
+      <h6 class="m-0 font-weight-bold text-primary">{% trans "check_in" %} {% trans "history" %}</h6>
+    </div>
+    <div class="card-body">
+      <table id="table"  class="table table-bordered" width="100%" cellspacing="0">
+        <thead>
+          <tr>
+            <th style="width: 30%;">{% trans "location" %}</th>
+            <th style="width: 30%;">{% trans "date.time" %}</th>
+            <th style="width: 25%;">{% trans "geoLocation" %}</th>
+            <th style="width: 15%;">{% trans "status" %}</th>
+          </tr>
+        </thead>     
+      </table>
+    </div>
+  </div>
 
-<link href="/static/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-<link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
-<link href="/static/vendor/sb-admin/sb-admin-2.css" rel="stylesheet">
-
-<script src="/static/vendor/jquery/jquery.min.js"></script>
-<script src="/static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-<script src="/static/vendor/jquery-easing/jquery.easing.min.js"></script>
-<script src="/static/vendor/sb-admin/sb-admin-2.js"></script>
-
-<body id="page-top">
-  <div id="wrapper">
-    <div id="content-wrapper" class="d-flex flex-column" style="min-height: 100vh;">
-      <div id="content">
-        <nav class="navbar navbar-expand navbar-light topbar shadow">
-          <ul class="navbar-nav">
-            <li class="nav-item">
-              <a href="/"><img style="width: 80px; height: 80px;" src="/static/img/scanX.png"></a>
-            </li>
-          </ul>
-          <ul class="navbar-nav ml-auto">
-            <li class="nav-item d-flex mr-4">
-              <span class="align-self-center">{% trans "last.login" %}: {{ user.last_login|date:"d/m/Y H:i:s" }}</span>
-            </li>
-            <li class="nav-item dropdown no-arrow d-flex">
-              <span class="mr-2 align-self-center">{{ user.fullname|default:'' }}</span>
-              <a class="p-0 nav-link dropdown-toggle" href="#" data-toggle="dropdown" aria-haspopup="true"
-                aria-expanded="false">
-                {% if user.profilePicture %}
-                <img class="img-profile rounded-circle" src="/{{ user.profilePicture.url }}">
-                {%else%}
-                <img class="img-profile rounded-circle" src="/static/img/user.png">
-                {%endif%}
-              </a>
-              <div class="dropdown-menu dropdown-menu-right">
-                <a class="dropdown-item" href="/profile/update">
-                  <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                  {% trans "profile" %}
-                </a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="/accounts/logout">
-                  <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                  {% trans "logout" %}
-                </a>
-              </div>
-            </li>
-          </ul>
-        </nav>
-
-        {%block content %}
-        <div class="container mt-3 mb-3 text-center">
-          <div class="row">
-            <div class="col">
-              <h1>{% trans "welcome.to.scanx" %}!</h1>
-              {% trans "please.use.the.below.links.to.download.the.mobile.app" %}
-            </div>
-          </div>
-          <div class="row mt-3">
-            <div class="col-4 text-center">
-              <h4>{% trans "iOS" %}</h4>
-              <br>
-              <img class="mb-3" style="max-width:250px;" src="/static/img/ios_app.png">
-              <br>
-              <a href="https://apps.apple.com/us/app/scanx/id1517228454?ls=1">https://apps.apple.com/us/app/scanx/id1517228454?ls=1</a>
-            </div>
-            <div class="col-4 d-flex align-items-center justify-content-center">
-              <img style="width: 200px; height: 200px;" src="/static/img/scanX.png">
-            </div>
-            <div class="col-4 text-center">
-              <h4>{% trans "android" %}</h4>
-              <br>
-              <img class="mb-3" style="max-width:250px;" src="/static/img/android_app.png">
-              <br>
-              <a
-                href="https://play.google.com/store/apps/details?id=cloud.scanx">https://play.google.com/store/apps/details?id=cloud.scanx</a>
-            </div>
-          </div>
+  <div class="modal fade" id="locationModal">      
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Checkin Location</h5>
+          <button type="button" class="close" data-dismiss="modal">
+            <span aria-hidden="true">&times;</span>
+          </button>
         </div>
-        {%endblock%}
 
-      </div> <!-- End of Main Content -->
-      <footer class="sticky-footer bg-white">
-        <div class="container my-auto">
-          <div class="copyright text-center my-auto">
-            <span>{% trans "copyright" %}</span>
-            <br><br>
-            {% trans "server.time" %}: {% now "d/m/Y H:i:s" %}
-          </div>
-        </div>
-      </footer>
-    </div> <!-- End of Content Wrapper -->
-  </div> <!-- End of Page Wrapper -->
-  <script src="/static/js/sb-admin-2.js"></script>
-</body>
+        <div class="modal-body">
+          <input type="hidden" id="lat">
+          <input type="hidden" id="lng">
+          <div id="map" style="width: 100%; height: 500px;"></div>
+        </div>       
+      </div>
+    </div>
+  </div>
+</div> 
+<script>
+  var map;
+  var marker;
+  var ref_position = { lat: 52.479865, lng: -1.911067 };
+
+  $(document).ready(function() {
+    var table = $('#table').DataTable({
+      "ordering": false,
+      "processing": true,
+      "serverSide": true,
+      "language": {
+        "processing": "<div class='spinner-border'></div>"
+      },
+      "drawCallback": function (settings) {
+        $('[data-toggle="tooltip"]').tooltip();
+      },
+      "ajax": {
+        "url": "/api/checkin/search",
+        "data": function(data) {
+          data.userId = '{{request.user.id}}';
+        }
+      },
+      "columns": [
+        { "data": "location" },
+        { render: function (data, type, row) { return `${row.date}` }},
+        { render: function(data, type, row) {
+            if(!row.lat || !row.lng) return '';
+            return `<a href='javascript:openLocationModal(${row.lat},${row.lng})'>&nbsp;${row.lat},${row.lng}</a>`;
+          }         
+        },
+        { "data": "status",
+          "render": function(data, type, row) {
+            if(data == 1) {
+              return `<i style='color:green' class="fas fa-check"></i>`;
+            }else {
+              return `<span data-toggle="tooltip" data-placement="top" title='${row["statusText"]}'><i style='color:red' class="fas fa-exclamation-triangle"></i></span>`;
+            }
+          },        
+          sClass: "text-center"
+        }
+      ],
+    });
+  });
+
+  function openLocationModal(lat, lng) {
+    $('#lat').val(lat);
+    $('#lng').val(lng);
+    $('#locationModal').modal();
+  }
+
+  $('#locationModal').on('shown.bs.modal', function() {
+    var lat = parseFloat($('#lat').val());
+    var lng = parseFloat($('#lng').val());
+    var position = {lat:lat, lng:lng};
+    
+    if(marker) {
+      marker.setMap(null);
+    }
+
+    marker = new google.maps.Marker({ position: position, map: map });
+    map.setCenter(position);    
+  });
+
+  function initMap() {  
+    map = new google.maps.Map(document.getElementById('map'), { zoom: 16, center: ref_position });  
+  }  
+</script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBR8gU4Te36NCYlc2ZdynsOWQOS03lzWKc&callback=initMap"></script>
+{% endblock %}

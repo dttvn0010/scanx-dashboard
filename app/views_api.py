@@ -34,11 +34,7 @@ def searchLogIn(request):
     length = int(request.query_params.get('length', 0))
     
     logIns = LogIn.objects.filter(user__organization=request.user.organization)
-    recordsTotal = logIns.count()
-
-    if keyword != '':
-        logIns = logIns.filter(user__fullname__contains=keyword)
-
+    
     if userId:
         logIns = logIns.filter(user__id=int(userId))
 
@@ -49,6 +45,11 @@ def searchLogIn(request):
     if endDate:
         endDate = make_aware(datetime.strptime(endDate, '%d/%m/%Y') + timedelta(days=1))
         logIns = logIns.filter(date__lt=endDate)                        
+
+    recordsTotal = logIns.count()
+
+    if keyword != '':
+        logIns = logIns.filter(user__fullname__contains=keyword)
 
     logIns = logIns.order_by('-date')
     recordsFiltered = logIns.count()
@@ -157,13 +158,7 @@ def searchCheckIn(request):
     length = int(request.query_params.get('length', 0))
     
     checkIns = CheckIn.objects.filter(user__organization=request.user.organization)
-    recordsTotal = checkIns.count()
-
-    if keyword != '':
-        checkIns = checkIns.filter(Q(user__fullname__contains=keyword) 
-                                | Q(location__addressLine1__contains=keyword) 
-                                | Q(location__addressLine1__contains=keyword))
-
+    
     if userId:
         checkIns = checkIns.filter(user__id=int(userId))
 
@@ -181,6 +176,15 @@ def searchCheckIn(request):
     if endDate:        
         checkIns = checkIns.filter(date__lt=endDate)
         
+    recordsTotal = checkIns.count()
+
+    if keyword != '':
+        checkIns = checkIns.filter(Q(user__fullname__contains=keyword) 
+                                | Q(location__addressLine1__contains=keyword) 
+                                | Q(location__addressLine1__contains=keyword)
+                                | Q(location__city__contains=keyword)
+                                | Q(location__postCode__contains=keyword))
+
     checkIns = checkIns.order_by('-date')
     recordsFiltered = checkIns.count()
     checkIns = checkIns[start:start+length]
@@ -190,7 +194,7 @@ def searchCheckIn(request):
         item['user'] = f'{item["userFullName"]}'
         item['statusText'] = CheckIn.Status.messages.get(item['status'])
         
-        tmp = f'{item["addressLine1"]}, {item["addressLine2"]}, {item["city"]}, {item["postCode"]}'
+        tmp = f'{item["addressLine1"]}, {item["addressLine2"] or ""}, {item["city"]}, {item["postCode"]}'
         if tmp.replace(',', '').strip() == '':
             tmp = ''
 
