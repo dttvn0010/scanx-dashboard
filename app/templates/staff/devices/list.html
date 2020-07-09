@@ -131,11 +131,8 @@
           "data": "enabled",
           render: function (data, type, row) {
             var id = row['id'];
-            if (data) {
-              return `<input id="status_${id}" type="checkbox" onChange="disableItem(${id})" checked class="toggle-button">`;
-            } else {
-              return `<input id="status_${id}" type="checkbox" onChange="enableItem(${id})" class="toggle-button">`;
-            }
+            return `<input id="status_${id}" type="checkbox" onChange="toggleItem(${id})"
+                      ${data?'checked':''} class="toggle-button">`;
           },
           sClass: "text-center"
         },
@@ -174,38 +171,39 @@
     }
   }
 
+  async function toggleItem(id) {
+    var status = $('#status_'+id).prop('checked');
+    if(status) {
+      enableItem(id);
+    }else {
+      disableItem(id);
+    }
+  }
+
   async function disableItem(id) {
-    if ($('#status_' + id).prop('checked')) {
+    if (!confirm('{% trans "confirm.disable.device" %}')) {
+      $('#status_'+id).bootstrapToggle('on', true);
       return;
     }
-    /*
-    if (!confirm('{% trans "confirm.disable.device" %}')) {
-      $('#status_'+id).bootstrapToggle('on');
-      return
-    }*/
 
     var resp = await fetch('/api/device/disable/' + id);
     var result = await resp.json();
     if (!result.success) {
-      $('#status_' + id).bootstrapToggle('on');
+      $('#status_' + id).bootstrapToggle('on', true);
       alert(result.error);
     }
   }
 
   async function enableItem(id) {
-    if (!$('#status_' + id).prop('checked')) {
+    if (!confirm('{% trans "confirm.enable.device" %}')) {
+      $('#status_'+id).bootstrapToggle('off', true);
       return;
     }
-    /*
-    if (!confirm('{% trans "confirm.enable.device" %}')) {
-      $('#status_'+id).bootstrapToggle('off');
-      return
-    }*/
 
     var resp = await fetch('/api/device/enable/' + id);
     var result = await resp.json();
     if (!result.success) {
-      $('#status_' + id).bootstrapToggle('off');
+      $('#status_' + id).bootstrapToggle('off', true);
       alert(result.error);
     }
   }

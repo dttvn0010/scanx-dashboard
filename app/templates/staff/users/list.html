@@ -210,11 +210,12 @@ $(document).ready(function() {
           }
           var id = row.id;
           var locked = row.locked;
-          if(data) {
-            return `<input id="status_${id}" type="checkbox" ${locked?'disabled':''} onChange="disableItem(${id})" checked class="toggle-button">`;
-          }else {
-            return `<input id="status_${id}" type="checkbox" ${locked?'disabled':''} onChange="enableItem(${id})" class="toggle-button">`;
-          }
+          return `<input id="status_${id}" 
+                  type="checkbox" 
+                  ${data?  'checked':''} 
+                  ${locked?'disabled':''} 
+                  onChange="toggleItem(${id})" 
+                  class="toggle-button">`;
         } 
       },
       {
@@ -273,38 +274,41 @@ async function deleteUser() {
   }
 }
 
-async function disableItem(id) {
-  if($('#status_'+id).prop('checked')) {
+async function toggleItem(id) {
+  var status = $('#status_'+id).prop('checked');
+  if(status) {
+    enableItem(id);
+  }else {
+    disableItem(id);
+  }
+}
+
+async function disableItem(id) {  
+  
+  if (!confirm('{% trans "confirm.disable.user" %}')) {
+    $('#status_'+id).bootstrapToggle('on', true);
     return;
   }
-  /*
-  if (!confirm('{% trans "confirm.disable.user" %}')) {
-    $('#status_'+id).bootstrapToggle('on');
-    return;
-  }*/
 
   var resp = await fetch('/api/user/disable/' + id);
   var result = await resp.json();
   if(!result.success) {
-    $('#status_'+id).bootstrapToggle('on');
+    $('#status_'+id).bootstrapToggle('on', true);
     alert(result.error);
   }
 }
 
 async function enableItem(id) {
-  if(!$('#status_'+id).prop('checked')) {
+  
+  if (!confirm('{% trans "confirm.enable.user" %}')) {
+    $('#status_'+id).bootstrapToggle('off', true);
     return;
   }
-  /*
-  if (!confirm('{% trans "confirm.enable.user" %}')) {
-    $('#status_'+id).bootstrapToggle('off');
-    return;
-  }*/
 
   var resp = await fetch('/api/user/enable/' + id);
   var result = await resp.json();
   if(!result.success) {
-    $('#status_'+id).bootstrapToggle('off');
+    $('#status_'+id).bootstrapToggle('off', true);
     alert(result.error);
   }
 }
