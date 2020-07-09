@@ -178,11 +178,11 @@
     if ($('#status_' + id).prop('checked')) {
       return;
     }
-
+    /*
     if (!confirm('{% trans "confirm.disable.device" %}')) {
       $('#status_'+id).bootstrapToggle('on');
       return
-    }
+    }*/
 
     var resp = await fetch('/api/device/disable/' + id);
     var result = await resp.json();
@@ -196,11 +196,11 @@
     if (!$('#status_' + id).prop('checked')) {
       return;
     }
-
+    /*
     if (!confirm('{% trans "confirm.enable.device" %}')) {
       $('#status_'+id).bootstrapToggle('off');
       return
-    }
+    }*/
 
     var resp = await fetch('/api/device/enable/' + id);
     var result = await resp.json();

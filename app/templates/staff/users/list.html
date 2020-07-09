@@ -277,11 +277,11 @@ async function disableItem(id) {
   if($('#status_'+id).prop('checked')) {
     return;
   }
-
+  /*
   if (!confirm('{% trans "confirm.disable.user" %}')) {
     $('#status_'+id).bootstrapToggle('on');
     return;
-  }
+  }*/
 
   var resp = await fetch('/api/user/disable/' + id);
   var result = await resp.json();
@@ -295,11 +295,11 @@ async function enableItem(id) {
   if(!$('#status_'+id).prop('checked')) {
     return;
   }
-
+  /*
   if (!confirm('{% trans "confirm.enable.user" %}')) {
     $('#status_'+id).bootstrapToggle('off');
     return;
-  }
+  }*/
 
   var resp = await fetch('/api/user/enable/' + id);
   var result = await resp.json();
