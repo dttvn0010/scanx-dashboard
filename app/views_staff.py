@@ -4,6 +4,7 @@ from django.contrib.auth.hashers import make_password
 from django.conf import settings
 from django.utils import timezone
 from django.template.defaulttags import register
+from django.utils.translation import gettext_lazy as _
 
 import csv
 import json
