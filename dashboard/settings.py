@@ -169,7 +169,7 @@ ROLES = {
     'USER': 'USER'
 }
 
-HOST_URL = "http://localhost:8000" # "https://scanx.cloud"
+HOST_URL = "https://scanx.cloud"
 INVITE_URL = HOST_URL + "/accounts/initial_setup"
 RESET_PASSWORD_URL = HOST_URL + "/accounts/reset_password"
 PROFILE_IMAGE_SIZE = 300
