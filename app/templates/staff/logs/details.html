@@ -61,7 +61,7 @@
               </tr>
               <tr>
                 <td>{% trans "status" %}:</td>
-                <th>{{postContent|get_item:"status"}}</span></th>
+                <th>{{postContent|get_item:"status"|get_checkin_status_str}}</span></th>
               </tr>
             </tbody>
           </table>
