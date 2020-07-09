@@ -115,14 +115,14 @@
             <span>{% trans "app.info" %}</span></a>
         </li>
 
-        <hr class="sidebar-divider my-0">
-
-        <!-- Sidebar Toggler (Sidebar) -->
-        <div class="text-center d-none d-md-inline">
-          <button class="rounded-circle border-0" id="sidebarToggle"></button>
-        </div>
-
       {%endif%}
+
+      <hr class="sidebar-divider my-0">
+
+      <!-- Sidebar Toggler (Sidebar) -->
+      <div class="text-center d-none d-md-inline">
+        <button class="rounded-circle border-0" id="sidebarToggle"></button>
+      </div>
 
     </ul>
     {% endblock %}
@@ -198,6 +198,7 @@
   </div> <!-- End of Page Wrapper -->  
   <script src="/static/vendor/sb-admin/sb-admin-2.js"></script>
   <script src="/static/js/main.js"></script>
+  {%if user.is_tenant_admin %}
   <script>
     async function getLogs() {
       var resp = await fetch('/api/log/check_for_update?currentCount=' + $('#log_count').html());
@@ -251,4 +252,5 @@
       }, 3000);
     });
   </script>
+  {%endif%}  
 </body>
