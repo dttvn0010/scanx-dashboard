@@ -120,12 +120,11 @@
         {
           render: function (data, type, row) {
             if (!row.lat || !row.lng) return '';
-            return `<a href='javascript:openLocationModal(${row.lat},${row.lng})' 
+            return `&nbsp;<a href='javascript:openLocationModal(${row.lat},${row.lng})' 
                       data-toggle="tooltip" data-placement="top"
                       title='{% trans "coordinates.title" %}'>${row.lat},${row.lng}
                    </a>`;
-          },
-          sClass: "text-center"
+          }
         },
         {
           "data": "enabled",
