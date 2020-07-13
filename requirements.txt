@@ -1,0 +1,7 @@
+django==3.0.6
+djangorestframework
+djangorestframework_simplejwt
+pillow==7.1.2
+mysqlclient
+numpy==1.19.0
+requests==2.24.0
