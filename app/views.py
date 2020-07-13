@@ -27,6 +27,9 @@ from .mail_utils import sendAdminInvitationMail, sendInvitationMail, sendResetPa
 from .user_utils import genPassword
 from .log_utils import logAction
 
+def handler404(request, exception):
+    return render(request, '404.html')
+
 def logInHook(sender, user, request, **kwargs):
     logIn = LogIn()
     logIn.fromMobileApp = False

@@ -16,6 +16,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework_simplejwt import views as jwt_views 
+from django.conf.urls import (
+handler400, handler403, handler404, handler500
+)
+
+handler404 = 'app.views.handler404'
 
 urlpatterns = [
     path('admin/', admin.site.urls),
