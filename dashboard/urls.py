@@ -20,7 +20,10 @@ from django.conf.urls import (
 handler400, handler403, handler404, handler500
 )
 
-handler404 = 'app.views.handler404'
+handler400 = 'app.views.handlerBadRequest'
+handler403 = 'app.views.handlerBadRequest'
+handler404 = 'app.views.handlerBadRequest'
+handler500 = 'app.views.handlerBadRequest'
 
 urlpatterns = [
     path('admin/', admin.site.urls),
