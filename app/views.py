@@ -17,13 +17,11 @@ import random
 import csv
 import json
 from threading import Thread
-from io import BytesIO
-from PIL import Image
-import numpy as np
 
 from .models import *
 from .forms import *
 from .mail_utils import sendAdminInvitationMail, sendInvitationMail, sendResetPasswordMail
+from .img_utils import resizeProfileImage
 from .user_utils import genPassword
 from .log_utils import logAction
 
@@ -152,38 +150,16 @@ def resetPassword(request):
             email = request.POST.get('email')
             return render(request, 'registration/reset_password.html', {'email': email, 'form': form})
 
-
-def resizeProfileImage(imgField):
-    imageFile = BytesIO(imgField.read())
-    image = Image.open(imageFile)
-    w, h = image.size
-    sz = min(w, h, settings.PROFILE_IMAGE_SIZE)
-
-    image_data = np.array(image)
-    image_data = image_data[:,:,:3]
-
-    if h > w:
-        image_data = image_data[:w]
-    
-    image = Image.fromarray(image_data).resize((sz, sz), Image.ANTIALIAS)
-
-    output = BytesIO()
-    image.save(output, 'JPEG', quality=90)
-    fileName = f"{imgField.name.split('.')[0]}.jpg"
-    return InMemoryUploadedFile(output,'ImageField', fileName , 'image/jpeg', sys.getsizeof(output), None)
     
 def updateAccount(request):
     form = UpdateAccountForm(initial={
-            'fullname': request.user.fullname, 
-            'email': request.user.email
+            'fullname': request.user.fullname
         })
 
     if request.method == 'POST':
-        form = UpdateAccountForm(request.POST, request.FILES, initial={'email': request.user.email})
+        form = UpdateAccountForm(request.POST, request.FILES)
         if form.is_valid():
             user = request.user
-            user.username = form.cleaned_data['email']
-            user.email = form.cleaned_data['email']
             user.fullname = form.cleaned_data['fullname']
             profilePicture = form.cleaned_data.get('profilePicture')
             if profilePicture and profilePicture.name != '' :

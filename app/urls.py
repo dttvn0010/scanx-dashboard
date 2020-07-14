@@ -91,6 +91,7 @@ urlpatterns = [
     path('api/user/checkin', views_api.userCheckIn),
     path('api/user/get_checkin_history', views_api.getUserCheckInHistory),
     path('api/user/change_password', views_api.changeUserPassword),
+    path('api/user/update_profile', views_api.updateUserProfile),
 
     path('api/user/search', views_api.searchUser),
     path('api/user/get_by_organization', views_api.getUsersByOrganization),

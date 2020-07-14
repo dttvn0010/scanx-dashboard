@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-09 11:00+0100\n"
+"POT-Creation-Date: 2020-07-14 07:59+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,15 +22,15 @@ msgstr ""
 msgid "incorrect.temporary.password"
 msgstr "Incorrect temporary password"
 
-#: .\app\forms.py:38 .\app\forms.py:72 .\app\forms.py:116
+#: .\app\forms.py:38 .\app\forms.py:72 .\app\forms.py:108
 msgid "password.too.short"
 msgstr "Password is too short"
 
-#: .\app\forms.py:41 .\app\forms.py:75 .\app\forms.py:119
+#: .\app\forms.py:41 .\app\forms.py:75 .\app\forms.py:111
 msgid "password.cannot.be.all.digits"
 msgstr "Password cannot be all digits"
 
-#: .\app\forms.py:50 .\app\forms.py:84 .\app\forms.py:128
+#: .\app\forms.py:50 .\app\forms.py:84 .\app\forms.py:120
 msgid "confirmed.password.not.match"
 msgstr "Confirmed password does not match"
 
@@ -38,7 +38,7 @@ msgstr "Confirmed password does not match"
 msgid "no.user.with.email.exist"
 msgstr "No user with this email exists"
 
-#: .\app\forms.py:109
+#: .\app\forms.py:101
 msgid "incorrect.password"
 msgstr "Incorrect Password"
 
@@ -143,7 +143,7 @@ msgstr "Company Name"
 #: .\app\templates\_admin\organizations\details.html:89
 #: .\app\templates\_admin\organizations\list.html:138
 #: .\app\templates\_admin\organizations\list_users.html:70
-#: .\app\templates\staff\users\list.html:249 .\app\views_admin.py:140
+#: .\app\templates\staff\users\list.html:250 .\app\views_admin.py:140
 msgid "active"
 msgstr "Active"
 
@@ -190,7 +190,7 @@ msgstr "Success"
 
 #: .\app\models.py:150
 msgid "check_in.status.incorrect.mobile.time"
-msgstr "Incorrect mobile time"
+msgstr "Incorrect mobile time."
 
 #: .\app\models.py:151
 msgid "check_in.status.invalid.gps.position"
@@ -226,36 +226,36 @@ msgstr "Successfully Scanned Device. Location is: %s"
 
 #: .\app\models.py:162
 msgid "check_in.mobile.message.incorrect.mobile.time"
-msgstr "Incorrect mobile time !"
+msgstr "Incorrect mobile time."
 
 #: .\app\models.py:163
 msgid "check_in.mobile.message.invalid.gps.position"
-msgstr "Invalid GPS position, please check if GPS is enabled!"
+msgstr "Invalid GPS position, please check if GPS is enabled."
 
 #: .\app\models.py:164
 msgid "check_in.mobile.message.incorrect.location"
-msgstr "Device location is incorrect, please contact admin!"
+msgstr "Device location is incorrect, please contact admin."
 
 #: .\app\models.py:165
 msgid "check_in.mobile.message.invalid.device.code"
-msgstr "Invalid device code, please contact admin!"
+msgstr "Invalid device code, please contact admin."
 
 #: .\app\models.py:166
 msgid "check_in.mobile.message.incorrect.device.uid"
-msgstr "Device's UID is incorrect, please contact admin!"
+msgstr "Device's UID is incorrect, please contact admin."
 
 #: .\app\models.py:167
 msgid "check_in.mobile.message.device.not.registered"
 msgstr ""
-"Device has not been registered to your organization, please contact admin!"
+"Device has not been registered to your organization, please contact admin."
 
 #: .\app\models.py:168
 msgid "check_in.mobile.message.device.disabled"
-msgstr "Device has been disabled, please contact admin!"
+msgstr "Device has been disabled, please contact admin."
 
 #: .\app\models.py:169
 msgid "check_in.mobile.message.scan.not.time.out.yet"
-msgstr "Please wait a minimum of %d minutes before next scan"
+msgstr "Please wait a minimum of %d minutes before next scan."
 
 #: .\app\models.py:281
 msgid "log.view.checkin.template"
@@ -274,7 +274,7 @@ msgstr "User '%s' has performed action '%s %s'"
 msgid "scanx.cloud.dashboard"
 msgstr "ScanX Cloud Dashboard"
 
-#: .\app\templates\_admin\base.html:44
+#: .\app\templates\_admin\base.html:44 .\app\templates\error.html:7
 #: .\app\templates\registration\forgot_password.html:3
 #: .\app\templates\registration\forgot_password_sent.html:3
 #: .\app\templates\registration\initial_setup.html:3
@@ -405,37 +405,37 @@ msgid "prompt.password"
 msgstr "Please enter your password to confirm:"
 
 #: .\app\templates\_admin\devices\registered\list.html:60
-#: .\app\templates\_admin\devices\registered\list.html:98
+#: .\app\templates\_admin\devices\registered\list.html:96
 #: .\app\templates\_admin\devices\unregistered\list.html:108
-#: .\app\templates\_admin\devices\unregistered\list.html:146
+#: .\app\templates\_admin\devices\unregistered\list.html:144
 #: .\app\templates\_admin\organizations\list.html:111
 #: .\app\templates\_admin\organizations\list.html:146
 #: .\app\templates\staff\devices\list.html:69
-#: .\app\templates\staff\devices\list.html:145
+#: .\app\templates\staff\devices\list.html:141
 #: .\app\templates\staff\locations\list.html:109
 #: .\app\templates\staff\locations\list.html:136
 #: .\app\templates\staff\users\list.html:164
-#: .\app\templates\staff\users\list.html:226
+#: .\app\templates\staff\users\list.html:227
 msgid "delete"
 msgstr "Delete"
 
-#: .\app\templates\_admin\devices\registered\list.html:124
-#: .\app\templates\_admin\devices\unregistered\list.html:172
-#: .\app\templates\staff\devices\list.html:173
+#: .\app\templates\_admin\devices\registered\list.html:122
+#: .\app\templates\_admin\devices\unregistered\list.html:170
+#: .\app\templates\staff\devices\list.html:169
 #: .\app\templates\staff\locations\list.html:162
-#: .\app\templates\staff\users\list.html:272
+#: .\app\templates\staff\users\list.html:273
 msgid "error.occured"
 msgstr "Error Occured"
 
-#: .\app\templates\_admin\devices\registered\list.html:133
-#: .\app\templates\_admin\devices\unregistered\list.html:181
-#: .\app\templates\staff\devices\list.html:182
+#: .\app\templates\_admin\devices\registered\list.html:136
+#: .\app\templates\_admin\devices\unregistered\list.html:184
+#: .\app\templates\staff\devices\list.html:183
 msgid "confirm.disable.device"
 msgstr "Do you want to disable this device?"
 
-#: .\app\templates\_admin\devices\registered\list.html:150
-#: .\app\templates\_admin\devices\unregistered\list.html:198
-#: .\app\templates\staff\devices\list.html:199
+#: .\app\templates\_admin\devices\registered\list.html:151
+#: .\app\templates\_admin\devices\unregistered\list.html:199
+#: .\app\templates\staff\devices\list.html:197
 msgid "confirm.enable.device"
 msgstr "Do you want to enable this device?"
 
@@ -484,11 +484,11 @@ msgstr "CSV file:"
 msgid "csv.select.columns"
 msgstr "Select the CSV column you want to use the data from for each field."
 
-#: .\app\templates\_admin\devices\unregistered\list.html:145
+#: .\app\templates\_admin\devices\unregistered\list.html:143
 #: .\app\templates\_admin\organizations\list.html:145
-#: .\app\templates\staff\devices\list.html:144
+#: .\app\templates\staff\devices\list.html:140
 #: .\app\templates\staff\locations\list.html:135
-#: .\app\templates\staff\users\list.html:223
+#: .\app\templates\staff\users\list.html:224
 msgid "edit"
 msgstr "Edit"
 
@@ -652,7 +652,7 @@ msgstr "To Date"
 #: .\app\templates\_admin\logs\list.html:129
 #: .\app\templates\_admin\organizations\list.html:143
 #: .\app\templates\staff\logs\list.html:124
-#: .\app\templates\staff\users\list.html:222
+#: .\app\templates\staff\users\list.html:223
 msgid "view.details"
 msgstr "View details"
 
@@ -670,17 +670,17 @@ msgstr "Number of Registered Devices"
 
 #: .\app\templates\_admin\organizations\details.html:43
 #: .\app\templates\_admin\organizations\details.html:49
-#: .\app\templates\staff\users\list.html:246
 #: .\app\templates\staff\users\list.html:247
 #: .\app\templates\staff\users\list.html:248
+#: .\app\templates\staff\users\list.html:249
 msgid "yes"
 msgstr "Yes"
 
 #: .\app\templates\_admin\organizations\details.html:43
 #: .\app\templates\_admin\organizations\details.html:49
-#: .\app\templates\staff\users\list.html:246
 #: .\app\templates\staff\users\list.html:247
 #: .\app\templates\staff\users\list.html:248
+#: .\app\templates\staff\users\list.html:249
 msgid "no"
 msgstr "No"
 
@@ -689,7 +689,7 @@ msgstr "No"
 #: .\app\templates\_admin\organizations\list.html:138
 #: .\app\templates\_admin\organizations\list_users.html:69
 #: .\app\templates\staff\users\list.html:209
-#: .\app\templates\staff\users\list.html:249
+#: .\app\templates\staff\users\list.html:250
 msgid "pending"
 msgstr "Pending"
 
@@ -706,7 +706,7 @@ msgstr "Email"
 
 #: .\app\templates\_admin\organizations\details.html:91
 #: .\app\templates\_admin\organizations\list_users.html:70
-#: .\app\templates\staff\users\list.html:249
+#: .\app\templates\staff\users\list.html:250
 msgid "inactive"
 msgstr "Inactive"
 
@@ -763,12 +763,12 @@ msgid "view.users"
 msgstr "View users"
 
 #: .\app\templates\_admin\organizations\list.html:149
-#: .\app\templates\staff\users\list.html:230
+#: .\app\templates\staff\users\list.html:231
 msgid "resend.mail"
 msgstr "Resend invitation email"
 
 #: .\app\templates\_admin\organizations\list.html:183
-#: .\app\templates\staff\users\list.html:311
+#: .\app\templates\staff\users\list.html:317
 msgid "confirm.resend.mail"
 msgstr "Resend an invitation email to this user?"
 
@@ -898,11 +898,11 @@ msgstr "Forgot password"
 
 #: .\app\templates\registration\reset_password.html:34
 msgid "invalid.request"
-msgstr "The request is invalid!"
+msgstr "The request is invalid."
 
 #: .\app\templates\registration\reset_password.html:43
 msgid "expired.request"
-msgstr "The request is expired!"
+msgstr "The request is expired."
 
 #: .\app\templates\registration\reset_password.html:52
 msgid "reset.your.password"
@@ -920,7 +920,7 @@ msgstr "Please use the below links to download the mobile app"
 msgid "iOS"
 msgstr "iOS"
 
-#: .\app\templates\staff\app_link.html:30
+#: .\app\templates\staff\app_link.html:24
 msgid "android"
 msgstr "Android"
 
@@ -1106,7 +1106,7 @@ msgstr "User details"
 
 #: .\app\templates\staff\users\form.html:68
 msgid "please.select.a.role"
-msgstr "Please select at least one role!"
+msgstr "Please select at least one role."
 
 #: .\app\templates\staff\users\form.html:81
 msgid "role.admin.warning"
@@ -1126,11 +1126,11 @@ msgstr "Import Users"
 msgid "delete.this.user"
 msgstr "Delete this User"
 
-#: .\app\templates\staff\users\list.html:281
+#: .\app\templates\staff\users\list.html:288
 msgid "confirm.disable.user"
 msgstr "Do you want to disable this user?"
 
-#: .\app\templates\staff\users\list.html:298
+#: .\app\templates\staff\users\list.html:303
 msgid "confirm.enable.user"
 msgstr "Do you want to enable this user?"
 
@@ -1142,67 +1142,71 @@ msgstr "Checkin History"
 msgid "name"
 msgstr "Name"
 
-#: .\app\views_api.py:268 .\app\views_api.py:599 .\app\views_api.py:826
-#: .\app\views_api.py:904 .\app\views_api.py:999
+#: .\app\views_api.py:268 .\app\views_api.py:628 .\app\views_api.py:855
+#: .\app\views_api.py:933 .\app\views_api.py:1028
 msgid "wrong.password"
-msgstr "Wrong Password!"
+msgstr "Wrong Password."
 
 #: .\app\views_api.py:334
 msgid "incorrect.username.or.password"
 msgstr "Incorrect username or password"
 
-#: .\app\views_api.py:342 .\app\views_api.py:499 .\app\views_api.py:676
-#: .\app\views_api.py:733
+#: .\app\views_api.py:342 .\app\views_api.py:498 .\app\views_api.py:528
+#: .\app\views_api.py:705 .\app\views_api.py:762
 msgid "incorrect.mobile.time"
-msgstr "Incorrect mobile time"
+msgstr "Incorrect mobile time."
 
-#: .\app\views_api.py:369 .\app\views_api.py:621 .\app\views_api.py:651
-#: .\app\views_api.py:667 .\app\views_api.py:724 .\app\views_api.py:774
-#: .\app\views_api.py:848 .\app\views_api.py:878
+#: .\app\views_api.py:369 .\app\views_api.py:650 .\app\views_api.py:680
+#: .\app\views_api.py:696 .\app\views_api.py:753 .\app\views_api.py:803
+#: .\app\views_api.py:877 .\app\views_api.py:907
 msgid "no.permission"
-msgstr "You do not have permission to perform this action!"
+msgstr "You do not have permission to perform this action."
 
-#: .\app\views_api.py:505
+#: .\app\views_api.py:504
+msgid "fullname.cannot.be.blank"
+msgstr "Full name cannot be blank."
+
+#: .\app\views_api.py:534
 msgid "incorrect.old.password"
 msgstr "Incorrect Old Password"
 
-#: .\app\views_api.py:511
+#: .\app\views_api.py:540
 msgid "new.password.empty"
 msgstr "New Password is empty"
 
-#: .\app\views_api.py:517
+#: .\app\views_api.py:546
 msgid "new.password.too.short"
 msgstr "New Password is too short"
 
-#: .\app\views_api.py:523
+#: .\app\views_api.py:552
 msgid "new.password.cannot.be.all.digits"
 msgstr "New Password cannot be all digits"
 
-#: .\app\views_api.py:645
+#: .\app\views_api.py:674
 msgid "user.locked.by.super.admin"
 msgstr "User has been locked by super admin"
 
-#: .\app\views_api.py:685
+#: .\app\views_api.py:714
 msgid "invalid.uid.value"
 msgstr "Invalid UID value"
 
-#: .\app\views_api.py:698
+#: .\app\views_api.py:727
 msgid "invalid.scan.code"
-msgstr "Invalid scan code!"
+msgstr "Invalid scan code."
 
-#: .\app\views_api.py:744
+#: .\app\views_api.py:773
 msgid "invalid.position"
-msgstr "Invalid position!"
+msgstr "Invalid position."
 
-#: .\app\views_api.py:753
+#: .\app\views_api.py:782
 msgid "no.device.with.provided.uid"
 msgstr "No device with provided UID exists"
 
-#: .\app\views_api.py:759
+#: .\app\views_api.py:788
 msgid "device.has.been.disabled"
 msgstr "Device has been disabled"
 
-#: .\app\views_api.py:872
+#: .\app\views_api.py:901
 msgid "device.locked.by.super.admin"
 msgstr "Device has been locked by super admin"
 

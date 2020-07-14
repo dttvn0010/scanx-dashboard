@@ -18,7 +18,7 @@ from. param_utils import getTenantParamValue, getSystemParamValue
 from .models import *
 from .serializers import *
 from .log_utils import logAction
-
+from .img_utils import resizeProfileImage
 
 # ================================================ LogIn ========================================================
 
@@ -481,6 +481,35 @@ def getUserCheckInHistory(request):
     return Response({
         "data": result
     })
+
+@api_view(['POST'])
+@permission_classes((IsAuthenticated,))
+def updateUserProfile(request):
+    
+    mobiletime = float(request.data.get('mobiletime', '0'))
+    allowedTimeDiff = getSystemParamValue('MAX_TIME_DIFF_ALLOW',  settings.MAX_TIME_DIFF_ALLOW)
+
+    fullname = request.data.get('fullname', '')
+    profilePicture = request.data.get('profilePicture')
+
+    if abs(mobiletime - time()) > allowedTimeDiff:
+        return Response({
+            "success": False,
+            "message": _("incorrect.mobile.time")
+        })
+
+    if fullname.strip() == '':
+        return Response({
+            "success": False,
+            "message": _("fullname.cannot.be.blank")
+        })
+    
+    user = request.user
+    user.fullname = fullname
+    if profilePicture and profilePicture.name != '' :
+        user.profilePicture = resizeProfileImage(profilePicture)
+    user.save()
+    return Response({'success': True})
 
 @api_view(['POST'])
 @permission_classes((IsAuthenticated,))

@@ -86,16 +86,8 @@ class ResetPasswordForm(forms.Form):
         return password2 
 
 class UpdateAccountForm(forms.Form):
-    email = forms.EmailField()
     fullname = forms.CharField(max_length=30)
     profilePicture = forms.ImageField(required=False)
-
-    def clean_email(self):
-        email = self.cleaned_data.get('email')
-        if email != self.initial.get('email') and User.objects.filter(email=email):
-            raise forms.ValidationError('{_("user.with.email")} "%s" {_("already.exists")}' % (email))
-
-        return email
 
 class ChangePasswordForm(forms.Form):
     current_pass = forms.CharField()
