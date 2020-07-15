@@ -441,6 +441,7 @@ def userCheckIn(request):
     return Response({
         'success': status == CheckIn.Status.SUCCESS, 
         'statusCode': 1 if status == CheckIn.Status.SUCCESS else (2 if status != CheckIn.Status.SCAN_NOT_TIME_OUT_YET else 3),
+        'delay': scanDelay,
         'message': CheckIn.Status.mobile_messages.get(status, '') % tuple(message_params)
     })
 
