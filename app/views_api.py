@@ -288,11 +288,19 @@ def isValidLat(lat):
 
 def getUserData(user):
     nfcEnabled = qrScanEnabled = sharedLocation = False
+    scanDelay = 0
+    iosAppVersion = androidAppVersion = ''
+    isIOSNewUpdate = isAndroidNewUpdate = False
 
     if user.organization:
         nfcEnabled = user.nfcEnabled and user.organization.nfcEnabled
         qrScanEnabled = user.qrScanEnabled and user.organization.qrScanEnabled
         sharedLocation = user.sharedLocation
+        scanDelay = getTenantParamValue('SCAN_TIME_DELAY', user.organization, settings.SCAN_TIME_DELAY)
+        iosAppVersion = getTenantParamValue('IOS_APP_VERSION', user.organization)
+        isIOSNewUpdate = getTenantParamValue('IS_IOS_APP_NEW_UPDATE', user.organization) == 1
+        androidAppVersion = getTenantParamValue('ANDROID_APP_VERSION', user.organization)
+        isAndroidNewUpdate = getTenantParamValue('IS_ANDROID_APP_NEW_UPDATE', user.organization) == 1
 
     data = {
         'fullname': user.fullname, 
@@ -300,7 +308,12 @@ def getUserData(user):
         'nfcEnabled': nfcEnabled,
         'qrScanEnabled': qrScanEnabled,
         'sharedLocation': sharedLocation,
-        'roles': user.role_codes
+        'roles': user.role_codes,
+        'scanDelay': scanDelay,
+        'iosAppVersion': iosAppVersion,
+        'isIOSNewUpdate': isIOSNewUpdate,
+        'androidAppVersion': androidAppVersion,
+        'isAndroidNewUpdate': isAndroidNewUpdate
     }
 
     if user.profilePicture:
@@ -440,8 +453,7 @@ def userCheckIn(request):
 
     return Response({
         'success': status == CheckIn.Status.SUCCESS, 
-        'statusCode': 1 if status == CheckIn.Status.SUCCESS else (2 if status != CheckIn.Status.SCAN_NOT_TIME_OUT_YET else 3),
-        'delay': scanDelay,
+        'statusCode': 1 if status == CheckIn.Status.SUCCESS else (2 if status != CheckIn.Status.SCAN_NOT_TIME_OUT_YET else 3),        
         'message': CheckIn.Status.mobile_messages.get(status, '') % tuple(message_params)
     })
 
