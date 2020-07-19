@@ -297,9 +297,9 @@ def getUserData(user):
         qrScanEnabled = user.qrScanEnabled and user.organization.qrScanEnabled
         sharedLocation = user.sharedLocation
         scanDelay = getTenantParamValue('SCAN_TIME_DELAY', user.organization, settings.SCAN_TIME_DELAY)
-        iosAppVersion = getTenantParamValue('IOS_APP_VERSION', user.organization)
+        iosAppVersion = getTenantParamValue('IOS_APP_VERSION', user.organization, '1.0')
         isIOSNewUpdate = getTenantParamValue('IS_IOS_APP_NEW_UPDATE', user.organization) == 1
-        androidAppVersion = getTenantParamValue('ANDROID_APP_VERSION', user.organization)
+        androidAppVersion = getTenantParamValue('ANDROID_APP_VERSION', user.organization, '1.0')
         isAndroidNewUpdate = getTenantParamValue('IS_ANDROID_APP_NEW_UPDATE', user.organization) == 1
 
     data = {
