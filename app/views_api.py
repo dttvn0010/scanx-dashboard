@@ -289,18 +289,12 @@ def isValidLat(lat):
 def getUserData(user):
     nfcEnabled = qrScanEnabled = sharedLocation = False
     scanDelay = 0
-    iosAppVersion = androidAppVersion = ''
-    isIOSNewUpdate = isAndroidNewUpdate = False
-
+ 
     if user.organization:
         nfcEnabled = user.nfcEnabled and user.organization.nfcEnabled
         qrScanEnabled = user.qrScanEnabled and user.organization.qrScanEnabled
         sharedLocation = user.sharedLocation
-        scanDelay = getTenantParamValue('SCAN_TIME_DELAY', user.organization, settings.SCAN_TIME_DELAY)
-        iosAppVersion = getTenantParamValue('IOS_APP_VERSION', user.organization, '1.0')
-        isIOSNewUpdate = getTenantParamValue('IS_IOS_APP_NEW_UPDATE', user.organization) == 1
-        androidAppVersion = getTenantParamValue('ANDROID_APP_VERSION', user.organization, '1.0')
-        isAndroidNewUpdate = getTenantParamValue('IS_ANDROID_APP_NEW_UPDATE', user.organization) == 1
+        scanDelay = getTenantParamValue('SCAN_TIME_DELAY', user.organization, settings.SCAN_TIME_DELAY)      
 
     data = {
         'fullname': user.fullname, 
@@ -310,10 +304,10 @@ def getUserData(user):
         'sharedLocation': sharedLocation,
         'roles': user.role_codes,
         'scanDelay': scanDelay,
-        'iosAppVersion': iosAppVersion,
-        'isIOSNewUpdate': isIOSNewUpdate,
-        'androidAppVersion': androidAppVersion,
-        'isAndroidNewUpdate': isAndroidNewUpdate
+        'iosAppVersion': getSystemParamValue('IOS_APP_VERSION', '1.0'),
+        'isIOSNewUpdate': getSystemParamValue('IS_IOS_APP_NEW_UPDATE') == 1,
+        'androidAppVersion': getSystemParamValue('ANDROID_APP_VERSION', '1.0'),
+        'isAndroidNewUpdate': getSystemParamValue('IS_ANDROID_APP_NEW_UPDATE') == 1
     }
 
     if user.profilePicture:
