@@ -119,7 +119,7 @@ msgstr "This device does not exist"
 
 #: .\app\forms_staff.py:60
 msgid "this.device.not.set.uid.yet"
-msgstr "This device's UID has not been set yet."
+msgstr "This device's UID has not been set yet"
 
 #: .\app\forms_staff.py:63
 msgid "this.device.is.already.registered"
@@ -131,7 +131,7 @@ msgstr "Organization Name"
 
 #: .\app\forms_staff.py:81
 msgid "detail.information"
-msgstr "Detail Information"
+msgstr "Detailed Information"
 
 # Super admin dashboard
 # Sidebar and, Header, footer
@@ -190,7 +190,7 @@ msgstr "Success"
 
 #: .\app\models.py:150
 msgid "check_in.status.incorrect.mobile.time"
-msgstr "Incorrect mobile time."
+msgstr "Incorrect mobile time"
 
 #: .\app\models.py:151
 msgid "check_in.status.invalid.gps.position"
@@ -210,7 +210,7 @@ msgstr "Incorrect device UID"
 
 #: .\app\models.py:155
 msgid "check_in.status.device.not.registered"
-msgstr "Device not exist"
+msgstr "Device does not exist"
 
 #: .\app\models.py:156
 msgid "check_in.status.device.disabled"
@@ -218,7 +218,7 @@ msgstr "Device was disabled"
 
 #: .\app\models.py:157
 msgid "check_in.status.scan.not.time.out.yet"
-msgstr "Scan not time out yet"
+msgstr "Scan delay error"
 
 #: .\app\models.py:161
 msgid "check_in.mobile.message.success"
