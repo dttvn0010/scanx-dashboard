@@ -433,7 +433,7 @@ def userCheckIn(request):
 
         timediff = scantime - datetime.timestamp(lastCheckIn.date)
 
-        if status == CheckIn.Status.SUCCESS and timediff < scanDelay * 60:
+        if status == CheckIn.Status.SUCCESS and timediff < scanDelay:
             status = CheckIn.Status.SCAN_NOT_TIME_OUT_YET
             message_params = [scanDelay]
 
