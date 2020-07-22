@@ -479,7 +479,7 @@ def getUserCheckInHistory(request):
     for item in checkIns:
         result.append({
             'location': str(item.location),
-            'date': item.date.strftime('%d/%m/%Y %H:%M:%S') if item.date else '',
+            'date': timezone.localtime(item.date).strftime('%d/%m/%Y %H:%M:%S') if item.date else '',
             'position': {
                 'lat': item.lat,
                 'lng': item.lng
