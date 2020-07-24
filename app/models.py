@@ -176,7 +176,8 @@ class CheckIn(models.Model):
     scanCode = models.CharField(max_length=50, blank=True, null=True)
     uid = models.CharField(max_length=50, blank=True, null=True)
     lat = models.FloatField(null=True)
-    lng = models.FloatField(null=True)    
+    lng = models.FloatField(null=True) 
+    address = models.CharField(max_length=200, blank=True)   
     date = models.DateTimeField()
     status = models.IntegerField(null=True)
 

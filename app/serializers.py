@@ -39,7 +39,7 @@ class CheckInSerializer(ModelSerializer):
     date = DateTimeField(format="%d/%m/%Y %H:%M:%S", required=False, read_only=True)
     class Meta:
         model = CheckIn
-        fields = ('username', 'userFullName', 'addressLine1', 'addressLine2', 'postCode', 'city', 'lat', 'lng', 'date', 'status',)
+        fields = ('username', 'userFullName', 'addressLine1', 'addressLine2', 'postCode', 'city', 'lat', 'lng', 'address', 'date', 'status',)
 
 class LogInSerializer(ModelSerializer):    
     userFullName = CharField(source='user.fullname', default="")

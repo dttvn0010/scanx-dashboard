@@ -80,7 +80,11 @@
         { "data": "user" },
         { render: function(data, type, row) {
             if(!row.lat || !row.lng) return '';
-            return `<a href='javascript:openLocationModal(${row.lat},${row.lng})'>&nbsp;${row.lat},${row.lng}</a>`;
+            var html = `<a href='javascript:openLocationModal(${row.lat},${row.lng})'>&nbsp;${row.lat},${row.lng}</a>`;
+            if(row.address && row.address != '') {
+              html += `<br>(${row.address})`;
+            }
+            return html;
           }         
         },
         { "data": "status",

@@ -368,6 +368,14 @@ def getUserInfo(request):
     data['success'] = True
     return Response(data)
 
+def getAdressFromGeoLocation(lat, lng):
+    url = settings.GMAP_ADDRESS_API_URL + f'&latlng={lat},{lng}'
+    try:
+        resp = requests.get(url)
+        obj = json.loads(resp.text)
+        return obj['plus_code']['compound_code']
+    except:
+        return ''
 
 @api_view(['POST'])
 @permission_classes((IsAuthenticated,))
@@ -390,6 +398,7 @@ def userCheckIn(request):
     checkIn.uid = uid
     checkIn.lat = lat
     checkIn.lng = lng
+    checkIn.address = getAdressFromGeoLocation(lat, lng)
     checkIn.date = datetime.fromtimestamp(scantime)
 
     message_params = []
@@ -405,15 +414,15 @@ def userCheckIn(request):
     
     device = None
 
-    if status == CheckIn.Status.SUCCESS :
-        arr = code.split('-')
-        if len(arr) != 3 or arr[0] != settings.SCAN_CODE_PREFIX:
+    arr = code.split('-')
+    if len(arr) != 3 or arr[0] != settings.SCAN_CODE_PREFIX:
+        if status == CheckIn.Status.SUCCESS:
             status = CheckIn.Status.INVALID_DEVICE_CODE
-        else:
-            id1, id2 = arr[1:]
-            device = Device.objects.filter(id1=id1, id2=id2, organization=request.user.organization).first()
-            checkIn.device = device
-            checkIn.location = device.installationLocation if device else None
+    else:
+        id1, id2 = arr[1:]
+        device = Device.objects.filter(id1=id1, id2=id2, organization=request.user.organization).first()
+        checkIn.device = device
+        checkIn.location = device.installationLocation if device else None
     
     if status == CheckIn.Status.SUCCESS and not device:
         status = CheckIn.Status.DEVICE_NOT_REGISTERED
