@@ -369,7 +369,7 @@ def getUserInfo(request):
     return Response(data)
 
 def removeDoorNumbert(s):
-    s = s.strip()
+    s = s.replace('Unnamed Road,', '').strip()
     pos = s.find(' ')
     if pos > 0 and s[:pos].isdigit():
         return s[pos:].strip()
