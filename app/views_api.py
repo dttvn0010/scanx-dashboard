@@ -368,12 +368,19 @@ def getUserInfo(request):
     data['success'] = True
     return Response(data)
 
+def removeDoorNumbert(s):
+    s = s.strip()
+    pos = s.find(' ')
+    if pos > 0 and s[:pos].isdigit():
+        return s[pos:].strip()
+    return s
+
 def getAdressFromGeoLocation(lat, lng):
     url = settings.GMAP_ADDRESS_API_URL + f'&latlng={lat},{lng}'
     try:
         resp = requests.get(url)
         obj = json.loads(resp.text)
-        return obj['plus_code']['compound_code']
+        return removeDoorNumbert(obj['results'][0]['formatted_address'])
     except:
         return ''
 
