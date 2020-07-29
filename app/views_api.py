@@ -852,10 +852,13 @@ def searchUnregisteredDevice(request):
     devices = Device.objects.filter(organization__isnull=True)
     recordsTotal = devices.count()
 
-    devices = devices.filter(Q(id1__contains=keyword) | Q(id2__contains=keyword)).order_by('-createdDate')
+    devices = devices.filter(Q(id1__contains=keyword) 
+                            | Q(id2__contains=keyword) 
+                            | Q(uid__contains=keyword)).order_by('-createdDate')
+
     recordsFiltered = devices.count()
     devices = devices[start:start+length]
-    data = DeviceSerializer(devices, many=True).data
+    data = UnRegisteredDeviceSerializer(devices, many=True).data
     
     return Response({
         "draw": draw,

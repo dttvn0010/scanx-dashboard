@@ -24,6 +24,13 @@ class DeviceSerializer(ModelSerializer):
         model = Device
         fields = ('id', 'addressLine1', 'addressLine2', 'postCode', 'city', 'organizationName', 'id1', 'id2', 'uid', 'enabled', 'registeredDate', 'lat', 'lng') 
 
+class UnRegisteredDeviceSerializer(ModelSerializer):
+    
+    class Meta:
+        model = Device
+        fields = ('id', 'id1', 'id2', 'uid', 'enabled') 
+
+
 class LocationSerializer(ModelSerializer):
     class Meta:
         model = Location
