@@ -844,6 +844,9 @@ def getAllNFCTags(request):
 @api_view(['GET'])
 @permission_classes((IsAuthenticated,))
 def searchUnregisteredDevice(request):
+    if not request.user.is_superuser:
+        return Response({'success': False, 'message': _('no.permission')})
+        
     draw = request.query_params.get('draw', 1)    
     keyword = request.query_params.get('search[value]', '')
     start = int(request.query_params.get('start', 0))
