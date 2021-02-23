@@ -24,7 +24,51 @@ class Role(models.Model):
         
     def __str__(self):
         return self.name
+
+class Group(models.Model):
+    organization = models.ForeignKey(Organization, blank=True, null=True, on_delete=models.CASCADE)
+    code = models.CharField(max_length=30, unique=True)
+    name = models.CharField(max_length=200)
+    description = models.CharField(max_length=500, blank=True, null=True)
+
+    def __str__(self):
+        return self.name
         
+    def hasFeaturePermission(self, featureCode):
+        featurePermissionSet = self.groupFeaturePermission_set.all()
+        return any(p.featureCode == featureCode for p in featurePermissionSet)
+
+    def hasPagePermission(self, pageCode, actionCode):
+        pagePermissionSet = self.groupPagePermission_set.all()
+        
+        if actionCode != 'VIEW':
+            return any(p.pageCode == pageCode and p.actionCode == actionCode for p in pagePermissionSet)
+        else:
+            return any(p.pageCode == pageCode for p in pagePermissionSet)
+
+    def getViewHistoryGroups(self):
+        view_groups = []
+        viewHistoryPermissionSet = self.groupViewHistoryPermission_set.all()
+        
+        for p in viewHistoryPermissionSet:
+            if not any(x.code == p.view_group.code for x in view_groups):
+                view_groups.append(p.view_group)
+                
+        return view_groups
+
+class GroupFeaturePermission(models.Model):
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    featureCode = models.CharField(max_length=50)
+
+class GroupPagePermission(models.Model):
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    pageCode = models.CharField(max_length=50)
+    actionCode = models.CharField(max_length=30)
+
+class GroupViewHistoryPermission(models.Model):
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    viewGroup = models.ForeignKey(Group, related_name='viewGroup', on_delete=models.CASCADE, default=None)
+
 class User(AbstractUser):
     class Status:
         INVITED = 0
@@ -35,6 +79,7 @@ class User(AbstractUser):
     organization = models.ForeignKey(Organization, blank=True, null=True, on_delete=models.CASCADE)
     fullname = models.CharField(verbose_name=_("fullname") + " (*)", max_length=50, blank=True, null=True)
     roles = models.ManyToManyField(Role, verbose_name=_("role") + " (*)")
+    groups = models.ManyToManyField(Group, verbose_name=_("group") + " (*)")
     nfcEnabled = models.BooleanField(verbose_name=_('nfc.enabled'), blank=True, null=True)
     qrScanEnabled = models.BooleanField(verbose_name=_('qr.scanning.enabled'), blank=True, null=True)
     sharedLocation = models.BooleanField(verbose_name=_('geolocation.enabled'), blank=True, null=True)
@@ -59,6 +104,22 @@ class User(AbstractUser):
 
     def hasAnyRole(self, roleCodes):
         return any(self.hasRole(roleCode) for roleCode in roleCodes)
+
+    def hasFeaturePermission(self, featureCode):
+        return any(group.hasFeaturePermission(featureCode) for group in self.groups.all())
+
+    def hasPagePermission(self, pageCode, actionCode):
+        return any(group.hasPagePermission(pageCode, actionCode) for group in self.groups.all())
+
+    def getViewHistoryGroups(self):
+        view_groups = []
+
+        for group in self.groups.all():
+            for view_group in group.getViewHistoryGroups():
+                if not any(x.code == view_group.code for x in view_groups):
+                    view_groups.append(view_group)
+        
+        return view_groups
 
     @property
     def role_names(self):

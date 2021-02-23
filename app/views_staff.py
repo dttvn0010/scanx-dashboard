@@ -9,7 +9,6 @@ from django.utils.translation import gettext_lazy as _
 import csv
 import json
 from datetime import datetime, timedelta
-from threading import Thread
 
 from .models import *
 from .forms_staff import *
@@ -29,6 +28,14 @@ def get_item(d, key):
 @register.filter
 def has_role(user, roleCode):
     return user and user.hasRole(roleCode)
+
+@register.filter
+def has_page_permission(user, pageCode, actionCode):
+    return user and user.hasPagePermission(user, pageCode, actionCode)
+
+@register.filter
+def has_feature_permission(user, featureCode):
+    return user and user.hasFeaturePermission(user, featureCode)
 
 @register.filter
 def get_checkin_status_str(code):
@@ -410,6 +417,124 @@ def updateDevice(request, pk):
 
     return render(request, 'staff/devices/form.html', {'form': form, 'edit_device': device})
 
+#================================= Groups  ====================================================================
+
+@login_required
+def listGroups(request):
+    if not request.user.organization:
+        return redirect('login')
+
+    groups = Group.objects.filter(organization=request.user.organization)
+    return render(request, "staff/groups/list.html", {"groups": groups})
+
+@login_required
+def addGroup(request):
+    if not request.user.organization:
+        return redirect('login')
+
+    form = GroupForm()
+
+    if request.method == 'POST':
+        form = GroupForm(request.POST)
+        if form.is_valid():     
+            group = form.save(commit=False)
+            group.organization = request.user.organization
+            group.save()
+            logAction('CREATE', request.user, None, group)
+            return redirect('staff-group')
+
+    return render(request, 'staff/groups/form.html', {'form': form})
+
+@login_required
+def updateGroup(request, pk):
+    if not request.user.organization:
+        return redirect('login')
+
+    old_group = get_object_or_404(Group, pk=pk)
+    group = get_object_or_404(Group, pk=pk)
+    form = GroupForm(instance=group)
+
+    if request.method == 'POST':
+        form = GroupForm(request.POST, instance=group)
+
+        if form.is_valid():
+            group = form.save()
+            logAction('UPDATE', request.user, old_group, group)
+            return redirect('staff-group')
+
+    return render(request, 'staff/groups/form.html', {'form': form })
+
+def setGroupPermission(request, pk):
+    if not request.user.organization:
+        return redirect('login')
+
+    group = get_object_or_404(Group, pk=pk)
+    group_features = GroupFeaturePermission.objects.filter(group=group)
+    group_page_permissions = GroupPagePermission.objects.filter(group=group)
+    group_view_history_groups = GroupViewHistoryPermission.objects.filter(group=group) 
+    
+    pages = [dict(p) for p in settings.PAGES]
+    
+    for group_page_permission in group_page_permissions:
+        page = next(x for x in pages if x['code'] == group_page_permission.pageCode)
+        if not page: continue
+        page[group_page_permission.actionCode.lower()] = True
+
+    features = [dict(f) for f in (settings.FEATURES)]
+    for group_feature in group_features:
+        feature = next(x for x in features if x['code'] == group_feature.featureCode)
+        if not feature: continue
+        feature['access'] = True
+
+    view_groups = Group.objects.filter(organization=request.user.organization)
+    for group_view_history_group in group_view_history_groups:
+        view_group = next(x for x in view_groups if x.id == group_view_history_group.viewGroup.id)
+        if not view_group: continue
+        view_group.viewed = True
+
+    context = {
+        'group': group,
+        'view_groups': view_groups,
+        'pages': pages,
+        'features': features,
+    }
+
+    if request.method == 'POST':
+        data = request.POST
+
+        for group_feature in group_features:
+            group_feature.delete()
+
+        for group_page_permission in group_page_permissions:
+            group_page_permission.delete()
+
+        for group_view_history_group in group_view_history_groups:
+            group_view_history_group.delete()
+
+        for feature in features:
+            featureCode = feature['code']
+            if data.get('feature_' + featureCode):
+                group_feature = GroupFeaturePermission(group=group, featureCode=featureCode)
+                group_feature.save()
+
+        for page in pages:
+            pageCode = page['code']
+            for action in settings.PAGE_ACTIONS:
+                actionCode = action['code']
+                if data.get(f'page_{pageCode}_{actionCode}'):
+                    group_page_permission = GroupPagePermission(group=group, pageCode=pageCode, actionCode=actionCode)
+                    group_page_permission.save()
+
+        for view_group in view_groups:
+            if data.get(f'view_group_{view_group.id}'):
+                group_view_history_group = GroupViewHistoryPermission(group=group, viewGroup=view_group)
+                group_view_history_group.save()
+
+        return redirect('staff-group')
+
+    return render(request, 'staff/groups/permissions.html', context)
+
+
 #================================= Reports  ====================================================================
 
 def getCheckInReport(organization, status, userId, locationId, startDate, endDate):
@@ -632,7 +757,6 @@ def editCustomParams(request):
             tenant_param = tenant_param_map[key]
             tenant_param.value = value
             tenant_param.save()
-            print(key, value)
             
         saved = True
 

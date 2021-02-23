@@ -1,0 +1,131 @@
+{% extends "../base.html" %}
+{% load i18n %}
+
+{% block sidebar %}
+{% with page=9 %}
+{{ block.super }}
+{% endwith %}
+{% endblock %}
+
+{% block content %}
+<div class="content p-3">
+  <div class="card shadow mb-4">
+    <div class="card-header py-3">
+      <h6 class="m-0 font-weight-bold text-primary">{% trans "list.of.groups" %}</h6>
+    </div>
+    <div class="card-body">
+      <div class="row mb-4">
+        <div class="col-8">
+          <a href='/staff/groups/add' class="btn btn-sm btn-primary">
+            <i class="fas fa-plus text-white-50"></i> {% trans "add.group" %}
+          </a>
+        </div>
+      </div>
+
+      <table id="table" class="table table-bordered" width="100%" cellspacing="0">
+        <thead>
+          <tr>
+            <th style="width: 25%;">{% trans "name" %}</th>
+            <th style="width: 25%;">{% trans "code" %}</th>
+            <th style="width: 40%;">{% trans "description" %}</th>
+            <th style="width: 10%;"></th>
+          </tr>
+        </thead>
+      </table>
+    </div>
+  </div>
+
+  <div class="modal fade" id="deleteConfirmModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{% trans "delete.this.group" %}?</h5>
+          <button type="button" class="close" data-dismiss="modal">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <form id="fmt3" method="POST" onkeydown="return event.key != 'Enter';">
+            {%csrf_token%}
+            <input type="hidden" id="groupId">
+            <div class="row">
+              <div class="col"><label>{% trans "prompt.password" %}:</label></div>
+            </div>
+            <div class="row mt-2">
+              <div class="col"><input class="form-control" type="password" id="password" name="password"></div>
+            </div>
+            <div class="row mt-2">
+              <div class="col">
+                <label id="errorLabel" style="color: red;"></label>
+              </div>
+            </div>
+            <button type="button" onclick="deleteGroup()" class="mt-3 btn btn-sm btn-danger">
+              {% trans "delete" %}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var map;
+    var marker;
+    var ref_position = { lat: 52.479865, lng: -1.911067 };
+  
+    $(document).ready(function () {
+      $('#table').DataTable({
+        "ordering": false,
+        "processing": true,
+        "serverSide": true,
+        "language": {
+          "processing": "<div class='spinner-border'></div>"
+        },
+        "drawCallback": function (settings) {
+          $('.toggle-button').bootstrapToggle({ size: "xs" });
+          $('[data-toggle="tooltip"]').tooltip();
+        },
+        "ajax": "/api/group/search",
+        "columns": [
+          { "data": "code" },
+          { "data": "name" },
+          { "data": "description" },         
+          {
+            render: function (data, type, row) {
+              return `<a title='{% trans "edit" %}' href="/staff/groups/update/${row['id']}"><i class="fas fa-edit"></i></a>&nbsp;&nbsp;`
+                + `<a title='{% trans "set.permissions" %}' href="/staff/groups/permissions/${row['id']}"><i class="fas fa-user-secret"></i></a>&nbsp;&nbsp;`
+                + `<a title='{% trans "delete" %}' href="#" onclick="openDeleteConfirmation(${row['id']})" ><i class="fas fa-trash" style="color:red"></i></a>`;
+            },
+            sClass: "text-center"
+          }
+        ],
+      });
+  
+      $('[data-toggle="tooltip"]').tooltip();
+    });
+  
+    function openDeleteConfirmation(id) {
+      $("#errorLabel").html('');
+      $('#password').val('');
+      $('#groupId').val(id);
+      $("#deleteConfirmModal").modal();
+    }
+  
+    async function deleteGroup() {
+      $("#errorLabel").html('');
+      var formData = new FormData(document.getElementById("fmt3"));
+      var response = await fetch("/api/group/delete_from_org/" + $('#groupId').val(), {
+        body: formData,
+        method: "POST"
+      });
+      var result = await response.json();
+      if (result.success) {
+        location.href = "/staff/groups";
+      } else {
+        $("#errorLabel").html(result.error || '{% trans "error.occured" %}');
+      }
+    }
+  </script>
+
+{% endblock %}

@@ -30,10 +30,14 @@ class UnRegisteredDeviceSerializer(ModelSerializer):
         model = Device
         fields = ('id', 'id1', 'id2', 'uid', 'enabled') 
 
-
 class LocationSerializer(ModelSerializer):
     class Meta:
         model = Location
+        fields = '__all__'        
+
+class GroupSerializer(ModelSerializer):
+    class Meta:
+        model = Group
         fields = '__all__'        
 
 class CheckInSerializer(ModelSerializer):    

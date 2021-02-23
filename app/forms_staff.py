@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 class UserCreateForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ('fullname', 'email', 'nfcEnabled', 'qrScanEnabled', 'sharedLocation')
+        fields = ('fullname', 'email', 'nfcEnabled', 'qrScanEnabled', 'sharedLocation', 'groups')
 
     fullname = forms.CharField(max_length=30, label=_("fullname") + " (*)")
     email = forms.EmailField(max_length=50, label=_("email.address") + " (*)")
@@ -21,11 +21,10 @@ class UserCreateForm(forms.ModelForm):
 
         return email
 
-
 class UserChangeForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ( 'nfcEnabled', 'qrScanEnabled', 'sharedLocation')
+        fields = ( 'nfcEnabled', 'qrScanEnabled', 'sharedLocation', 'groups')
 
     nfcEnabled = forms.BooleanField(label=_('nfc.enabled'), required=False)
     qrScanEnabled = forms.BooleanField(label=_('qr.scanning.enabled'), required=False)
@@ -75,6 +74,10 @@ class DeviceChangeForm(forms.Form):
 
     description = forms.CharField(label=_('description'), required=False, widget=forms.Textarea(attrs={'rows':2}))
 
+class GroupForm(forms.ModelForm):
+    class Meta:
+        model = Group
+        exclude = ('organization',)
 
 class OrganizationChangeForm(forms.Form):
     name = forms.CharField(label=_("organization.name") + " (*)")

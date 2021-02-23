@@ -170,6 +170,27 @@ ROLES = {
     'USER': 'USER'
 }
 
+FEATURES = [
+    {'code': 'USE_APP', 'name': 'Use of tracdisc app (ability to scan tracdisc devices)'}
+]
+
+PAGES = [
+    {'code': 'DASHBOARD', 'name': 'Dashboard'},
+    {'code': 'USERS', 'name': 'Users'},
+    {'code': 'DEVICES', 'name': 'Devices'},
+    {'code': 'GROUPS', 'name': 'Groups'},
+    {'code': 'REPORTS', 'name': 'Reports'},
+    {'code': 'SETTINGS', 'name': 'Settings'},
+    {'code': 'LOGS', 'name': 'Logs'},
+    {'code': 'APP_INFO', 'name': 'App Info'},
+]
+
+PAGE_ACTIONS = [
+    {'code': 'VIEW', 'name': 'View'},
+    {'code': 'EDIT', 'name': 'Edit'},
+    {'code': 'DELETE', 'name': 'Delete'},
+]
+
 HOST_URL =  "https://scanx.cloud"
 INVITE_URL = HOST_URL + "/accounts/initial_setup"
 RESET_PASSWORD_URL = HOST_URL + "/accounts/reset_password"

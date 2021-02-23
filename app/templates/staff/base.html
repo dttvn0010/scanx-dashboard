@@ -68,9 +68,16 @@
           <a class="nav-link" href="/staff/devices">
             <span>{% trans "devices" %}</span></a>
         </li>
-                    
+                  
         <hr class="sidebar-divider my-0">
 
+        <li class="nav-item {% if page == 9 %} active {%endif%}">
+          <a class="nav-link" href="/staff/groups">
+            <span>{% trans "groups" %}</span></a>
+        </li>
+
+        <hr class="sidebar-divider my-0">
+        
         <li class="nav-item">
           <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapse1" aria-expanded="true">
             <span>{% trans "reports" %}</span>

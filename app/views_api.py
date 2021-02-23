@@ -1084,6 +1084,49 @@ def searchLocationByPostCode(request):
     else:
         return Response({'items': [], 'success': True})
 
+# =================================================== Groups ======================================================
+@api_view(['GET'])
+@permission_classes((IsAuthenticated,))
+def searchGroup(request):
+    draw = request.query_params.get('draw', 1)    
+    keyword = request.query_params.get('search[value]', '')
+    start = int(request.query_params.get('start', 0))
+    length = int(request.query_params.get('length', 0))
+    
+    groups = Group.objects.filter(organization=request.user.organization)
+    recordsTotal = groups.count()
+
+    groups = groups.filter(Q(code__contains=keyword) | Q(name__contains=keyword))
+    
+    recordsFiltered = groups.count()
+    groups = groups[start:start+length]
+    data = GroupSerializer(groups, many=True).data
+    
+    return Response({
+        "draw": draw,
+        "recordsTotal": recordsTotal,
+        "recordsFiltered": recordsFiltered,
+        "data": data
+    })     
+
+@api_view(['POST'])
+@permission_classes((IsAuthenticated,))
+def deleteGroup(request, pk):
+    try:
+        password = request.data.get('password', '')
+
+        if request.user.check_password(password):
+            group = Group.objects.get(pk=pk)
+            logAction('DELETE', request.user, group, None)
+            group.delete()
+            return Response({'success': True})    
+        else:
+            return Response({'success': False, 'error': _('wrong.password')})    
+
+    except Exception as e:
+        traceback.print_exc()
+        return Response({'success': False, 'error': str(e)})
+
 # =================================================== Mail Templates ======================================================
 @api_view(['GET'])
 @permission_classes((IsAuthenticated,))

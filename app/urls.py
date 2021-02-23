@@ -61,8 +61,13 @@ urlpatterns = [
 
     path('staff/devices', views_staff.listDevices, name='staff-device'),
     path('staff/devices/add', views_staff.addDevice),
-    path('staff/devices/update/<int:pk>', views_staff.updateDevice,),    
+    path('staff/devices/update/<int:pk>', views_staff.updateDevice),    
         
+    path('staff/groups', views_staff.listGroups, name='staff-group'),
+    path('staff/groups/add', views_staff.addGroup),
+    path('staff/groups/update/<int:pk>', views_staff.updateGroup),  
+    path('staff/groups/permissions/<int:pk>', views_staff.setGroupPermission),  
+
     path('staff/reports/check_in', views_staff.reportCheckIn),
     path('staff/reports/check_in/export_pdf', views_staff.reportCheckInExportPdf),
     
@@ -115,6 +120,9 @@ urlpatterns = [
     path('api/location/search', views_api.searchLocation),
     path('api/location/search_by_postcode', views_api.searchLocationByPostCode),
     path('api/location/delete/<int:pk>', views_api.deleteLocation),
+
+    path('api/group/search', views_api.searchGroup),
+    path('api/group/delete/<int:pk>', views_api.deleteGroup),
 
     path('api/mail_template/get_content/<int:pk>', views_api.getMailTemplateContent),
 
