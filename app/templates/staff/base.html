@@ -43,41 +43,47 @@
 
       <hr class="sidebar-divider my-0">
 
-      <li class="nav-item {% if not page  %} active {%endif%}">
-        <a class="nav-link" href="/staff">
-          <span>{% trans "dashboard" %}</span></a>
-      </li>
-      {%if user.is_tenant_admin %}
+      {% if user|has_page_view_permission:"DASHBOARD" %}
+        <li class="nav-item {% if not page  %} active {%endif%}">
+          <a class="nav-link" href="/staff">
+            <span>{% trans "dashboard" %}</span></a>
+        </li>
         <hr class="sidebar-divider my-0">
-
+      {% endif %}
+      
+      {% if user|has_page_view_permission:"USERS" %}
         <li class="nav-item {% if page == 1 %} active {%endif%}">
           <a class="nav-link" href="/staff/users">
             <span>{% trans "users" %}</span></a>
         </li>
-
         <hr class="sidebar-divider my-0">
+      {% endif %}
 
+      {% if user|has_page_view_permission:"LOCATIONS" %}
         <li class="nav-item {% if page == 2 %} active {%endif%}">
           <a class="nav-link" href="/staff/locations">
             <span>{% trans "locations" %}</span></a>
         </li>
-
         <hr class="sidebar-divider my-0">
+      {% endif %}
 
+      {% if user|has_page_view_permission:"DEVICES" %}
         <li class="nav-item {% if page == 3 %} active {%endif%}">
           <a class="nav-link" href="/staff/devices">
             <span>{% trans "devices" %}</span></a>
-        </li>
-                  
+        </li>                  
         <hr class="sidebar-divider my-0">
+      {% endif %}
 
+      {% if user|has_page_view_permission:"GROUPS" %}
         <li class="nav-item {% if page == 9 %} active {%endif%}">
           <a class="nav-link" href="/staff/groups">
             <span>{% trans "groups" %}</span></a>
         </li>
-
         <hr class="sidebar-divider my-0">
-        
+      {% endif %}
+      
+      {% if user|has_page_view_permission:"REPORTS" %}
         <li class="nav-item">
           <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapse1" aria-expanded="true">
             <span>{% trans "reports" %}</span>
@@ -89,9 +95,10 @@
             </div>
           </div>
         </li>
-
         <hr class="sidebar-divider my-0">
+      {% endif %}
 
+      {% if user|has_page_view_permission:"SETTINGS" %}
         <li class="nav-item">
           <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapse2" aria-expanded="true">
             <span>{% trans "settings" %}</span>
@@ -107,24 +114,24 @@
             </div>
           </div>
         </li>
-
         <hr class="sidebar-divider my-0">
+      {% endif %}
 
+      {% if user|has_page_view_permission:"LOGS" %}
         <li class="nav-item {% if page == 7 %} active {%endif%}">
           <a class="nav-link" href="/staff/logs">
             <span>{% trans "logs" %}</span></a>
         </li>
-
         <hr class="sidebar-divider my-0">
+      {% endif %}
 
+      {% if user|has_page_view_permission:"APP_INFO" %}
         <li class="nav-item {% if page == 8 %} active {%endif%}">
           <a class="nav-link" href="/staff/app_info">
             <span>{% trans "app.info" %}</span></a>
         </li>
-
-      {%endif%}
-
-      <hr class="sidebar-divider my-0">
+        <hr class="sidebar-divider my-0">
+        {% endif %}
 
       <!-- Sidebar Toggler (Sidebar) -->
       <div class="text-center d-none d-md-inline">

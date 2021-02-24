@@ -9,71 +9,87 @@
 
 {% block content %}
 <div class="content p-3">
-  <div class="card shadow mb-4">
-    <div class="card-header py-3">
-      <h6 class="m-0 font-weight-bold text-primary">{% trans "Permissions For" %} {{ group.name }}</h6>
-    </div>
-    <div class="card-body">
-      <form method="POST" novalidate> 
-        {% csrf_token %}
-        <table class="table">
-          <tbody>
-            <tr>
-              <th style="width: 75%;">Features (or modules):</th>
-              <th colspan="3">Access</th>
-            </tr>
-            {%  for feature in features %}
-            <tr>
-              <td>{{feature.name}}</td>
-              <td colspan="3">
-                <input name='feature_{{feature.code}}' type="checkbox" {% if feature.access %} checked {% endif %}>
-              </td>
-            </tr>
-            {% endfor %}
-            <tr>
-              <th>Access to Pages</th>
-              <th>View</th>
-              <th>Edit</th>
-              <th>Delete</th>
-            </tr>
-            {% for page in pages %}
-            <tr>
-              <td>{{page.name}}</td>
-              <td>
-                <input name='page_{{page.code}}_VIEW' type="checkbox" {% if page.view %} checked {% endif %}>
-              </td>
-              <td>
-                <input name='page_{{page.code}}_EDIT' type="checkbox" {% if page.edit %} checked {% endif %}>
-              </td>
-              <td>
-                <input name='page_{{page.code}}_DELETE' type="checkbox" {% if page.delete %} checked {% endif %}>
-              </td>
-            </tr>
-            {% endfor %}
-            <tr>
-              <th>View check-in history of Groups</th>
-              <th colspan="3">View</th>              
-            </tr>
-            {% for view_group in view_groups %}
+  {% if user|has_page_view_permission:"GROUPS" %}
+    <div class="card shadow mb-4">
+      <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">{% trans "Permissions For" %} {{ group.name }}</h6>
+      </div>
+      <div class="card-body">
+        <form method="POST" novalidate> 
+          {% csrf_token %}
+          <table class="table">
+            <tbody>
               <tr>
-                <td>{{view_group.name}}</td>
+                <th style="width: 75%;">Features (or modules):</th>
+                <th colspan="3">Access</th>
+              </tr>
+              {%  for feature in features %}
+              <tr>
+                <td>{{feature.name}}</td>
                 <td colspan="3">
-                  <input name='view_group_{{view_group.id}}' type="checkbox" {% if view_group.viewed %} checked {% endif %}>
+                  <input name='feature_{{feature.code}}' type="checkbox" 
+                    {% if feature.access %} checked {% endif %}
+                    {% if not user|has_page_edit_permission:"GROUPS"%} onclick="return false;" {%endif%}>
                 </td>
               </tr>
-            {% endfor %}
-          </tbody>
-        </table>        
+              {% endfor %}
+              <tr>
+                <th>Access to Pages</th>
+                <th>View</th>
+                <th>Edit</th>
+                <th>Delete</th>
+              </tr>
+              {% for page in pages %}
+              <tr>
+                <td>{{page.name}}</td>
+                <td>
+                  <input name='page_{{page.code}}_VIEW' type="checkbox" 
+                    {% if page.view %} checked {% endif %}
+                    {% if not user|has_page_edit_permission:"GROUPS"%} onclick="return false;" {%endif%}>
+                </td>
+                <td>
+                  <input name='page_{{page.code}}_EDIT' type="checkbox" 
+                    {% if page.edit %} checked {% endif %}
+                    {% if not user|has_page_edit_permission:"GROUPS"%} onclick="return false;" {%endif%}>
+                </td>
+                <td>
+                  <input name='page_{{page.code}}_DELETE' type="checkbox" 
+                    {% if page.delete %} checked {% endif %}
+                    {% if not user|has_page_edit_permission:"GROUPS"%} onclick="return false;" {%endif%}>
+                </td>
+              </tr>
+              {% endfor %}
+              <tr>
+                <th>View check-in history of Groups</th>
+                <th colspan="3">View</th>              
+              </tr>
+              {% for view_group in view_groups %}
+                <tr>
+                  <td>{{view_group.name}}</td>
+                  <td colspan="3">
+                    <input name='view_group_{{view_group.id}}' type="checkbox" 
+                      {% if view_group.viewed %} checked {% endif %}
+                      {% if not user|has_page_edit_permission:"GROUPS"%} onclick="return false;" {%endif%}>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>        
 
-        <a class="btn btn-sm btn-secondary mr-1" href='/staff/groups'>
-          <i class="fas fa-arrow-left text-white-50"></i> {% trans "back" %}
-        </a>
-        
-        <button class="btn btn-sm btn-primary" type="submit">
-          <i class="fas fa-save text-white-50"></i> {% trans "save" %}
-        </button>        
-      </form>      
+          <a class="btn btn-sm btn-secondary mr-1" href='/staff/groups'>
+            <i class="fas fa-arrow-left text-white-50"></i> {% trans "back" %}
+          </a>
+          
+          {% if user|has_page_edit_permission:"GROUPS"%}
+            <button class="btn btn-sm btn-primary" type="submit">
+              <i class="fas fa-save text-white-50"></i> {% trans "save" %}
+            </button>        
+          {%endif%}
+        </form>      
+      </div>
     </div>
-  </div>
+  {%else%}
+    <h4>You do not have access to this page</h4>
+  {%endif%}
 </div>
 {% endblock %}

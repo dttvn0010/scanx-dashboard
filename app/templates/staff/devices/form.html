@@ -8,37 +8,41 @@
 {% endblock %}
 
 {% block content %}
-<div class="content p-3">
-  <div class="card shadow mb-4">
-    <div class="card-header py-3">
-      <h6 class="m-0 font-weight-bold text-primary">{% trans "device.details" %}</h6>
+  <div class="content p-3">
+    {% if user|has_page_edit_permission:"DEVICES" %}
+    <div class="card shadow mb-4">
+      <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">{% trans "device.details" %}</h6>
+      </div>
+      <div class="card-body">
+        <form method="POST" novalidate> 
+          {% csrf_token %}
+          <table class="table table-form mb-2">
+            {% if edit_device %}
+              <tr>
+                <th>{% trans "id1" %}:</th>
+                <td>{{ edit_device.id1 }}</td>              
+              </tr>
+              <tr>
+                <th>{% trans "id2" %}:</th>
+                <td>{{ edit_device.id2 }}</td>              
+              </tr>         
+            {%endif%}
+            {{ form }}
+          </table>
+          
+          <a class="btn btn-sm btn-secondary mr-1" href='/staff/devices'>
+            <i class="fas fa-arrow-left text-white-50"></i> {% trans "back" %}
+          </a>
+          
+          <button class="btn btn-sm btn-primary" type="submit">
+            <i class="fas fa-save text-white-50"></i> {% trans "save" %}
+          </button>        
+        </form>
+      </div>
     </div>
-    <div class="card-body">
-      <form method="POST" novalidate> 
-        {% csrf_token %}
-        <table class="table table-form mb-2">
-          {% if edit_device %}
-            <tr>
-              <th>{% trans "id1" %}:</th>
-              <td>{{ edit_device.id1 }}</td>              
-            </tr>
-            <tr>
-              <th>{% trans "id2" %}:</th>
-              <td>{{ edit_device.id2 }}</td>              
-            </tr>         
-          {%endif%}
-          {{ form }}
-        </table>
-        
-        <a class="btn btn-sm btn-secondary mr-1" href='/staff/devices'>
-          <i class="fas fa-arrow-left text-white-50"></i> {% trans "back" %}
-        </a>
-        
-        <button class="btn btn-sm btn-primary" type="submit">
-          <i class="fas fa-save text-white-50"></i> {% trans "save" %}
-        </button>        
-      </form>
-    </div>
+    {% else %}
+      <h4>You do not have access to this page</h4>
+    {% endif %}
   </div>
-</div>
 {% endblock %}

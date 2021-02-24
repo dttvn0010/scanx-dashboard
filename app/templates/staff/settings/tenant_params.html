@@ -9,37 +9,51 @@
 
 {% block content %}
 <div class="content p-3">
-  <div class="card shadow mb-4">
-    <div class="card-header py-3">
-      <h6 class="m-0 font-weight-bold text-primary">{% trans "custom.parameters" %}</h6>
-    </div>
-    <div class="card-body">
-      {%if saved%}
-      <span class="badge badge-success mb-3">{% trans "successfully.saved" %}!</span>
-      {%endif%}
-      <form method="POST">
-        {% csrf_token %}
-        <table class="table">
-          <tbody>
-            {% for param in tenant_params %}
-            <tr>
-              <th style="width:40%">{{param.parameter.name}}:</th>
-              <td>
-                <input type='{{param.parameter.type}}' value='{{param.value}}' 
-                  {%if param.parameter.min or param.parameter.min == 0 %} min='{{param.parameter.min}}' {%endif%}
-                  {%if param.parameter.max %} max='{{param.parameter.max}}' {%endif%}
-                  {%if param.parameter.maxLength %} maxlength='{{param.parameter.maxLength}}' {%endif%}
-                  class="form-control" name='{{ param.parameter.key }}'>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>    
-        <button type="submit" class="btn btn-sm btn-primary">
-          <i class="fas fa-save text-white-50"></i> {% trans "save" %}
-        </button>
-      </form>
-    </div>
-  </div>  
+  {% if user|has_page_view_permission:"SETTINGS" %}
+    <div class="card shadow mb-4">
+      <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">{% trans "custom.parameters" %}</h6>
+      </div>
+      <div class="card-body">
+        {%if saved%}
+        <span class="badge badge-success mb-3">{% trans "successfully.saved" %}!</span>
+        {%endif%}
+        <form method="POST">
+          {% csrf_token %}
+          <table class="table">
+            <tbody>
+              {% for param in tenant_params %}
+              <tr>
+                <th style="width:40%">{{param.parameter.name}}:</th>
+                <td>
+                  <input type='{{param.parameter.type}}' value='{{param.value}}' 
+                    {%if param.parameter.min or param.parameter.min == 0 %} min='{{param.parameter.min}}' {%endif%}
+                    {%if param.parameter.max %} max='{{param.parameter.max}}' {%endif%}
+                    {%if param.parameter.maxLength %} maxlength='{{param.parameter.maxLength}}' {%endif%}
+                    class="form-control" name='{{ param.parameter.key }}'>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>  
+          {% if user|has_page_edit_permission:"SETTINGS" %}  
+            <button type="submit" class="btn btn-sm btn-primary">
+              <i class="fas fa-save text-white-50"></i> {% trans "save" %}
+            </button>
+          {%endif%}
+        </form>
+      </div>
+    </div>  
+  {%else%}
+    <h4>You do not have access to this page</h4>
+  {%endif%}
 </div>
+<script>
+$(document).ready(function() {
+  if('{{ user|has_page_edit_permission:"SETTINGS" }}' == 'False') {
+    $('input,textarea').attr('readonly', 'readonly');
+    $('input[type=checkbox]').attr('onclick', 'return false;');
+  }
+});
+</script>
 {% endblock %}

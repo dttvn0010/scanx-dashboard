@@ -34,12 +34,13 @@ class Group(models.Model):
     def __str__(self):
         return self.name
         
-    def hasFeaturePermission(self, featureCode):
-        featurePermissionSet = self.groupFeaturePermission_set.all()
+    def hasFeaturePermission(self, featureCode):        
+        featurePermissionSet = GroupFeaturePermission.objects.filter(group=self)
         return any(p.featureCode == featureCode for p in featurePermissionSet)
 
     def hasPagePermission(self, pageCode, actionCode):
-        pagePermissionSet = self.groupPagePermission_set.all()
+        
+        pagePermissionSet = GroupPagePermission.objects.filter(group=self)
         
         if actionCode != 'VIEW':
             return any(p.pageCode == pageCode and p.actionCode == actionCode for p in pagePermissionSet)
@@ -48,11 +49,11 @@ class Group(models.Model):
 
     def getViewHistoryGroups(self):
         view_groups = []
-        viewHistoryPermissionSet = self.groupViewHistoryPermission_set.all()
+        viewHistoryPermissionSet = GroupViewHistoryPermission.objects.filter(group=self)
         
         for p in viewHistoryPermissionSet:
-            if not any(x.code == p.view_group.code for x in view_groups):
-                view_groups.append(p.view_group)
+            if not any(x.code == p.viewGroup.code for x in view_groups):
+                view_groups.append(p.viewGroup)
                 
         return view_groups
 
@@ -106,12 +107,21 @@ class User(AbstractUser):
         return any(self.hasRole(roleCode) for roleCode in roleCodes)
 
     def hasFeaturePermission(self, featureCode):
+        if self.hasRole('ADMIN'):
+            return True
+
         return any(group.hasFeaturePermission(featureCode) for group in self.groups.all())
 
     def hasPagePermission(self, pageCode, actionCode):
+        if self.hasRole('ADMIN'):
+            return True
+
         return any(group.hasPagePermission(pageCode, actionCode) for group in self.groups.all())
 
     def getViewHistoryGroups(self):
+        if self.hasRole('ADMIN'):
+            return Groups.objects.filter(organization=self.organization)
+
         view_groups = []
 
         for group in self.groups.all():

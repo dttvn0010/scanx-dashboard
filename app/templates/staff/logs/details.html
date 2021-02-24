@@ -10,120 +10,123 @@
 
 {% block content %}
 <div class="content p-3">
-  
-  <div class="card shadow mb-4">
-    <div class="card-header py-3">
-      <h6 class="m-0 font-weight-bold text-primary">{% trans "log.details" %}</h6>
-    </div>
-    <div class="card-body">
-      <div class="table-responsive">
-        {% if log.action.is_login %}
-          <table class="table">
-            <tbody>
-              <tr>
-                <td style="width: 40%;">{% trans "action" %}:</td>
-                <th>Login</th>
-              </tr>            
-              <tr>
-                <td>{% trans "perform.user" %}:</td>
-                <th>{{log.performUser}}</th>
-              </tr>
-              <tr>
-                <td>{% trans "date.time" %}:</td>
-                <th>{{log.actionDate|date:"d/m/Y H:i:s"}}</span></th>
-              </tr>
-            </tbody>
-          </table>
-        {% elif log.action.is_checkin %}
-          <table class="table">
-            <tbody>
-              <tr>
-                <td style="width: 40%;">{% trans "action" %}:</td>
-                <th>Checkin</th>
-              </tr>            
-              <tr>
-                <td>{% trans "perform.user" %}:</td>
-                <th>{{log.performUser}}</th>
-              </tr>
-              <tr>
-                <td>{% trans "date.time" %}:</td>
-                <th>{{log.actionDate|date:"d/m/Y H:i:s"}}</span></th>
-              </tr>
-              <tr>
-                <td>{% trans "location" %}:</td>
-                <th>
-                  {% with lat=postContent|get_item:"lat" lng=postContent|get_item:"lng" %}
-                    {%if lat and lng %}
-                      <span>{{lat}},{{lng}}</span>
-                    {%endif%}
-                  {% endwith %}
-                </th>
-              </tr>
-              <tr>
-                <td>{% trans "status" %}:</td>
-                <th>{{postContent|get_item:"status"|get_checkin_status_str}}</span></th>
-              </tr>
-            </tbody>
-          </table>
-          <div id="map" style="width: 100%;min-height: 560px;"></div>
-        {% else %}
-          <table class="table">
-            <tbody>
-              <tr>
-                <td style="width: 40%;">{% trans "action" %}:</td>
-                <th>{{log.action.name}}</th>
-              </tr>
-              <tr>
-                <td>{% trans "object" %}:</td>
-                <th>{{log.modelName}}</th>
-              </tr>
-              <tr>
-                <td>{% trans "perform.user" %}:</td>
-                <th>{{log.performUser}}</th>
-              </tr>
-              <tr>
-                <td>{% trans "date.time" %}:</td>
-                <th>{{log.actionDate|date:"d/m/Y H:i:s"}}</span></th>
-              </tr>
-            </tbody>
-          </table>
-        {% endif %}
-      </div>
-    </div>
-  </div>
-  
-  {% if log.action.is_crud %}
+  {% if user|has_page_view_permission:"LOGS" %}
     <div class="card shadow mb-4">
       <div class="card-header py-3">
-        <h6 class="m-0 font-weight-bold text-primary">{% trans "list.of.fields" %}</h6>
+        <h6 class="m-0 font-weight-bold text-primary">{% trans "log.details" %}</h6>
       </div>
       <div class="card-body">
         <div class="table-responsive">
-          <table class="table table-bordered">
-            <thead>
-              <tr>
-                <th style="width: 30%;">{% trans "filed.name" %}</th>
-                <th style="width: 35%;">{% trans "content.before.action" %}</th>
-                <th style="width: 35%;">{% trans "content.after.action" %}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for field in logFields %}
-              <tr>
-                <td>{{field}}</td>
-                <td>{{preContent|get_item:field}}</td>
-                <td>{{postContent|get_item:field}}</td>              
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+          {% if log.action.is_login %}
+            <table class="table">
+              <tbody>
+                <tr>
+                  <td style="width: 40%;">{% trans "action" %}:</td>
+                  <th>Login</th>
+                </tr>            
+                <tr>
+                  <td>{% trans "perform.user" %}:</td>
+                  <th>{{log.performUser}}</th>
+                </tr>
+                <tr>
+                  <td>{% trans "date.time" %}:</td>
+                  <th>{{log.actionDate|date:"d/m/Y H:i:s"}}</span></th>
+                </tr>
+              </tbody>
+            </table>
+          {% elif log.action.is_checkin %}
+            <table class="table">
+              <tbody>
+                <tr>
+                  <td style="width: 40%;">{% trans "action" %}:</td>
+                  <th>Checkin</th>
+                </tr>            
+                <tr>
+                  <td>{% trans "perform.user" %}:</td>
+                  <th>{{log.performUser}}</th>
+                </tr>
+                <tr>
+                  <td>{% trans "date.time" %}:</td>
+                  <th>{{log.actionDate|date:"d/m/Y H:i:s"}}</span></th>
+                </tr>
+                <tr>
+                  <td>{% trans "location" %}:</td>
+                  <th>
+                    {% with lat=postContent|get_item:"lat" lng=postContent|get_item:"lng" %}
+                      {%if lat and lng %}
+                        <span>{{lat}},{{lng}}</span>
+                      {%endif%}
+                    {% endwith %}
+                  </th>
+                </tr>
+                <tr>
+                  <td>{% trans "status" %}:</td>
+                  <th>{{postContent|get_item:"status"|get_checkin_status_str}}</span></th>
+                </tr>
+              </tbody>
+            </table>
+            <div id="map" style="width: 100%;min-height: 560px;"></div>
+          {% else %}
+            <table class="table">
+              <tbody>
+                <tr>
+                  <td style="width: 40%;">{% trans "action" %}:</td>
+                  <th>{{log.action.name}}</th>
+                </tr>
+                <tr>
+                  <td>{% trans "object" %}:</td>
+                  <th>{{log.modelName}}</th>
+                </tr>
+                <tr>
+                  <td>{% trans "perform.user" %}:</td>
+                  <th>{{log.performUser}}</th>
+                </tr>
+                <tr>
+                  <td>{% trans "date.time" %}:</td>
+                  <th>{{log.actionDate|date:"d/m/Y H:i:s"}}</span></th>
+                </tr>
+              </tbody>
+            </table>
+          {% endif %}
         </div>
       </div>
     </div>
-  {% endif %}
-  <a href="/staff/logs" class="mt-2 btn btn-sm btn-secondary">
-    <i class="fas fa-arrow-left text-white-50"></i> {% trans "back" %}
-  </a>
+    
+    {% if log.action.is_crud %}
+      <div class="card shadow mb-4">
+        <div class="card-header py-3">
+          <h6 class="m-0 font-weight-bold text-primary">{% trans "list.of.fields" %}</h6>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th style="width: 30%;">{% trans "filed.name" %}</th>
+                  <th style="width: 35%;">{% trans "content.before.action" %}</th>
+                  <th style="width: 35%;">{% trans "content.after.action" %}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for field in logFields %}
+                <tr>
+                  <td>{{field}}</td>
+                  <td>{{preContent|get_item:field}}</td>
+                  <td>{{postContent|get_item:field}}</td>              
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+    <a href="/staff/logs" class="mt-2 btn btn-sm btn-secondary">
+      <i class="fas fa-arrow-left text-white-50"></i> {% trans "back" %}
+    </a>
+  {%else%}
+    <h4>You do not have access to this page</h4>
+  {%endif%}
 </div>
 
 <script> 

@@ -10,103 +10,107 @@
 
 {% block content %}
 <div class="content p-3">
-  <div class="card shadow mb-4">
-    <div class="card-header py-3">
-      <h6 class="m-0 font-weight-bold text-primary">{% trans "check_in" %} {% trans "report" %}</h6>
-    </div>
-    <div class="card-body">
-      <form>
-        <input type="hidden" name="reported" value="1">
-        <div class="row">
-          <div class="col">
-            <label><b>{% trans "show.by" %}:</b></label>
+  {% if user|has_page_view_permission:"REPORTS" %}
+    <div class="card shadow mb-4">
+      <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">{% trans "check_in" %} {% trans "report" %}</h6>
+      </div>
+      <div class="card-body">
+        <form>
+          <input type="hidden" name="reported" value="1">
+          <div class="row">
+            <div class="col">
+              <label><b>{% trans "show.by" %}:</b></label>
+            </div>
+          </div>    
+          <div class="row mt-2">
+            <div class="col-4">
+              <label>{% trans "user" %}:</label>
+              <select name="userId" class="form-control">
+                <option value="">{% trans "all" %}</option>
+                {% for u in users %}
+                  <option value="{{u.id}}" {% if userId == u.id %}selected{%endif%}>{{u.fullname}}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-4">
+              <label>{% trans "location" %}:</label>
+              <select name="locationId" class="form-control">
+                <option value="">{% trans "all" %}</option>
+                {% for l in locations %}
+                  <option value="{{l.id}}" {% if locationId == l.id %}selected{%endif%}>{{l}}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-4">
+              <label>{% trans "status" %}:</label>
+              <select name="status" class="form-control">
+                <option value="">{% trans "all" %}</option>
+                <option {%if status == 1 %}selected {%endif%} value="1">{% trans "successful" %}</option>
+                <option {%if status == 2 %}selected {%endif%} value="2">{% trans "failed" %}</option>              
+              </select>
+            </div>          
           </div>
-        </div>    
-        <div class="row mt-2">
-          <div class="col-4">
-            <label>{% trans "user" %}:</label>
-            <select name="userId" class="form-control">
-              <option value="">{% trans "all" %}</option>
-              {% for u in users %}
-                <option value="{{u.id}}" {% if userId == u.id %}selected{%endif%}>{{u.fullname}}</option>
-              {% endfor %}
-            </select>
+          <div class="row mt-2">
+            <div class="col-4">
+              <label>{% trans "from.date" %}:</label>
+              <input name="startDate" value="{{startDate|default:''}}" class="form-control date" placeholder='{% trans "select.a.date" %}'>
+            </div>
+            <div class="col-4">
+              <label>{% trans "to.date" %}:</label>
+              <input name="endDate" value="{{endDate|default:''}}" class="form-control date" placeholder='{% trans "select.a.date" %}'>
+            </div>
           </div>
-          <div class="col-4">
-            <label>{% trans "location" %}:</label>
-            <select name="locationId" class="form-control">
-              <option value="">{% trans "all" %}</option>
-              {% for l in locations %}
-                <option value="{{l.id}}" {% if locationId == l.id %}selected{%endif%}>{{l}}</option>
-              {% endfor %}
-            </select>
+          <div class="row mt-3">
+            <div class="col">
+              <button type="submit" class="btn btn-sm btn-primary mr-1">
+                <i class="fas fa-file text-white-50"></i> {% trans "generate.report" %}
+              </button>
+              {%if reported %}
+              <button type="button" class="btn btn-sm btn-primary" onclick="exportPDF()">
+                <i class="fas fa-download text-white-50"></i> {% trans "export.pdf" %}
+              </button>
+              {% endif %}
+            </div>
           </div>
-          <div class="col-4">
-            <label>{% trans "status" %}:</label>
-            <select name="status" class="form-control">
-              <option value="">{% trans "all" %}</option>
-              <option {%if status == 1 %}selected {%endif%} value="1">{% trans "successful" %}</option>
-              <option {%if status == 2 %}selected {%endif%} value="2">{% trans "failed" %}</option>              
-            </select>
-          </div>          
-        </div>
-        <div class="row mt-2">
-          <div class="col-4">
-            <label>{% trans "from.date" %}:</label>
-            <input name="startDate" value="{{startDate|default:''}}" class="form-control date" placeholder='{% trans "select.a.date" %}'>
-          </div>
-          <div class="col-4">
-            <label>{% trans "to.date" %}:</label>
-            <input name="endDate" value="{{endDate|default:''}}" class="form-control date" placeholder='{% trans "select.a.date" %}'>
-          </div>
-        </div>
-        <div class="row mt-3">
-          <div class="col">
-            <button type="submit" class="btn btn-sm btn-primary mr-1">
-              <i class="fas fa-file text-white-50"></i> {% trans "generate.report" %}
-            </button>
-            {%if reported %}
-            <button type="button" class="btn btn-sm btn-primary" onclick="exportPDF()">
-              <i class="fas fa-download text-white-50"></i> {% trans "export.pdf" %}
-            </button>
-            {% endif %}
-          </div>
-        </div>
-      </form>
-    
-      {% if reported %}
-      <table class="table">
-        <thead>
+        </form>
+      
+        {% if reported %}
+        <table class="table">
+          <thead>
+            <tr>
+              <th style="width: 35%;">{% trans "location" %}</th>
+              <th style="width: 25%;">{% trans "date.time" %}</th>
+              <th style="width: 17%;">{% trans "user" %}</th>
+              <th style="width: 23%;">{% trans "status" %}</th>
+            </tr>
+          </thead>
+          {% for checkIn in checkIns %}
+            <tr>
+              <td>{{checkIn.location|default:''}}</td>
+              <td>{{checkIn.date|date:"d/m/Y H:i:s"}}</td>
+              <td>{{checkIn.user.fullname}}</td>
+              <td>
+                {%if checkIn.status == 1 %}
+                  {% trans "successful" %}
+                {%else%}
+                  {{ checkIn.error_message }}
+                {%endif%}
+              </td>
+            </tr>
+          {% endfor %}
+          {% if not checkIns %}
           <tr>
-            <th style="width: 35%;">{% trans "location" %}</th>
-            <th style="width: 25%;">{% trans "date.time" %}</th>
-            <th style="width: 17%;">{% trans "user" %}</th>
-            <th style="width: 23%;">{% trans "status" %}</th>
+            <td colspan="3">{% trans "no.result.found" %}.</td>
           </tr>
-        </thead>
-        {% for checkIn in checkIns %}
-          <tr>
-            <td>{{checkIn.location|default:''}}</td>
-            <td>{{checkIn.date|date:"d/m/Y H:i:s"}}</td>
-            <td>{{checkIn.user.fullname}}</td>
-            <td>
-              {%if checkIn.status == 1 %}
-                {% trans "successful" %}
-              {%else%}
-                {{ checkIn.error_message }}
-              {%endif%}
-            </td>
-          </tr>
-        {% endfor %}
-        {% if not checkIns %}
-        <tr>
-          <td colspan="3">{% trans "no.result.found" %}.</td>
-        </tr>
-        {% endif %}
-      </table>
-      {%endif%}
-    </div>
-  </div>  
+          {% endif %}
+        </table>
+        {%endif%}
+      </div>
+    </div>  
+  {%else%}
+    <h4>You do not have access to this page</h4>
+  {%endif%}
 </div>
 
 

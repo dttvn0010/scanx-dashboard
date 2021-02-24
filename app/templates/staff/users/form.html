@@ -9,53 +9,57 @@
 
 {% block content %}
 <div class="content p-3">
-  <div class="card shadow mb-4">
-    <div class="card-header py-3">
-      <h6 class="m-0 font-weight-bold text-primary">{% trans "user.details" %}</h6>
-    </div>
-    <div class="card-body">
-      <form id="fmt" method="POST" novalidate> 
-        {% csrf_token %}        
-        <table class="table table-form mb-2">
-          {% if edit_user %}
+  {% if user|has_page_edit_permission:"USERS" %}
+    <div class="card shadow mb-4">
+      <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">{% trans "user.details" %}</h6>
+      </div>
+      <div class="card-body">
+        <form id="fmt" method="POST" novalidate> 
+          {% csrf_token %}        
+          <table class="table table-form mb-2">
+            {% if edit_user %}
+              <tr>
+                <th style="width: 30%;">{% trans "fullname" %}:</th>
+                <td>{{ edit_user.fullname }}</td>              
+              </tr>
+              <tr>
+                <th>{% trans "email.address" %}:</th>
+                <td>{{edit_user.email}}</td>              
+              </tr>         
+            {%endif%}
+            {{ form }}
             <tr>
-              <th style="width: 30%;">{% trans "fullname" %}:</th>
-              <td>{{ edit_user.fullname }}</td>              
-            </tr>
-            <tr>
-              <th>{% trans "email.address" %}:</th>
-              <td>{{edit_user.email}}</td>              
-            </tr>         
-          {%endif%}
-          {{ form }}
-          <tr>
-            <th>Roles (*):</th>
-            <td>
-              {% if lockAdmin %}
-                <span title="{{roleAdmin.description}}" data-toggle="tooltip" data-placement="top">
-                  <input type="checkbox" 
-                    onclick="return false;" checked class="role-chkbox" value="{{roleAdmin.id}}"> {{roleAdmin.name}}
-                </span>
-              {% else %}
-                {% for role in allRoles %}
-                  <span title="{{role.description}}" data-toggle="tooltip" data-placement="top" class="mr-4">
-                    <input {% if edit_user|has_role:role.code %} checked {%endif%}
-                      class="role-chkbox" value="{{role.id}}" type="checkbox" code="{{role.code}}"> {{role.name}}
+              <th>Roles (*):</th>
+              <td>
+                {% if lockAdmin %}
+                  <span title="{{roleAdmin.description}}" data-toggle="tooltip" data-placement="top">
+                    <input type="checkbox" 
+                      onclick="return false;" checked class="role-chkbox" value="{{roleAdmin.id}}"> {{roleAdmin.name}}
                   </span>
-                {%endfor%}
-              {%endif%}
-            </td>
-          </tr>
-        </table>
-        <a class="btn btn-sm btn-secondary mr-1" href='/staff/users'>
-          <i class="fas fa-arrow-left text-white-50"></i> {% trans "back" %}
-        </a>
-        <button onclick="save()" class="btn btn-sm btn-primary" type="button">
-          <i class="fas fa-save text-white-50"></i> {% trans "save" %}
-        </button>        
-      </form>
+                {% else %}
+                  {% for role in allRoles %}
+                    <span title="{{role.description}}" data-toggle="tooltip" data-placement="top" class="mr-4">
+                      <input {% if edit_user|has_role:role.code %} checked {%endif%}
+                        class="role-chkbox" value="{{role.id}}" type="checkbox" code="{{role.code}}"> {{role.name}}
+                    </span>
+                  {%endfor%}
+                {%endif%}
+              </td>
+            </tr>
+          </table>
+          <a class="btn btn-sm btn-secondary mr-1" href='/staff/users'>
+            <i class="fas fa-arrow-left text-white-50"></i> {% trans "back" %}
+          </a>
+          <button onclick="save()" class="btn btn-sm btn-primary" type="button">
+            <i class="fas fa-save text-white-50"></i> {% trans "save" %}
+          </button>        
+        </form>
+      </div>
     </div>
-  </div>
+  {% else %}
+    <h4>You do not have access to this page</h4>
+  {% endif %}
 </div>
 <script> 
   function save() {

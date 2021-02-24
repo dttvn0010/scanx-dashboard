@@ -30,12 +30,20 @@ def has_role(user, roleCode):
     return user and user.hasRole(roleCode)
 
 @register.filter
-def has_page_permission(user, pageCode, actionCode):
-    return user and user.hasPagePermission(user, pageCode, actionCode)
+def has_page_view_permission(user, pageCode):
+    return user and user.hasPagePermission(pageCode, 'VIEW')
+
+@register.filter
+def has_page_edit_permission(user, pageCode):
+    return user and user.hasPagePermission(pageCode, 'EDIT')
+
+@register.filter
+def has_page_delete_permission(user, pageCode):
+    return user and user.hasPagePermission(pageCode, 'DELETE')
 
 @register.filter
 def has_feature_permission(user, featureCode):
-    return user and user.hasFeaturePermission(user, featureCode)
+    return user and user.hasFeaturePermission(featureCode)
 
 @register.filter
 def get_checkin_status_str(code):
@@ -90,12 +98,12 @@ def addUser(request):
     if not request.user.organization:
         return redirect('login')
 
-    form = UserCreateForm(initial={'nfcEnabled': True, 'qrScanEnabled': False, 'sharedLocation': True})
+    form = UserCreateForm(organization=request.user.organization, initial={'nfcEnabled': True, 'qrScanEnabled': False, 'sharedLocation': True})
     allRoles = Role.objects.all()
     roleAdmin = allRoles.filter(code='ADMIN').first()
 
     if request.method == 'POST':
-        form = UserCreateForm(request.POST)
+        form = UserCreateForm(request.POST, organization=request.user.organization)
         if form.is_valid():
             email = form.cleaned_data['email']
             fullname = form.cleaned_data['fullname']            
@@ -130,15 +138,14 @@ def updateUser(request, pk):
     old_user = get_object_or_404(User, pk=pk)
     user = get_object_or_404(User, pk=pk)
     
-    form = UserChangeForm(instance=user)
+    form = UserChangeForm(organization=request.user.organization, instance=user)
     allRoles = Role.objects.all()
     roleAdmin = allRoles.filter(code='ADMIN').first()
 
     lockAdmin = request.user.username == user.username and user.hasRole('ADMIN')
 
     if request.method == 'POST':
-        form = UserChangeForm(request.POST, instance=user)
-
+        form = UserChangeForm(request.POST, organization=request.user.organization, instance=user)        
         if form.is_valid():
             user = form.save(commit=False)
             roleIds = form.cleaned_data.get('roleIds', '')
@@ -148,6 +155,7 @@ def updateUser(request, pk):
                 user.roles.add(Role.objects.get(pk=roleId))
 
             user.save()
+            form.save_m2m()
 
             logAction('UPDATE', request.user, old_user, user)
             return redirect('staff-user')

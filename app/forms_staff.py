@@ -7,6 +7,11 @@ class UserCreateForm(forms.ModelForm):
         model = User
         fields = ('fullname', 'email', 'nfcEnabled', 'qrScanEnabled', 'sharedLocation', 'groups')
 
+    def __init__(self, *args, **kwargs):        
+        organization = kwargs.pop('organization', None)
+        super().__init__(*args, **kwargs)  
+        self.fields['groups'].queryset = Group.objects.filter(organization=organization)
+
     fullname = forms.CharField(max_length=30, label=_("fullname") + " (*)")
     email = forms.EmailField(max_length=50, label=_("email.address") + " (*)")
     nfcEnabled = forms.BooleanField(label=_('nfc.enabled'), required=False)
@@ -25,6 +30,11 @@ class UserChangeForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ( 'nfcEnabled', 'qrScanEnabled', 'sharedLocation', 'groups')
+
+    def __init__(self, *args, **kwargs):        
+        organization = kwargs.pop('organization', None)
+        super().__init__(*args, **kwargs)  
+        self.fields['groups'].queryset = Group.objects.filter(organization=organization)
 
     nfcEnabled = forms.BooleanField(label=_('nfc.enabled'), required=False)
     qrScanEnabled = forms.BooleanField(label=_('qr.scanning.enabled'), required=False)

@@ -177,6 +177,7 @@ FEATURES = [
 PAGES = [
     {'code': 'DASHBOARD', 'name': 'Dashboard'},
     {'code': 'USERS', 'name': 'Users'},
+    {'code': 'LOCATIONS', 'name': 'Locations'},
     {'code': 'DEVICES', 'name': 'Devices'},
     {'code': 'GROUPS', 'name': 'Groups'},
     {'code': 'REPORTS', 'name': 'Reports'},

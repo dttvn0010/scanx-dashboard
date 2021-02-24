@@ -9,110 +9,116 @@
 
 {% block content %}
 <div class="content p-3">
-  <div class="card shadow mb-4">
-    <div class="card-header py-3">
-      <h6 class="m-0 font-weight-bold text-primary">{% trans "list.of.locations" %}</h6>
-    </div>
-    <div class="card-body">
-      <div class="row mb-4">
-        <div class="col-8">
-          <a href='/staff/locations/add' class="btn btn-sm btn-primary mr-1">
-            <i class="fas fa-plus text-white-50"></i> {% trans "add.location" %}
-          </a>
-          <button class="btn btn-sm btn-primary mr-1" onclick="showImportModal()">
-            <i class="fas fa-upload text-white-50"></i> {% trans "import" %}
-          </button>      
-          <a href='/staff/locations/export' class="btn btn-sm btn-primary mr-1">
-            <i class="fas fa-download text-white-50"></i> {% trans "export" %}
-          </a>      
+  {% if user|has_page_view_permission:"LOCATIONS" %}
+    <div class="card shadow mb-4">
+      <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">{% trans "list.of.locations" %}</h6>
+      </div>
+      <div class="card-body">
+        {% if user|has_page_edit_permission:"LOCATIONS" %}
+          <div class="row mb-4">
+            <div class="col-8">
+              <a href='/staff/locations/add' class="btn btn-sm btn-primary mr-1">
+                <i class="fas fa-plus text-white-50"></i> {% trans "add.location" %}
+              </a>
+              <button class="btn btn-sm btn-primary mr-1" onclick="showImportModal()">
+                <i class="fas fa-upload text-white-50"></i> {% trans "import" %}
+              </button>      
+              <a href='/staff/locations/export' class="btn btn-sm btn-primary mr-1">
+                <i class="fas fa-download text-white-50"></i> {% trans "export" %}
+              </a>      
+            </div>          
+          </div>
+        {%endif%}
+        <div class="table-responsive">
+          <table id="table" class="table table-bordered" width="100%" cellspacing="0">
+            <thead>
+              <tr>
+                <th style="width: 30%;">{% trans "addressLine1" %}</th>
+                <th style="width: 30%;">{% trans "addressLine2" %}</th>
+                <th style="width: 15%;">{% trans "city" %}</th>
+                <th style="width: 15%;">{% trans "postCode" %}</th>
+                <th style="width: 10%;"></th>
+              </tr>
+            </thead>
+          </table>
         </div>
       </div>
-      <div class="table-responsive">
-        <table id="table" class="table table-bordered" width="100%" cellspacing="0">
-          <thead>
-            <tr>
-              <th style="width: 30%;">{% trans "addressLine1" %}</th>
-              <th style="width: 30%;">{% trans "addressLine2" %}</th>
-              <th style="width: 15%;">{% trans "city" %}</th>
-              <th style="width: 15%;">{% trans "postCode" %}</th>
-              <th style="width: 10%;"></th>
-            </tr>
-          </thead>
-        </table>
-      </div>
     </div>
-  </div>
 
-  <div class="modal fade" id="uploadModal">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">{% trans "import.locations" %}</h5>
-          <button type="button" class="close" data-dismiss="modal">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-
-        <div class="modal-body">
-          <form id="fmt" method="POST" enctype="multipart/form-data">
-            {%csrf_token%}
-            <div class="row">
-              <div class="col-3">
-                <label>{% trans "csv.file" %}:</label>
-              </div>
-              <div class="col-5">
-                <input type="file" accept=".csv" class="form-control-file" 
-                  id="csv_file" name="csv_file" onchange="previewImport()">
-              </div>
-            </div>            
-          </form>
-
-          <form id="fmt2" style="display: none;" method="POST" action="/staff/locations/import">
-            {%csrf_token%}
-            <label>{% trans "csv.select.columns" %}</label>
-            <div id="fmt2Body"></div>
-            <button type="submit" class="mt-3 btn btn-sm btn-primary">
-              <i class="fas fa-upload text-white-50"></i> {% trans "import" %}
+    <div class="modal fade" id="uploadModal">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">{% trans "import.locations" %}</h5>
+            <button type="button" class="close" data-dismiss="modal">
+              <span aria-hidden="true">&times;</span>
             </button>
-          </form>
-        </div>       
+          </div>
+
+          <div class="modal-body">
+            <form id="fmt" method="POST" enctype="multipart/form-data">
+              {%csrf_token%}
+              <div class="row">
+                <div class="col-3">
+                  <label>{% trans "csv.file" %}:</label>
+                </div>
+                <div class="col-5">
+                  <input type="file" accept=".csv" class="form-control-file" 
+                    id="csv_file" name="csv_file" onchange="previewImport()">
+                </div>
+              </div>            
+            </form>
+
+            <form id="fmt2" style="display: none;" method="POST" action="/staff/locations/import">
+              {%csrf_token%}
+              <label>{% trans "csv.select.columns" %}</label>
+              <div id="fmt2Body"></div>
+              <button type="submit" class="mt-3 btn btn-sm btn-primary">
+                <i class="fas fa-upload text-white-50"></i> {% trans "import" %}
+              </button>
+            </form>
+          </div>       
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="modal fade" id="deleteConfirmModal">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">{% trans "delete.this.location" %}?</h5>
-          <button type="button" class="close" data-dismiss="modal">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-
-        <div class="modal-body">
-          <form id="fmt3" method="POST" onkeydown="return event.key != 'Enter';">
-            {%csrf_token%}
-            <input type="hidden" id="locationId">
-            <div class="row">
-              <div class="col"><label>{% trans "prompt.password" %}:</label></div>
-            </div>
-            <div class="row mt-2">
-              <div class="col"><input class="form-control" type="password" id="password" name="password"></div>
-            </div>
-            <div class="row mt-2">
-              <div class="col">
-                <label id="errorLabel" style="color: red;"></label>
-              </div>
-            </div>
-            <button type="button" onclick="deleteLocation()" class="mt-3 btn btn-sm btn-danger">
-              {% trans "delete" %}
+    <div class="modal fade" id="deleteConfirmModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">{% trans "delete.this.location" %}?</h5>
+            <button type="button" class="close" data-dismiss="modal">
+              <span aria-hidden="true">&times;</span>
             </button>
-          </form>
+          </div>
+
+          <div class="modal-body">
+            <form id="fmt3" method="POST" onkeydown="return event.key != 'Enter';">
+              {%csrf_token%}
+              <input type="hidden" id="locationId">
+              <div class="row">
+                <div class="col"><label>{% trans "prompt.password" %}:</label></div>
+              </div>
+              <div class="row mt-2">
+                <div class="col"><input class="form-control" type="password" id="password" name="password"></div>
+              </div>
+              <div class="row mt-2">
+                <div class="col">
+                  <label id="errorLabel" style="color: red;"></label>
+                </div>
+              </div>
+              <button type="button" onclick="deleteLocation()" class="mt-3 btn btn-sm btn-danger">
+                {% trans "delete" %}
+              </button>
+            </form>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  {%else%}
+    <h4>You do not have access to this page</h4>
+  {%endif%}
 </div>
 
 <script>
@@ -132,8 +138,14 @@ $(document).ready(function() {
       { "data": "postCode" },
       {
         render: function (data, type, row) {
-          return `<a title='{% trans "edit" %}' href="/staff/locations/update/${row['id']}"><i class="fas fa-edit"></i></a>&nbsp;&nbsp;`
-                + `<a title='{% trans "delete" %}' href="#" onclick="openDeleteConfirmation(${row['id']})" ><i class="fas fa-trash" style="color:red"></i></a>`;
+          var html = '';
+          if('{{user|has_page_edit_permission:"LOCATIONS"}}' == 'True') {
+            html += `<a title='{% trans "edit" %}' href="/staff/locations/update/${row['id']}"><i class="fas fa-edit"></i></a>&nbsp;&nbsp;`;
+          }
+          if('{{user|has_page_delete_permission:"LOCATIONS"}}' == 'True') {
+            html += `<a title='{% trans "delete" %}' href="#" onclick="openDeleteConfirmation(${row['id']})" ><i class="fas fa-trash" style="color:red"></i></a>`;
+          }
+          return html;
         },        
         sClass: "text-center"
       }
