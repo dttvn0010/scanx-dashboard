@@ -37,7 +37,7 @@
   <div id="wrapper">
     {% block sidebar %}
     <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark" id="accordionSidebar">
-      <a class="sidebar-brand d-flex align-items-center" href="/">
+      <a class="sidebar-brand d-flex align-items-center" href="/staff">
         <div class="sidebar-brand-text">{% trans "scanx" %}</div>
       </a>
 
@@ -45,7 +45,7 @@
 
       {% if user|has_page_view_permission:"DASHBOARD" %}
         <li class="nav-item {% if not page  %} active {%endif%}">
-          <a class="nav-link" href="/staff">
+          <a class="nav-link" href="/staff/dashboard">
             <span>{% trans "dashboard" %}</span></a>
         </li>
         <hr class="sidebar-divider my-0">

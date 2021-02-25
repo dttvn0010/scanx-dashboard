@@ -4,18 +4,24 @@
 {% block content %}
 <div class="content d-flex flex-column">
   {% if user|has_page_view_permission:"DASHBOARD" %}
-    <ul class="nav nav-tabs">
-      <li class="nav-item">
-        <a href="/staff" class="nav-link">{% trans "table.view" %}</a>
-      </li>
-      <li class="nav-item">
-        <a href="/staff/map_view" class="nav-link active">{% trans "map.view" %}</a>
-      </li>
-    </ul>
-    <audio id="dingAudio">
-      <source src="/static/audio/ding.mp3" type="audio/mpeg">
-    </audio>
-    <div id="map" class="flex-column" style="flex:1; width: 100%;min-height: 600px;"></div>  
+    {% if user.viewed_groups or user|has_role:"ADMIN" %}
+      <ul class="nav nav-tabs">
+        <li class="nav-item">
+          <a href="/staff/dashboard" class="nav-link">{% trans "table.view" %}</a>
+        </li>
+        <li class="nav-item">
+          <a href="/staff/map_view" class="nav-link active">{% trans "map.view" %}</a>
+        </li>
+      </ul>
+      <audio id="dingAudio">
+        <source src="/static/audio/ding.mp3" type="audio/mpeg">
+      </audio>
+      <div id="map" class="flex-column" style="flex:1; width: 100%;min-height: 600px;"></div>  
+    {%else%}
+      <div class="p-3">
+        <h4>You have not been granted access to view history of any group</h4>
+      </div>
+    {%endif%}
   {%else%}
     <div class="p-3">
       <h4>You do not have access to this page</h4>

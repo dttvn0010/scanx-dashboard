@@ -41,7 +41,9 @@ urlpatterns = [
     path('_admin/logs/details/<int:pk>', views_admin.viewLogDetail),
 
     # Tenant pages
-    path('staff', views_staff.tableView),
+    path('staff', views_staff.home),
+
+    path('staff/dashboard', views_staff.tableView),
     path('staff/map_view', views_staff.mapView),
 
     path('staff/users', views_staff.listUsers, name='staff-user'),

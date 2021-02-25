@@ -12,7 +12,7 @@
   {% if user|has_page_view_permission:"GROUPS" %}
     <div class="card shadow mb-4">
       <div class="card-header py-3">
-        <h6 class="m-0 font-weight-bold text-primary">{% trans "Permissions For" %} {{ group.name }}</h6>
+        <h6 class="m-0 font-weight-bold text-primary">{% trans "permissions.for" %} {{ group.name }}</h6>
       </div>
       <div class="card-body">
         <form method="POST" novalidate> 
@@ -20,8 +20,8 @@
           <table class="table">
             <tbody>
               <tr>
-                <th style="width: 75%;">Features (or modules):</th>
-                <th colspan="3">Access</th>
+                <th style="width: 75%;">{% trans "features.or.modules" %}:</th>
+                <th colspan="3">{% trans "access" %}</th>
               </tr>
               {%  for feature in features %}
               <tr>
@@ -34,10 +34,10 @@
               </tr>
               {% endfor %}
               <tr>
-                <th>Access to Pages</th>
-                <th>View</th>
-                <th>Edit</th>
-                <th>Delete</th>
+                <th>{% trans "access.to.pages" %}</th>
+                <th>{% trans "view" %}</th>
+                <th>{% trans "edit" %}</th>
+                <th>{% trans "delete" %}</th>
               </tr>
               {% for page in pages %}
               <tr>
@@ -60,15 +60,15 @@
               </tr>
               {% endfor %}
               <tr>
-                <th>View check-in history of Groups</th>
-                <th colspan="3">View</th>              
+                <th>{% trans "view.check.in.history.of.groups" %}</th>
+                <th colspan="3">{% trans "view" %}</th>              
               </tr>
-              {% for view_group in view_groups %}
+              {% for viewed_group in viewed_groups %}
                 <tr>
-                  <td>{{view_group.name}}</td>
+                  <td>{{viewed_group.name}}</td>
                   <td colspan="3">
-                    <input name='view_group_{{view_group.id}}' type="checkbox" 
-                      {% if view_group.viewed %} checked {% endif %}
+                    <input name='viewed_group_{{viewed_group.id}}' type="checkbox" 
+                      {% if viewed_group.viewed %} checked {% endif %}
                       {% if not user|has_page_edit_permission:"GROUPS"%} onclick="return false;" {%endif%}>
                   </td>
                 </tr>

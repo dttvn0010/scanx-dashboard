@@ -51,6 +51,13 @@ def get_checkin_status_str(code):
         return _('successful')
     else:
         return CheckIn.Status.messages.get(code, '')
+        
+@login_required
+def home(request):
+    if not request.user.organization:
+        return redirect('login')
+
+    return render(request, "staff/home.html")
 
 @login_required
 def tableView(request):
@@ -494,15 +501,15 @@ def setGroupPermission(request, pk):
         if not feature: continue
         feature['access'] = True
 
-    view_groups = Group.objects.filter(organization=request.user.organization)
+    viewed_groups = Group.objects.filter(organization=request.user.organization)
     for group_view_history_group in group_view_history_groups:
-        view_group = next(x for x in view_groups if x.id == group_view_history_group.viewGroup.id)
-        if not view_group: continue
-        view_group.viewed = True
+        viewed_group = next(x for x in viewed_groups if x.id == group_view_history_group.viewGroup.id)
+        if not viewed_group: continue
+        viewed_group.viewed = True
 
     context = {
         'group': group,
-        'view_groups': view_groups,
+        'viewed_groups': viewed_groups,
         'pages': pages,
         'features': features,
     }
@@ -533,9 +540,9 @@ def setGroupPermission(request, pk):
                     group_page_permission = GroupPagePermission(group=group, pageCode=pageCode, actionCode=actionCode)
                     group_page_permission.save()
 
-        for view_group in view_groups:
-            if data.get(f'view_group_{view_group.id}'):
-                group_view_history_group = GroupViewHistoryPermission(group=group, viewGroup=view_group)
+        for viewed_group in viewed_groups:
+            if data.get(f'viewed_group_{viewed_group.id}'):
+                group_view_history_group = GroupViewHistoryPermission(group=group, viewGroup=viewed_group)
                 group_view_history_group.save()
 
         return redirect('staff-group')
@@ -545,8 +552,8 @@ def setGroupPermission(request, pk):
 
 #================================= Reports  ====================================================================
 
-def getCheckInReport(organization, status, userId, locationId, startDate, endDate):
-    checkIns = CheckIn.objects.filter(user__organization=organization)
+def getCheckInReport(users, status, userId, locationId, startDate, endDate):
+    checkIns = CheckIn.objects.filter(user__in=users)
 
     if status == 1:
         checkIns = checkIns.filter(status=CheckIn.Status.SUCCESS)
@@ -591,9 +598,9 @@ def reportCheckIn(request):
     startDate = query_params.get('startDate', '')
     endDate = query_params.get('endDate', '')
 
-    users = User.objects.filter(organization=request.user.organization)
+    users = request.user.viewed_users
     locations = Location.objects.filter(organization=request.user.organization)
-    checkIns = getCheckInReport(request.user.organization, status, userId, locationId, startDate, endDate)
+    checkIns = getCheckInReport(users, status, userId, locationId, startDate, endDate)
 
     return render(request, 'staff/reports/check_in.html', 
         {
@@ -626,7 +633,8 @@ def reportCheckInExportPdf(request):
     reportedUser = User.objects.get(pk=userId) if userId else None
     reportedLocation = Location.objects.get(pk=locationId) if locationId else None
 
-    checkIns = getCheckInReport(request.user.organization, status, userId, locationId, startDate, endDate)
+    users = request.user.viewed_users
+    checkIns = getCheckInReport(users, status, userId, locationId, startDate, endDate)
     resp = render(request, 'staff/reports/check_in_pdf.html', 
                 {
                     'checkIns': checkIns, 
@@ -640,11 +648,8 @@ def reportCheckInExportPdf(request):
 
     return HttpResponse(json.dumps({'html': content}), content_type='application/json')
 
-def getLogInReport(organization, userId, startDate, endDate):
-    logIns = LogIn.objects.filter(user__organization=organization)
-
-    if userId:
-        logIns = logIns.filter(user__id=int(userId))
+def getLogInReport(users, startDate, endDate):
+    logIns = LogIn.objects.filter(user__in=users)
 
     if startDate:
         startDate = datetime.strptime(startDate, '%d/%m/%Y')
@@ -669,8 +674,10 @@ def reportLogIn(request):
     startDate = query_params.get('startDate', '')
     endDate = query_params.get('endDate', '')
 
-    users = User.objects.filter(organization=request.user.organization)
-    logIns = getLogInReport(request.user.organization, userId, startDate, endDate)
+    users = request.user.viewed_users
+    reportedUser = User.objects.get(pk=userId) if userId else None
+
+    logIns = getLogInReport([reportedUser] if reportedUser else users, startDate, endDate)
 
     return render(request, 'staff/reports/log_in.html', 
         {
@@ -692,8 +699,10 @@ def reportLogInExportPdf(request):
     startDate = query_params.get('startDate', '')
     endDate = query_params.get('endDate', '')
 
+    users = request.user.viewed_users
+
     reportedUser = User.objects.get(pk=userId) if userId else None
-    logIns = getLogInReport(request.user.organization, userId, startDate, endDate)
+    logIns = getLogInReport([reportedUser] if reportedUser else users, startDate, endDate)
 
     resp =  render(request, 'staff/reports/log_in_pdf.html', {
                 'logIns': logIns,
@@ -781,8 +790,9 @@ def listLogs(request):
     actions = LogAction.objects.all()
     logConfigs = LogConfig.objects.all()
     modelNames = [logConfig.modelName for logConfig in logConfigs]
-    
-    users = User.objects.filter(organization=request.user.organization)
+        
+    users = request.user.viewed_users
+
     context = {
         'actions': actions,
         'users': users,

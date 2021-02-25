@@ -11,87 +11,91 @@
 {% block content %}
 <div class="content p-3">
   {% if user|has_page_view_permission:"LOGS" %}
-    <div class="card shadow mb-4">
-      <div class="card-header py-3">
-        <h6 class="m-0 font-weight-bold text-primary">{% trans "logs" %}</h6>
+    {% if user.viewed_groups or user|has_role:"ADMIN" %}
+      <div class="card shadow mb-4">
+        <div class="card-header py-3">
+          <h6 class="m-0 font-weight-bold text-primary">{% trans "logs" %}</h6>
+        </div>
+        <div class="card-body">
+          <form>
+            <input type="hidden" name="reported" value="1">
+            <div class="row">
+              <div class="col">
+                <label><b>{% trans "show.by" %}:</b></label>
+              </div>
+            </div>
+            <div class="row mt-2">
+              <div class="col-4">
+                <label>{% trans "perform.user" %}:</label>
+                <select id="userId" onchange="updateData()" class="form-control">
+                  <option value="">{% trans "all" %}</option>
+                  {% for u in users %}
+                  <option value="{{u.id}}">{{u.fullname}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <div class="col-4">
+                <label>{% trans "action" %}:</label>
+                <select id="actionId" onchange="updateData()" class="form-control">
+                  <option value="">{% trans "all" %}</option>
+                  {% for a in actions %}
+                  <option value="{{a.id}}">{{a.name}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <div class="col-4">
+                <label>{% trans "object" %}:</label>
+                <select id="modelName" onchange="updateData()" class="form-control">
+                  <option value="">{% trans "all" %}</option>
+                  {% for m in modelNames %}
+                  <option value="{{m}}" {% if m  == modelName %}selected{%endif%}>{{m}}</option>
+                  {% endfor %}
+                </select>
+              </div>   
+            </div>
+            <div class="row mt-3">
+              <div class="col-4">
+                <label>{% trans "status" %}:</label> 
+                <select id="viewStatus" onchange="updateData()" class="form-control">
+                  <option value="">{% trans "all" %}</option>
+                  <option value="1">Unviewed</option>
+                  <option value="2">Viewed</option>
+                </select>
+              </div>
+
+              <div class="col-4">
+                <label>{% trans "from.date" %}:</label>
+                <input id="startDate" onblur="updateData()" value="{{startDate|default:''}}" class="form-control date"
+                  placeholder='{% trans "select.a.date" %}'>
+              </div>
+
+              <div class="col-4">
+                <label>{% trans "to.date" %}:</label>
+                <input id="endDate" onblur="updateData()" value="{{endDate|default:''}}" class="form-control date"
+                  placeholder='{% trans "select.a.date" %}'>
+              </div>
+            </div>       
+          </form>
+
+          <hr/>
+          <table id="table" class="table table-bordered">
+            <thead>
+              <tr>
+                <th style="width: 22%;">{% trans "action" %}</th>            
+                <th style="width: 22%;">{% trans "object" %}</th>
+                <th style="width: 24%;">{% trans "perform.user" %}</th>
+                <th style="width: 22%;">{% trans "date.time" %}</th>       
+                <th style="width: 8%;" class="text-center"></th>     
+              </tr>
+            </thead>       
+          </table>
+        </div>
       </div>
-      <div class="card-body">
-        <form>
-          <input type="hidden" name="reported" value="1">
-          <div class="row">
-            <div class="col">
-              <label><b>{% trans "show.by" %}:</b></label>
-            </div>
-          </div>
-          <div class="row mt-2">
-            <div class="col-4">
-              <label>{% trans "perform.user" %}:</label>
-              <select id="userId" onchange="updateData()" class="form-control">
-                <option value="">{% trans "all" %}</option>
-                {% for u in users %}
-                <option value="{{u.id}}">{{u.fullname}}</option>
-                {% endfor %}
-              </select>
-            </div>
-
-            <div class="col-4">
-              <label>{% trans "action" %}:</label>
-              <select id="actionId" onchange="updateData()" class="form-control">
-                <option value="">{% trans "all" %}</option>
-                {% for a in actions %}
-                <option value="{{a.id}}">{{a.name}}</option>
-                {% endfor %}
-              </select>
-            </div>
-
-            <div class="col-4">
-              <label>{% trans "object" %}:</label>
-              <select id="modelName" onchange="updateData()" class="form-control">
-                <option value="">{% trans "all" %}</option>
-                {% for m in modelNames %}
-                <option value="{{m}}" {% if m  == modelName %}selected{%endif%}>{{m}}</option>
-                {% endfor %}
-              </select>
-            </div>   
-          </div>
-          <div class="row mt-3">
-            <div class="col-4">
-              <label>{% trans "status" %}:</label> 
-              <select id="viewStatus" onchange="updateData()" class="form-control">
-                <option value="">{% trans "all" %}</option>
-                <option value="1">Unviewed</option>
-                <option value="2">Viewed</option>
-              </select>
-            </div>
-
-            <div class="col-4">
-              <label>{% trans "from.date" %}:</label>
-              <input id="startDate" onblur="updateData()" value="{{startDate|default:''}}" class="form-control date"
-                placeholder='{% trans "select.a.date" %}'>
-            </div>
-
-            <div class="col-4">
-              <label>{% trans "to.date" %}:</label>
-              <input id="endDate" onblur="updateData()" value="{{endDate|default:''}}" class="form-control date"
-                placeholder='{% trans "select.a.date" %}'>
-            </div>
-          </div>       
-        </form>
-
-        <hr/>
-        <table id="table" class="table table-bordered">
-          <thead>
-            <tr>
-              <th style="width: 22%;">{% trans "action" %}</th>            
-              <th style="width: 22%;">{% trans "object" %}</th>
-              <th style="width: 24%;">{% trans "perform.user" %}</th>
-              <th style="width: 22%;">{% trans "date.time" %}</th>       
-              <th style="width: 8%;" class="text-center"></th>     
-            </tr>
-          </thead>       
-        </table>
-      </div>
-    </div>
+    {%else%}
+      <h4>You have not been granted access to view history of any group</h4>
+    {%endif%} 
   {%else%}
     <h4>You do not have access to this page</h4>
   {%endif%}

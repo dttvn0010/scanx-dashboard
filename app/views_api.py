@@ -96,8 +96,9 @@ def checkForNewCheckIn(request):
     newCheckIn = {}
 
     if lastUpdated != '':
+        users = request.user.viewed_users
         lastUpdatedTime = make_aware(datetime.strptime(lastUpdated, '%d/%m/%Y %H:%M:%S'))
-        lastCheckIn = CheckIn.objects.filter(organization=request.user.organization, status=CheckIn.Status.SUCCESS).order_by('-date').first()
+        lastCheckIn = CheckIn.objects.filter(user__in=users, status=CheckIn.Status.SUCCESS).order_by('-date').first()
 
         if lastCheckIn:
             newCheckIn = CheckInSerializer(lastCheckIn).data
@@ -157,10 +158,12 @@ def searchCheckIn(request):
     start = int(request.query_params.get('start', 0))
     length = int(request.query_params.get('length', 0))
     
-    checkIns = CheckIn.objects.filter(user__organization=request.user.organization)
+    checkIns = CheckIn.objects.all()
     
     if userId:
         checkIns = checkIns.filter(user__id=int(userId))
+    else:
+        checkIns = checkIns.filter(user__in=request.user.viewed_users)
 
     if status == '1':
         checkIns = checkIns.filter(status=CheckIn.Status.SUCCESS)
@@ -1176,7 +1179,7 @@ def searchLog(request):
     fromSuperAdmin = request.query_params.get('fromSuperAdmin')
     viewStatus = request.query_params.get('viewStatus')
     organizationId = request.query_params.get('organizationId')
-    userId = request.query_params.get("userId")    
+    userId = request.query_params.get("userId")
     actionId = request.query_params.get("actionId")
 
     modelName = request.query_params.get("modelName")
@@ -1189,18 +1192,20 @@ def searchLog(request):
     logs = Log.objects.all()
 
     if not fromSuperAdmin:
-        logs = logs.filter(organization=request.user.organization)
+        if userId:
+            logs = logs.filter(performUser__id=userId)
+        else:        
+            logs = logs.filter(performUser__in=request.user.viewed_users)
     elif organizationId:
         logs = logs.filter(organization=organizationId)
-
+        if userId:
+            logs = logs.filter(performUser__id=userId)
+        
     if viewStatus == '1':
         logs = logs.filter(~Q(viewUsers=request.user))
     elif viewStatus == '2':
         logs = logs.filter(viewUsers=request.user)
             
-    if userId:
-        logs = logs.filter(performUser__id=userId)
-
     if actionId:
         logs = logs.filter(action__id=actionId)
 

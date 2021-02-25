@@ -48,14 +48,14 @@ class Group(models.Model):
             return any(p.pageCode == pageCode for p in pagePermissionSet)
 
     def getViewHistoryGroups(self):
-        view_groups = []
+        viewed_groups = []
         viewHistoryPermissionSet = GroupViewHistoryPermission.objects.filter(group=self)
         
         for p in viewHistoryPermissionSet:
-            if not any(x.code == p.viewGroup.code for x in view_groups):
-                view_groups.append(p.viewGroup)
+            if not any(x.code == p.viewGroup.code for x in viewed_groups):
+                viewed_groups.append(p.viewGroup)
                 
-        return view_groups
+        return viewed_groups
 
 class GroupFeaturePermission(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
@@ -120,16 +120,31 @@ class User(AbstractUser):
 
     def getViewHistoryGroups(self):
         if self.hasRole('ADMIN'):
-            return Groups.objects.filter(organization=self.organization)
+            return Group.objects.filter(organization=self.organization)
 
-        view_groups = []
+        viewed_groups = []
 
         for group in self.groups.all():
-            for view_group in group.getViewHistoryGroups():
-                if not any(x.code == view_group.code for x in view_groups):
-                    view_groups.append(view_group)
+            for viewed_group in group.getViewHistoryGroups():
+                if not any(x.code == viewed_group.code for x in viewed_groups):
+                    viewed_groups.append(viewed_group)
         
-        return view_groups
+        return viewed_groups
+
+    @property
+    def viewed_groups(self):
+        return self.getViewHistoryGroups()
+
+    @property
+    def viewed_users(self):
+        if self.hasRole('ADMIN'):
+            return User.objects.filter(organization=self.organization)
+        else:
+            return User.objects.filter(groups__in=self.getViewHistoryGroups())
+
+    @property
+    def view_users(self):
+        return self.getViewHistoryGroups()
 
     @property
     def role_names(self):
@@ -153,8 +168,12 @@ class User(AbstractUser):
     def count_new_logs(self):
         if self.is_superuser:
             return Log.objects.filter(~Q(viewUsers=self)).count()
-        elif self.hasRole('ADMIN'):
-            return Log.objects.filter(organization=self.organization).filter(~Q(viewUsers=self)).count()
+        else:
+            logs = Log.objects.filter(organization=self.organization).filter(~Q(viewUsers=self))
+            if not self.hasRole('ADMIN'):
+                logs = logs.filter(performUser__in=self.view_users)
+            
+            return logs.count()
         
         return 0
 
@@ -162,8 +181,12 @@ class User(AbstractUser):
     def get_new_logs(self):
         if self.is_superuser:
             return Log.objects.filter(~Q(viewUsers=self)).order_by('-actionDate')[:5]
-        elif self.hasRole('ADMIN'):
-            return Log.objects.filter(organization=self.organization).filter(~Q(viewUsers=self)).order_by('-actionDate')[:5]
+        else:
+            logs = Log.objects.filter(organization=self.organization).filter(~Q(viewUsers=self))
+            if not self.hasRole('ADMIN'):
+                logs = logs.filter(performUser__in=self.view_users)
+            
+            return logs.order_by('-actionDate')[:5]
         
         return []
        

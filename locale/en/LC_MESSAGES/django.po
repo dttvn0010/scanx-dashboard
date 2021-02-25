@@ -1215,3 +1215,44 @@ msgstr "already exists"
 
 msgid "device.with"
 msgstr "Device with"
+
+msgid "code"
+msgstr "Code"
+
+msgid "groups"
+msgstr "Groups"
+
+msgid "list.of.groups"
+msgstr "List of Groups"
+
+msgid "add.group"
+msgstr "Add Group"
+
+msgid "group.details"
+msgstr "Group Details"
+
+msgid "permissions.for"
+msgstr "Permissions for"
+
+msgid "set.permissions"
+msgstr "Set Permissions"
+
+msgid "features.or.modules"
+msgstr "Features or Modules"
+
+msgid "feature.name"
+msgstr "Feature Name"
+
+msgid "access.to.pages"
+msgstr "Access to Pages"
+
+msgid "access"
+msgstr "Access"
+
+msgid "view"
+msgstr "View"
+
+msgid "view.check.in.history.of.groups"
+msgstr "View check-in history of Groups"
+
+
