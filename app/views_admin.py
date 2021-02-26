@@ -16,9 +16,64 @@ from .forms_admin import *
 from .param_utils import getSystemParamValue
 from .user_utils import genPassword
 from .import_utils import getPermutation, importPreview
-from .mail_utils import sendAdminInvitationMail
+from .mail_utils import sendResellerInvitationMail, sendAdminInvitationMail
 from .log_utils import logAction
 
+# ========================================== Resellers ======================================================
+
+@login_required
+def listResellers(request):
+    if not request.user.is_superuser:
+        return redirect('login')
+
+    return render(request, "_admin/resellers/list.html")
+
+@login_required
+def addReseller(request):
+    if not request.user.is_superuser:
+        return redirect('login')
+
+    form = ResellerCreateForm()
+
+    if request.method == 'POST':
+        form = ResellerCreateForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            fullname = form.cleaned_data['fullname']            
+
+            password = genPassword()
+            user = User.objects.create_user(username=email, password='temp_' + password)
+            user.fullname = fullname
+            user.email = email
+            user.status = User.Status.INVITED
+            user.isReseller = True
+            user.createdDate = timezone.now()
+            user.save()
+            
+            sendResellerInvitationMail(fullname, email, password)
+                
+            logAction('CREATE', request.user, None, user)
+            return redirect('admin-home')
+
+    return render(request, '_admin/resellers/form.html', {'form': form})
+
+@login_required
+def resendResellerMail(request, pk):
+    if not request.user.is_superuser:
+        return redirect('login')
+
+    reseller = get_object_or_404(User, pk=pk)
+
+    if reseller and reseller.status == User.Status.INVITED:
+        password = genPassword()
+        reseller.password = make_password('temp_' + password)
+        reseller.save()
+        sendResellerInvitationMail(reseller.fullname, reseller.email, password)
+    
+    return redirect('admin-home')
+
+
+# ========================================== Organization ======================================================
 def createTenantAdmin(request, organization, adminName, adminEmail):
     if adminEmail == "":
         return 
@@ -29,7 +84,6 @@ def createTenantAdmin(request, organization, adminName, adminEmail):
     user.password = make_password('temp_' + password)
     user.fullname = adminName    
     user.nfcEnabled =  user.sharedLocation = True
-    user.qrScanEnabled = False
     user.status = User.Status.INVITED
     user.createdDate = timezone.now()
     user.organization = organization    
@@ -41,18 +95,17 @@ def createTenantAdmin(request, organization, adminName, adminEmail):
     logAction('CREATE', request.user, None, user)
     sendAdminInvitationMail(organization.name, adminName, adminEmail, password)
 
-# ========================================== Organization ======================================================
 
 @login_required
 def listOrganizations(request):
-    if not request.user.is_superuser:
+    if not request.user.is_superuser and not request.user.isReseller:
         return redirect('login')
 
     return render(request, "_admin/organizations/list.html")
 
 @login_required
 def viewOrganizationDetails(request, pk):
-    if not request.user.is_superuser:
+    if not request.user.is_superuser and not request.user.isReseller:
         return redirect('login')
 
     org = get_object_or_404(Organization, pk=pk)
@@ -72,23 +125,24 @@ def viewOrganizationDetails(request, pk):
 
 @login_required
 def listOrganizationUsers(request, pk):
-    if not request.user.is_superuser:
+    if not request.user.is_superuser and not request.user.isReseller:
         return redirect('login')
     org = get_object_or_404(Organization, pk=pk)
     return render(request, "_admin/organizations/list_users.html", {"organization": org})
 
 @login_required
 def addOrganization(request):
-    if not request.user.is_superuser:
+    if not request.user.is_superuser and not request.user.isReseller:
         return redirect('login')
 
-    form = OrganizationCreationForm(initial={'nfcEnabled': True, 'qrScanEnabled': False, 'active': True})
+    form = OrganizationCreationForm(initial={'nfcEnabled': True, 'active': True})
 
     if request.method == 'POST':
         form = OrganizationCreationForm(request.POST)
         if form.is_valid():
             org = form.save(commit=False)
             org.createdDate = timezone.now()
+            org.createdBy = request.user
             org.adminUsername = form.cleaned_data['adminEmail']
             org.save()
             
@@ -99,13 +153,13 @@ def addOrganization(request):
 
             createTenantAdmin(request, org, adminName, adminEmail)
 
-            return redirect('admin-home')
+            return redirect('admin-organization')
 
     return render(request, '_admin/organizations/form.html', {'form': form})
 
 @login_required
 def updateOrganization(request, pk):
-    if not request.user.is_superuser:
+    if not request.user.is_superuser and not request.user.isReseller:
         return redirect('login')
 
     old_org = get_object_or_404(Organization, pk=pk)
@@ -117,13 +171,13 @@ def updateOrganization(request, pk):
         if form.is_valid():                        
             org = form.save(commit=True)
             logAction('UPDATE', request.user, old_org, org)
-            return redirect('admin-home')
+            return redirect('admin-organization')
 
     return render(request, '_admin/organizations/form.html', {'form': form})
 
 @login_required
-def resendMail(request, pk):
-    if not request.user.is_superuser:
+def resendAdminMail(request, pk):
+    if not request.user.is_superuser and not request.user.isReseller:
         return redirect('login')
 
     org = get_object_or_404(Organization, pk=pk)
@@ -134,14 +188,13 @@ def resendMail(request, pk):
         tenantAdmin.save()
         sendAdminInvitationMail(org.name, tenantAdmin.fullname, tenantAdmin.email, password)
     
-    return redirect('admin-home')
+    return redirect('admin-organization')
     
-
-ORG_HEADER = [_('name'), _('admin.name'), _('admin.email'), _('nfc.enabled'), _('qr.scanning.enabled'), _('active')]
+ORG_HEADER = [_('name'), _('admin.name'), _('admin.email'), _('nfc.enabled'), _('active')]
 
 @login_required
 def exportOrganization(request):
-    if not request.user.is_superuser:
+    if not request.user.is_superuser and not request.user.isReseller:
         return redirect('login')
 
     lst = Organization.objects.all()
@@ -152,7 +205,7 @@ def exportOrganization(request):
             tenantAdmin = User.objects.filter(username=item.adminUsername).first()
             adminName = tenantAdmin.fullname if tenantAdmin else ''
             adminEmail = tenantAdmin.email if tenantAdmin else ''
-            writer.writerow([item.name, adminName, adminEmail, item.nfcEnabled, item.qrScanEnabled, item.active])
+            writer.writerow([item.name, adminName, adminEmail, item.nfcEnabled, item.active])
 
     csv_file = open('organizations.csv', 'rb')
     response = HttpResponse(content=csv_file)
@@ -162,14 +215,14 @@ def exportOrganization(request):
 
 @login_required
 def importOrganizationPreview(request):
-    if not request.user.is_superuser:
+    if not request.user.is_superuser and not request.user.isReseller:
         return redirect('login')
 
     return importPreview(request, ORG_HEADER)
 
 @login_required
 def importOrganization(request):
-    if not request.user.is_superuser:
+    if not request.user.is_superuser and not request.user.isReseller:
         return redirect('login')
 
     if request.method == 'POST':
@@ -180,7 +233,7 @@ def importOrganization(request):
             indexes[i] = int(request.POST.get(f'col_{i}', '0'))
         
         for row in records:
-            name, adminName, adminEmail, nfcEnabled, qrScanEnabled, active = getPermutation(row, indexes)
+            name, adminName, adminEmail, nfcEnabled, active = getPermutation(row, indexes)
             if Organization.objects.filter(name=name).count() > 0:
                 continue
 
@@ -188,7 +241,6 @@ def importOrganization(request):
             org.name = name
             org.adminUsername = adminEmail
             org.nfcEnabled = nfcEnabled == 'True'
-            org.qrScanEnabled = qrScanEnabled == 'True'
             org.active = active == 'True'
             org.createdDate = timezone.now()
             org.save()
@@ -197,21 +249,20 @@ def importOrganization(request):
         
         del request.session['records']
     
-    return redirect('admin-home')
+    return redirect('admin-organization')
 
 # ========================================== Unregistered devices ==========================================
 
 @login_required
 def listUnregisteredDevices(request):
-    if not request.user.is_superuser:
+    if not request.user.is_superuser and not request.user.isReseller:
         return redirect('login')
 
-    devices = Device.objects.filter(organization__isnull=True)
-    return render(request, "_admin/devices/unregistered/list.html", {"devices": devices})
+    return render(request, "_admin/devices/unregistered/list.html")
 
 @login_required
 def addUnregisteredDevice(request):
-    if not request.user.is_superuser:
+    if not request.user.is_superuser and not request.user.isReseller:
         return redirect('login')
 
     form = UnRegisteredDeviceForm()
@@ -221,6 +272,7 @@ def addUnregisteredDevice(request):
         if form.is_valid():            
             device = form.save(commit=False)
             device.createdDate = timezone.now()
+            device.createdBy = request.user
             device.status = Device.Status.ENABLED           
             device.enabled = True 
             device.save()
@@ -231,7 +283,7 @@ def addUnregisteredDevice(request):
 
 @login_required
 def updateUnregisteredDevice(request, pk):
-    if not request.user.is_superuser:
+    if not request.user.is_superuser and not request.user.isReseller:
         return redirect('login')
 
     old_device = get_object_or_404(Device, pk=pk)
@@ -250,7 +302,7 @@ def updateUnregisteredDevice(request, pk):
 
 @login_required
 def deleteUnregisteredDevice(request, pk):
-    if not request.user.is_superuser:
+    if not request.user.is_superuser and not request.user.isReseller:
         return redirect('login')
 
     device = get_object_or_404(Device, pk=pk)
@@ -262,10 +314,14 @@ DEVICE_HEADER = [_('id1'), _('id2')]
 
 @login_required
 def exportUnregisteredDevice(request):
-    if not request.user.is_superuser:
+    if not request.user.is_superuser and not request.user.isReseller:
         return redirect('login')
 
     lst = Device.objects.filter(organization__isnull=True)
+    
+    if request.user.isReseller:
+        lst = lst.filter(createdBy=request.user)
+
     with open('unreg_devices.csv', 'w', newline='') as fo:
         writer = csv.writer(fo)
         writer.writerow(DEVICE_HEADER)
@@ -280,14 +336,14 @@ def exportUnregisteredDevice(request):
 
 @login_required
 def importUnregisteredDevicePreview(request):
-    if not request.user.is_superuser:
+    if not request.user.is_superuser and not request.user.isReseller:
         return redirect('login')
 
     return importPreview(request, DEVICE_HEADER)
 
 @login_required
 def importUnregisteredDevice(request):
-    if not request.user.is_superuser:
+    if not request.user.is_superuser and not request.user.isReseller:
         return redirect('login')
 
     if request.method == 'POST':
@@ -307,6 +363,8 @@ def importUnregisteredDevice(request):
             device.id1 = id1
             device.id2 = id2
             device.enabled = True
+            device.createdDate = timezone.now()
+            device.createdBy = request.user
             device.save()
         
         del request.session['records']
@@ -317,12 +375,10 @@ def importUnregisteredDevice(request):
 
 @login_required
 def listRegisteredDevices(request):
-    if not request.user.is_superuser:
+    if not request.user.is_superuser and not request.user.isReseller:
         return redirect('login')
 
-    devices = Device.objects.filter(organization__isnull=False)
-    return render(request, "_admin/devices/registered/list.html", {"devices": devices})
-
+    return render(request, "_admin/devices/registered/list.html")
 
 # ========================================== Settings ==========================================
 
@@ -382,7 +438,7 @@ def editMailTemplates(request):
 
 @login_required
 def listLogs(request):
-    if not request.user.is_superuser:
+    if not request.user.is_superuser and not request.user.isReseller:
         return redirect('login')
 
     actions = LogAction.objects.all()
@@ -390,6 +446,9 @@ def listLogs(request):
     modelNames = [logConfig.modelName for logConfig in logConfigs]
     
     organizations = Organization.objects.all()
+    if not request.user.is_superuser:
+        organizations = organizations.filter(createdBy=request.user)
+
     context = {
         'actions': actions,
         'organizations': organizations,
@@ -399,7 +458,7 @@ def listLogs(request):
 
 @login_required
 def viewLogDetail(request, pk):
-    if not request.user.is_superuser:
+    if not request.user.is_superuser and not request.user.isReseller:
         return redirect('login')
 
     log = get_object_or_404(Log, pk=pk)

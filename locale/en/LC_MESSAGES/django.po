@@ -34,6 +34,15 @@ msgstr "Password cannot be all digits"
 msgid "confirmed.password.not.match"
 msgstr "Confirmed password does not match"
 
+msgid "user.with.email"
+msgstr "User with email"
+
+msgid "resellers"
+msgstr "Resellers"
+
+msgid "is.reseller"
+msgstr "Is Reseller"
+
 #: .\app\forms.py:60
 msgid "no.user.with.email.exist"
 msgstr "No user with this email exists"
@@ -1255,4 +1264,9 @@ msgstr "View"
 msgid "view.check.in.history.of.groups"
 msgstr "View check-in history of Groups"
 
+msgid "you.do.not.have.access.to.this.page"
+msgstr "You do not have access to this page"
+
+msgid "you.have.not.been.granted.access.to.view.history.of.any.group"
+msgstr "You have not been granted access to view history of any group"
 

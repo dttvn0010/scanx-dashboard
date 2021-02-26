@@ -2,10 +2,26 @@ from django import forms
 from .models import *
 from django.utils.translation import gettext_lazy as _
 
+class ResellerCreateForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ('fullname', 'email',)
+
+    fullname = forms.CharField(max_length=30, label=_("fullname") + " (*)")
+    email = forms.EmailField(max_length=50, label=_("email.address") + " (*)")
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email):
+            raise forms.ValidationError(f'{_("user.with.email")} "%s" {_("already.exists")}' % (email))
+
+        return email
+
+
 class OrganizationCreationForm(forms.ModelForm):
     class Meta:
         model = Organization
-        fields = ('name', 'nfcEnabled', 'qrScanEnabled', 'active')
+        fields = ('name', 'nfcEnabled', 'active')
 
     adminName = forms.CharField(max_length=30, label=_("admin.name") + " (*)")
     adminEmail = forms.EmailField(max_length=50, label=_("admin.email") + " (*)")
@@ -20,7 +36,7 @@ class OrganizationCreationForm(forms.ModelForm):
 class OrganizationChangeForm(forms.ModelForm):
     class Meta:
         model = Organization
-        fields = ('name', 'nfcEnabled', 'qrScanEnabled', 'active')
+        fields = ('name', 'nfcEnabled', 'active')
 
 class UnRegisteredDeviceForm(forms.ModelForm):
     class Meta:

@@ -72,7 +72,7 @@ def initialSetup(request):
 
 @login_required
 def home(request):
-    if request.user.is_superuser:
+    if request.user.is_superuser or request.user.isReseller:
         return HttpResponseRedirect("/_admin")
     else:
         if(request.user.status == User.Status.INVITED):

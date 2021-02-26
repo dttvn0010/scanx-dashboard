@@ -2,7 +2,7 @@
 {% load i18n %}
 
 {% block sidebar %}
-{% with page=1 %}
+{% with page=0 %}
 {{ block.super }}
 {% endwith %}
 {% endblock %}
@@ -11,22 +11,22 @@
 <div class="content p-3">
   <div class="card shadow mb-4">
     <div class="card-header py-3">
-      <h6 class="m-0 font-weight-bold text-primary">{% trans "organization.details" %}</h6>
+      <h6 class="m-0 font-weight-bold text-primary">{% trans "user.details" %}</h6>
     </div>
     <div class="card-body">
-      <form method="POST" novalidate> 
-        {% csrf_token %}
-        <table class="table table-form mb-2">{{ form }}</table>
-        
-        <a class="btn btn-sm btn-secondary mr-1" href="/_admin/organizations">
+      <form id="fmt" method="POST" novalidate> 
+        {% csrf_token %}        
+        <table class="table table-form mb-2">
+          {{ form }}
+        </table>
+        <a class="btn btn-sm btn-secondary mr-1" href="/_admin/resellers">
           <i class="fas fa-arrow-left text-white-50"></i> {% trans "back" %}
         </a>
-        
         <button class="btn btn-sm btn-primary" type="submit">
           <i class="fas fa-save text-white-50"></i> {% trans "save" %}
         </button>        
       </form>
     </div>
-  </div>  
+  </div>
 </div>
 {% endblock %}

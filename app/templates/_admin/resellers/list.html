@@ -1,0 +1,205 @@
+{% extends "../base.html" %}
+{% load i18n %}
+
+{% block sidebar %}
+{% with page=0 %}
+{{ block.super }}
+{% endwith %}
+{% endblock %}
+
+{% block content %}
+<div class="content p-3">
+  <div class="card shadow mb-4">
+    <div class="card-header py-3">
+      <h6 class="m-0 font-weight-bold text-primary">{% trans "list.of.users" %}</h6>
+    </div>
+    <div class="card-body">
+      <div class="row mb-4">
+        <div class="col-8">
+          <a href='/_admin/resellers/add' class="btn btn-sm btn-primary  mr-1">
+            <i class="fas fa-plus text-white-50"></i> {% trans "add.user" %}
+          </a>
+        </div>
+      </div>
+      <div class="table-responsive">
+        <table id="table" class="table table-bordered" width="100%" cellspacing="0">
+          <thead>
+            <tr>
+              <th style="width: 35%;">{% trans "fullname" %}</th>
+              <th style="width: 35%;">{% trans "email.address" %}</th>
+              <th style="width: 15%;">{% trans "status" %}</th>
+              <th style="width: 15%;"></th>
+            </tr>
+          </thead>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="deleteConfirmModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{% trans "delete.this.user" %}?</h5>
+          <button type="button" class="close" data-dismiss="modal">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <form id="fmt3" method="POST" onkeydown="return event.key != 'Enter';">
+            {%csrf_token%}
+            <input type="hidden" id="userId">
+            <div class="row">
+              <div class="col"><label>{% trans "prompt.password" %}:</label></div>
+            </div>
+            <div class="row mt-2">
+              <div class="col"><input class="form-control" type="password" id="password" name="password"></div>
+            </div>
+            <div class="row mt-2">
+              <div class="col">
+                <label id="errorLabel" style="color: red;"></label>
+              </div>
+            </div>
+            <button type="button" onclick="deleteUser()" class="mt-3 btn btn-sm btn-danger">
+              {% trans "delete" %}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+  $(document).ready(function () {
+    $('#table').DataTable({
+      "ordering": false,
+      "processing": true,
+      "serverSide": true,
+      "language": {
+        "processing": "<div class='spinner-border'></div>"
+      },
+      "drawCallback": function (settings) {
+        $('.toggle-button').bootstrapToggle({ size: "xs" });
+      },
+      "ajax": {
+        "url": "/api/user/search",
+        "data": function(data) {
+          data.isReseller = 1;
+        }
+      },
+      "columns": [
+        {
+          "data": "fullname",
+          render: function (data, type, row) {
+            var html = '';
+            if (row.profilePicture) {
+              html += `<img class="img-profile rounded-circle mr-2" src="/${row.profilePicture}">`;
+            } else {
+              html += `<img class="img-profile rounded-circle mr-2" src="/static/img/user.png">`;
+            }
+            html += `<span>${data}</span>`;
+            return html;
+          }
+        },
+        { "data": "email" },
+        {
+          "data": "is_active",
+          render: function (data, type, row) {
+            if (row.status == 0) {
+              return '{% trans "pending" %}';
+            }
+            var id = row.id;
+            var locked = row.locked;
+            return `<input id="status_${id}" 
+                  type="checkbox" 
+                  ${data ? 'checked' : ''} 
+                  ${locked ? 'disabled' : ''} 
+                  onChange="toggleItem(${id})" 
+                  class="toggle-button">`;
+          }
+        },
+        {
+          render: function (data, type, row) {
+            var html = `<a title='{% trans "delete" %}' href="#" onclick="openDeleteConfirmation(${row['id']})" ><i class="fas fa-trash" style="color:red"></i></a>`;
+            if (row.status == 0) {
+              html += `&nbsp;&nbsp;<a title='{% trans "resend.mail" %}' href="#" onclick="resendMail(${row['id']})" ><i class="fas fa-envelope"></i></a>`;
+            }
+            return html;
+          },
+          sClass: "pl-3 pr-3 text-center"
+        }
+      ],
+    })
+  });
+
+  function openDeleteConfirmation(id) {
+    $("#errorLabel").html('');
+    $('#password').val('');
+    $('#userId').val(id);
+    $("#deleteConfirmModal").modal();
+  }
+
+  async function deleteUser() {
+    $("#errorLabel").html('');
+    var formData = new FormData(document.getElementById("fmt3"));
+    var response = await fetch("/api/user/delete/" + $('#userId').val(), {
+      body: formData,
+      method: "POST"
+    });
+    var result = await response.json();
+    if (result.success) {
+      location.href = "/_admin/resellers";
+    } else {
+      $("#errorLabel").html(result.error || '{% trans "error.occured" %}');
+    }
+  }
+
+  async function toggleItem(id) {
+    var status = $('#status_' + id).prop('checked');
+    if (status) {
+      enableItem(id);
+    } else {
+      disableItem(id);
+    }
+  }
+
+  async function disableItem(id) {
+
+    if (!confirm('{% trans "confirm.disable.user" %}')) {
+      $('#status_' + id).bootstrapToggle('on', true);
+      return;
+    }
+
+    var resp = await fetch('/api/user/disable/' + id);
+    var result = await resp.json();
+    if (!result.success) {
+      $('#status_' + id).bootstrapToggle('on', true);
+      alert(result.error);
+    }
+  }
+
+  async function enableItem(id) {
+
+    if (!confirm('{% trans "confirm.enable.user" %}')) {
+      $('#status_' + id).bootstrapToggle('off', true);
+      return;
+    }
+
+    var resp = await fetch('/api/user/enable/' + id);
+    var result = await resp.json();
+    if (!result.success) {
+      $('#status_' + id).bootstrapToggle('off', true);
+      alert(result.error);
+    }
+  }
+
+  async function resendMail(id) {
+    if (confirm('{% trans "confirm.resend.mail" %}')) {
+      location.href = "/_admin/resellers/resend_mail/" + id;
+    }
+  }
+</script>
+{% endblock %}

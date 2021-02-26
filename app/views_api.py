@@ -235,6 +235,10 @@ def searchOrganization(request):
     length = int(request.query_params.get('length', 0))
     
     organizations = Organization.objects.all()
+
+    if not request.user.is_superuser:
+        organizations = organizations.filter(createdBy=request.user)
+
     recordsTotal = organizations.count()
 
     organizations = organizations.filter(name__contains=keyword).order_by('-createdDate')
@@ -290,12 +294,11 @@ def isValidLat(lat):
         return False
 
 def getUserData(user):
-    nfcEnabled = qrScanEnabled = sharedLocation = False
+    nfcEnabled = sharedLocation = False
     scanDelay = 0
  
     if user.organization:
         nfcEnabled = user.nfcEnabled and user.organization.nfcEnabled
-        qrScanEnabled = user.qrScanEnabled and user.organization.qrScanEnabled
         sharedLocation = user.sharedLocation
         scanDelay = getTenantParamValue('SCAN_TIME_DELAY', user.organization, settings.SCAN_TIME_DELAY)      
 
@@ -303,7 +306,6 @@ def getUserData(user):
         'fullname': user.fullname, 
         'email': user.email,
         'nfcEnabled': nfcEnabled,
-        'qrScanEnabled': qrScanEnabled,
         'sharedLocation': sharedLocation,
         'roles': user.role_codes,
         'scanDelay': scanDelay,
@@ -599,13 +601,18 @@ def searchUser(request):
     keyword = request.query_params.get('search[value]', '')
     start = int(request.query_params.get('start', 0))
     length = int(request.query_params.get('length', 0))
+    isReseller = request.query_params.get('isReseller')
 
     if request.query_params.get("organizationId"):
         organization = Organization.objects.get(pk=request.query_params.get("organizationId"))
     else:
         organization=request.user.organization
     
-    users = User.objects.filter(organization=organization)
+    if isReseller:
+        users = User.objects.filter(isReseller=True)
+    else:
+        users = User.objects.filter(organization=organization)
+
     recordsTotal = users.count()
 
     users = users.filter(Q(fullname__contains=keyword) | Q(email__contains=keyword))
@@ -847,7 +854,7 @@ def getAllNFCTags(request):
 @api_view(['GET'])
 @permission_classes((IsAuthenticated,))
 def searchUnregisteredDevice(request):
-    if not request.user.is_superuser:
+    if not request.user.is_superuser and not request.user.isReseller:
         return Response({'success': False, 'message': _('no.permission')})
         
     draw = request.query_params.get('draw', 1)    
@@ -856,6 +863,10 @@ def searchUnregisteredDevice(request):
     length = int(request.query_params.get('length', 0))
     
     devices = Device.objects.filter(organization__isnull=True)
+
+    if not request.user.is_superuser:
+        devices = devices.filter(createdBy=request.user)
+
     recordsTotal = devices.count()
 
     devices = devices.filter(Q(id1__contains=keyword) 
@@ -977,7 +988,11 @@ def searchRegisteredDevice(request):
     start = int(request.query_params.get('start', 0))
     length = int(request.query_params.get('length', 0))
     
-    devices = Device.objects.filter(organization__isnull=False)
+    devices = Device.objects.filter(organization__isnull=False)    
+    
+    if not request.user.is_superuser:
+        devices = devices.filter(createdBy=request.user)
+
     recordsTotal = devices.count()
 
     devices = devices.filter(Q(id1__contains=keyword) | Q(id2__contains=keyword)).order_by('-createdDate')
@@ -1196,8 +1211,13 @@ def searchLog(request):
             logs = logs.filter(performUser__id=userId)
         else:        
             logs = logs.filter(performUser__in=request.user.viewed_users)
-    elif organizationId:
-        logs = logs.filter(organization=organizationId)
+    else:
+        if organizationId:
+            logs = logs.filter(organization=organizationId)
+        elif not request.user.is_superuser:
+            organizations = Organization.objects.filter(createdBy=request.user)
+            logs = logs.filter(organization__in=organizations)
+
         if userId:
             logs = logs.filter(performUser__id=userId)
         

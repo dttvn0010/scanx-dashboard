@@ -105,7 +105,7 @@ def addUser(request):
     if not request.user.organization:
         return redirect('login')
 
-    form = UserCreateForm(organization=request.user.organization, initial={'nfcEnabled': True, 'qrScanEnabled': False, 'sharedLocation': True})
+    form = UserCreateForm(organization=request.user.organization, initial={'nfcEnabled': True, 'sharedLocation': True})
     allRoles = Role.objects.all()
     roleAdmin = allRoles.filter(code='ADMIN').first()
 
@@ -116,7 +116,6 @@ def addUser(request):
             fullname = form.cleaned_data['fullname']            
             user = createTempUser(request,  fullname, email)
             user.nfcEnabled = form.cleaned_data['nfcEnabled']
-            user.qrScanEnabled = form.cleaned_data['qrScanEnabled']
             user.sharedLocation = form.cleaned_data['sharedLocation']
             roleIds = form.cleaned_data.get('roleIds', '')
             
@@ -196,7 +195,7 @@ def exportUser(request):
         writer.writerow(USER_HEADER)
         for item in lst:
             roles = '|'.join([role.code for role in item.roles.all()])
-            writer.writerow([item.fullname, item.email, roles, item.nfcEnabled, item.qrScanEnabled, item.sharedLocation])
+            writer.writerow([item.fullname, item.email, roles, item.nfcEnabled, item.sharedLocation])
 
     csv_file = open('users.csv', 'rb')
     response = HttpResponse(content=csv_file)
@@ -224,7 +223,7 @@ def importUser(request):
             indexes[i] = int(request.POST.get(f'col_{i}', '0'))
         
         for row in records:
-            fullname, email, roles, nfcEnabled, qrScanEnabled, sharedLocation  = getPermutation(row, indexes)
+            fullname, email, roles, nfcEnabled, sharedLocation  = getPermutation(row, indexes)
             if User.objects.filter(email=email).count() > 0 or User.objects.filter(fullname=fullname).count() > 0:
                 continue
 
@@ -234,7 +233,6 @@ def importUser(request):
                 user.roles.add(Role.objects.get(code=role))
 
             user.nfcEnabled = nfcEnabled == 'True'
-            user.qrScanEnabled = qrScanEnabled == 'True'
             user.sharedLocation = sharedLocation == 'True'
             user.save()
 
@@ -723,8 +721,7 @@ def configureOranization(request):
         return redirect('login')
 
     org = request.user.organization
-    initial = {'name': org.name, 'description': org.description,
-                 'nfcEnabled': org.nfcEnabled, 'qrScanEnabled': org.qrScanEnabled}
+    initial = {'name': org.name, 'description': org.description, 'nfcEnabled': org.nfcEnabled}
 
     form = OrganizationChangeForm(initial=initial)
     saved = False
@@ -735,7 +732,6 @@ def configureOranization(request):
             org.name = form.cleaned_data.get("name")
             org.description = form.cleaned_data.get("description")
             org.nfcEnabled = form.cleaned_data.get("nfcEnabled")
-            org.qrScanEnabled = form.cleaned_data.get("qrScanEnabled")
             org.save()
             saved = True
 

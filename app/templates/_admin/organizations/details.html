@@ -44,12 +44,6 @@
               </th>
             </tr>
             <tr>
-              <td>{% trans "qr.scanning.enabled" %}:</td>
-              <th>
-                {%if organization.qrScanEnabled %} {% trans "yes" %} {%else%} {% trans "no" %} {%endif%}
-              </th>
-            </tr>
-            <tr>
               <td>{% trans "status" %}:</td>
               <th>
                 {%if tenantAdmin.status == 1 %} {% trans "active" %} {%else%} {% trans "pending" %} {%endif%}

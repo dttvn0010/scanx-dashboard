@@ -51,6 +51,15 @@
             <span>{% trans "organizations" %}</span></a>
         </li>
 
+        {% if user.is_superuser %}
+          <hr class="sidebar-divider">
+
+          <li class="nav-item {% if page == 0 %} active {%endif%}">
+            <a class="nav-link" href="/_admin/resellers">
+              <span>{% trans "resellers" %}</span></a>
+          </li>
+        {% endif %}
+
         <hr class="sidebar-divider">
 
         <li class="nav-item">
@@ -69,23 +78,25 @@
           </div>
         </li>
        
-        <hr class="sidebar-divider">
+        {% if user.is_superuser %}
+          <hr class="sidebar-divider">
 
-        <li class="nav-item">
-          <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapse3" aria-expanded="true">
-            <span>{% trans "settings" %}</span>
-          </a>
-          <div id="collapse3" class="collapse {% if group == 2%}show{%endif%}" data-parent="#accordionSidebar">
-            <div class="bg-white py-2 collapse-inner rounded">
-              <a class="collapse-item {% if page == 4 %} active {%endif%}" href="/_admin/settings/system_params">
-                {% trans "system.parameters" %}
-              </a>
-              <a class="collapse-item {% if page == 5 %} active {%endif%}" href="/_admin/settings/mail_templates">
-                {% trans "mail.templates" %}
-              </a>
+          <li class="nav-item">
+            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapse3" aria-expanded="true">
+              <span>{% trans "settings" %}</span>
+            </a>
+            <div id="collapse3" class="collapse {% if group == 2%}show{%endif%}" data-parent="#accordionSidebar">
+              <div class="bg-white py-2 collapse-inner rounded">
+                <a class="collapse-item {% if page == 4 %} active {%endif%}" href="/_admin/settings/system_params">
+                  {% trans "system.parameters" %}
+                </a>
+                <a class="collapse-item {% if page == 5 %} active {%endif%}" href="/_admin/settings/mail_templates">
+                  {% trans "mail.templates" %}
+                </a>
+              </div>
             </div>
-          </div>
-        </li>
+          </li>
+        {% endif %}
 
         <hr class="sidebar-divider">
 

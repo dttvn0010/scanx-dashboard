@@ -15,7 +15,8 @@ urlpatterns = [
     path('users', views_user.home, name='user-home'),
     
     # Admin pages
-    path('_admin', views_admin.listOrganizations, name='admin-home'),    
+    
+    path('_admin', views_admin.listOrganizations, name='admin-organization'),    
     path('_admin/organizations/add', views_admin.addOrganization),
     path('_admin/organizations/update/<int:pk>', views_admin.updateOrganization),    
     path('_admin/organizations/user_list/<int:pk>', views_admin.listOrganizationUsers),
@@ -23,7 +24,11 @@ urlpatterns = [
     path('_admin/organizations/export', views_admin.exportOrganization),
     path('_admin/organizations/import_preview', views_admin.importOrganizationPreview),
     path('_admin/organizations/import', views_admin.importOrganization),
-    path('_admin/organizations/resend_mail/<int:pk>', views_admin.resendMail),
+    path('_admin/organizations/resend_mail/<int:pk>', views_admin.resendAdminMail),
+
+    path('_admin/resellers', views_admin.listResellers, name='admin-home'),    
+    path('_admin/resellers/add', views_admin.addReseller),
+    path('_admin/resellers/resend_mail/<int:pk>', views_admin.resendResellerMail),
 
     path('_admin/devices/unregistered', views_admin.listUnregisteredDevices, name='admin-unregistered-device'),
     path('_admin/devices/unregistered/add', views_admin.addUnregisteredDevice),

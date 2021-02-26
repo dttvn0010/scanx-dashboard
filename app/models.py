@@ -9,10 +9,10 @@ class Organization(models.Model):
     adminUsername = models.CharField(max_length=150, null=True)
     description = models.CharField(max_length=500, blank=True, null=True)
     nfcEnabled = models.BooleanField(verbose_name=_('nfc.enabled'), default=False)
-    qrScanEnabled = models.BooleanField(verbose_name=_('qr.scanning.enabled'), default=False)    
     geoLocationEnabled = models.BooleanField(verbose_name=_('geolocation.enabled'), default=False)    
     active = models.BooleanField(verbose_name=_('active'), default=False)
     createdDate = models.DateTimeField(null=True)
+    createdBy = models.ForeignKey('app.User', null=True, on_delete=models.SET_NULL, related_name='createdBy')
 
     def __str__(self):
         return self.name
@@ -82,12 +82,12 @@ class User(AbstractUser):
     roles = models.ManyToManyField(Role, verbose_name=_("role") + " (*)")
     groups = models.ManyToManyField(Group, verbose_name=_("group") + " (*)")
     nfcEnabled = models.BooleanField(verbose_name=_('nfc.enabled'), blank=True, null=True)
-    qrScanEnabled = models.BooleanField(verbose_name=_('qr.scanning.enabled'), blank=True, null=True)
     sharedLocation = models.BooleanField(verbose_name=_('geolocation.enabled'), blank=True, null=True)
     profilePicture = models.ImageField(upload_to='static/images', blank=True, null=True) 
     status = models.IntegerField(blank=True, null=True)   
     tmpPassword = models.CharField(max_length=30, blank=True, null=True)
-    tmpPasswordExpired = models.DateTimeField(null=True)
+    tmpPasswordExpired = models.DateTimeField(null=True)    
+    isReseller = models.BooleanField(verbose_name=_('is.reseller'), default=False)
     createdDate = models.DateTimeField(null=True)
     
     @property
@@ -150,6 +150,9 @@ class User(AbstractUser):
     def role_names(self):
         if self.is_superuser:
             return 'Super Admin'
+
+        if self.isReseller:
+            return 'Reseller'
             
         return ','.join([role.name for role in self.roles.all()])
 
@@ -157,6 +160,9 @@ class User(AbstractUser):
     def role_codes(self):
         if self.is_superuser:
             return 'SUPER_ADMIN'
+
+        if self.isReseller:
+            return 'RESELLER'
 
         return ','.join([role.code for role in self.roles.all()])
 
@@ -166,10 +172,14 @@ class User(AbstractUser):
 
     @property   
     def count_new_logs(self):
+        logs = Log.objects.filter(~Q(performUser=self))
         if self.is_superuser:
-            return Log.objects.filter(~Q(viewUsers=self)).count()
+            return logs.filter(~Q(viewUsers=self)).count()
+        elif self.isReseller:
+            organizations = Organization.objects.filter(createdBy=self)
+            return logs.filter(organization__in=organizations).filter(~Q(viewUsers=self)).count()
         else:
-            logs = Log.objects.filter(organization=self.organization).filter(~Q(viewUsers=self))
+            logs = logs.filter(organization=self.organization).filter(~Q(viewUsers=self))
             if not self.hasRole('ADMIN'):
                 logs = logs.filter(performUser__in=self.view_users)
             
@@ -179,10 +189,14 @@ class User(AbstractUser):
 
     @property 
     def get_new_logs(self):
+        logs = Log.objects.filter(~Q(performUser=self))
         if self.is_superuser:
-            return Log.objects.filter(~Q(viewUsers=self)).order_by('-actionDate')[:5]
+            return logs.filter(~Q(viewUsers=self)).order_by('-actionDate')[:5]
+        elif self.isReseller:
+            organizations = Organization.objects.filter(createdBy=self)
+            return logs.filter(organization__in=organizations).filter(~Q(viewUsers=self)).order_by('-actionDate')[:5]
         else:
-            logs = Log.objects.filter(organization=self.organization).filter(~Q(viewUsers=self))
+            logs = logs.filter(organization=self.organization).filter(~Q(viewUsers=self))
             if not self.hasRole('ADMIN'):
                 logs = logs.filter(performUser__in=self.view_users)
             
@@ -197,6 +211,7 @@ class Location(models.Model):
     city = models.CharField(verbose_name=_("city") + " (*)", max_length=50)
     postCode = models.CharField(verbose_name=_("postCode") + " (*)", max_length=10)
     createdDate = models.DateTimeField(null=True)
+    createdBy = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         return f'{self.addressLine1}, {self.addressLine2}, {self.city}, {self.postCode}'
@@ -218,7 +233,8 @@ class Device(models.Model):
     registeredDate = models.DateTimeField(blank=True, null=True)
     status = models.IntegerField(blank=True, null=True)   
     enabled = models.BooleanField(default=True)
-    createdDate = models.DateTimeField(null=True)    
+    createdDate = models.DateTimeField(null=True)   
+    createdBy = models.ForeignKey(User, null=True, on_delete=models.SET_NULL) 
 
     def __str__(self):
         return f'{self.id1}-{self.id2}'

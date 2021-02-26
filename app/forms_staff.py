@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 class UserCreateForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ('fullname', 'email', 'nfcEnabled', 'qrScanEnabled', 'sharedLocation', 'groups')
+        fields = ('fullname', 'email', 'nfcEnabled', 'sharedLocation', 'groups')
 
     def __init__(self, *args, **kwargs):        
         organization = kwargs.pop('organization', None)
@@ -15,7 +15,6 @@ class UserCreateForm(forms.ModelForm):
     fullname = forms.CharField(max_length=30, label=_("fullname") + " (*)")
     email = forms.EmailField(max_length=50, label=_("email.address") + " (*)")
     nfcEnabled = forms.BooleanField(label=_('nfc.enabled'), required=False)
-    qrScanEnabled = forms.BooleanField(label=_('qr.scanning.enabled'), required=False)
     sharedLocation = forms.BooleanField(label=_('geolocation.enabled'), required=False)
     roleIds = forms.CharField(widget=forms.HiddenInput(), required=False)
     
@@ -29,7 +28,7 @@ class UserCreateForm(forms.ModelForm):
 class UserChangeForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ( 'nfcEnabled', 'qrScanEnabled', 'sharedLocation', 'groups')
+        fields = ( 'nfcEnabled', 'sharedLocation', 'groups')
 
     def __init__(self, *args, **kwargs):        
         organization = kwargs.pop('organization', None)
@@ -37,14 +36,13 @@ class UserChangeForm(forms.ModelForm):
         self.fields['groups'].queryset = Group.objects.filter(organization=organization)
 
     nfcEnabled = forms.BooleanField(label=_('nfc.enabled'), required=False)
-    qrScanEnabled = forms.BooleanField(label=_('qr.scanning.enabled'), required=False)
     sharedLocation = forms.BooleanField(label=_('geolocation.enabled'), required=False)
     roleIds = forms.CharField(widget=forms.HiddenInput(), required=False)
 
 class LocationForm(forms.ModelForm):
     class Meta:
         model = Location
-        exclude = ('organization', 'createdDate',)
+        exclude = ('organization', 'createdDate', 'createdBy', )
         
 class DeviceCreateForm(forms.Form):
     def __init__(self, *args, **kwargs):        
@@ -94,4 +92,3 @@ class OrganizationChangeForm(forms.Form):
     description = forms.CharField(label=_("detail.information"), required=False, 
                         widget=forms.Textarea(attrs={'rows':4}))
     nfcEnabled = forms.BooleanField(label=_('nfc.enabled'), required=False)
-    qrScanEnabled = forms.BooleanField(label=_('qr.scanning.enabled'), required=False)

@@ -13,7 +13,7 @@ class MyUserAdmin(UserAdmin):
             'Other information',  # group heading of your choice; set to None for a blank space instead of a header
             {
                 'fields': (
-                    'fullname', 'organization', 'status', 'roles'
+                    'fullname', 'organization', 'status', 'roles', 'isReseller',
                 ),
             },
         ),

@@ -45,6 +45,18 @@ def getMailTemplate(template_code):
     
     return '', ''
 
+def sendResellerInvitationMail(fullname, email, password):
+    try:
+        subject, body = getMailTemplate(settings.MAIL_TEMPLATE_CODES['RESELLER_INVITATION'])
+
+        html = body.replace('${Link.ACCEPT_INVITATION}', settings.INVITE_URL + f'?email={email}')
+        html = html.replace('${User.FULL_NAME}', fullname)
+        html = html.replace('${User.PASSWORD}', password)
+
+        sendMail(email, subject, html)
+    except:
+        traceback.print_exc()
+
 def sendAdminInvitationMail(organization, fullname, email, password):
     try:
         subject, body = getMailTemplate(settings.MAIL_TEMPLATE_CODES['ADMIN_INVITATION'])
