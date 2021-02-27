@@ -80,7 +80,7 @@ class User(AbstractUser):
     organization = models.ForeignKey(Organization, blank=True, null=True, on_delete=models.CASCADE)
     fullname = models.CharField(verbose_name=_("fullname") + " (*)", max_length=50, blank=True, null=True)
     roles = models.ManyToManyField(Role, verbose_name=_("role") + " (*)")
-    groups = models.ManyToManyField(Group, verbose_name=_("group") + " (*)", blank=True, null=True)
+    groups = models.ManyToManyField(Group, verbose_name=_("group"), blank=True, null=True)
     nfcEnabled = models.BooleanField(verbose_name=_('nfc.enabled'), blank=True, null=True)
     sharedLocation = models.BooleanField(verbose_name=_('geolocation.enabled'), blank=True, null=True)
     profilePicture = models.ImageField(upload_to='static/images', blank=True, null=True) 
