@@ -44,7 +44,7 @@
       <hr class="sidebar-divider my-0">
 
       {% if user|has_page_view_permission:"DASHBOARD" %}
-        <li class="nav-item {% if not page  %} active {%endif%}">
+        <li class="nav-item {% if page == 0  %} active {%endif%}">
           <a class="nav-link" href="/staff/dashboard">
             <span>{% trans "dashboard" %}</span></a>
         </li>
