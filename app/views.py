@@ -77,10 +77,10 @@ def home(request):
     else:
         if(request.user.status == User.Status.INVITED):
             return HttpResponseRedirect("/accounts/login")
-        elif request.user.hasRole('ADMIN') or request.user.hasRole('STAFF'):
-            return HttpResponseRedirect("/staff")
         else:
-            return HttpResponseRedirect("/users")
+            return HttpResponseRedirect("/staff")
+        #else:
+        #    return HttpResponseRedirect("/users")
 
 def privacy(request):
     return render(request, 'privacy.html')
