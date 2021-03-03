@@ -254,6 +254,76 @@ def resendMail(request, pk):
     
     return redirect('staff-user')
 
+def setUserPermission(request, pk):
+    if not request.user.organization:
+        return redirect('login')
+
+    user = get_object_or_404(User, pk=pk)
+    user_features = UserFeaturePermission.objects.filter(user=user)
+    user_page_permissions = UserPagePermission.objects.filter(user=user)
+    user_view_history_groups = UserViewHistoryPermission.objects.filter(user=user) 
+    
+    pages = [dict(p) for p in settings.PAGES]
+    
+    for user_page_permission in user_page_permissions:
+        page = next(x for x in pages if x['code'] == user_page_permission.pageCode)
+        if not page: continue
+        page[user_page_permission.actionCode.lower()] = True
+
+    features = [dict(f) for f in (settings.FEATURES)]
+    for user_feature in user_features:
+        feature = next(x for x in features if x['code'] == user_feature.featureCode)
+        if not feature: continue
+        feature['access'] = True
+
+    viewed_groups = Group.objects.filter(organization=request.user.organization)
+    for user_view_history_group in user_view_history_groups:
+        viewed_group = next(x for x in viewed_groups if x.id == user_view_history_group.viewGroup.id)
+        if not viewed_group: continue
+        viewed_group.viewed = True
+
+    context = {
+        'edit_user': user,
+        'viewed_groups': viewed_groups,
+        'pages': pages,
+        'features': features,
+    }
+
+    if request.method == 'POST':
+        data = request.POST
+
+        for user_feature in user_features:
+            user_feature.delete()
+
+        for user_page_permission in user_page_permissions:
+            user_page_permission.delete()
+
+        for user_view_history_group in user_view_history_groups:
+            user_view_history_group.delete()
+
+        for feature in features:
+            featureCode = feature['code']
+            if data.get('feature_' + featureCode):
+                user_feature = UserFeaturePermission(user=user, featureCode=featureCode)
+                user_feature.save()
+
+        for page in pages:
+            pageCode = page['code']
+            for action in settings.PAGE_ACTIONS:
+                actionCode = action['code']
+                if data.get(f'page_{pageCode}_{actionCode}'):
+                    user_page_permission = UserPagePermission(user=user, pageCode=pageCode, actionCode=actionCode)
+                    user_page_permission.save()
+
+        for viewed_group in viewed_groups:
+            if data.get(f'viewed_group_{viewed_group.id}'):
+                user_view_history_group = UserViewHistoryPermission(user=user, viewGroup=viewed_group)
+                user_view_history_group.save()
+
+        return redirect('staff-user')
+
+    return render(request, 'staff/users/permissions.html', context)
+
 #================================= Locations  ====================================================================
 @login_required
 def listLocations(request):

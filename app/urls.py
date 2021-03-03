@@ -58,6 +58,7 @@ urlpatterns = [
     path('staff/users/import_preview', views_staff.importUserPreview),
     path('staff/users/import', views_staff.importUser),
     path('staff/users/resend_mail/<int:pk>', views_staff.resendMail),
+    path('staff/users/permissions/<int:pk>', views_staff.setUserPermission),  
 
     path('staff/locations', views_staff.listLocations, name='staff-location'),
     path('staff/locations/add', views_staff.addLocation),

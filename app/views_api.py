@@ -323,7 +323,7 @@ def getUserData(user):
         data['NFCButtonText'] = getTenantParamValue('NFC_BUTTON_TEXT', user.organization, settings.NFC_BUTTON_TEXT)
         data['QRButtonText'] = getTenantParamValue('QR_BUTTON_TEXT', user.organization, settings.QR_BUTTON_TEXT)
 
-    if user.hasAnyRole(['ADMIN', 'INSTALLER']):
+    if user.hasAnyRole(['ADMIN', 'STAFF']):
         data['UpdateDeviceCoordinatesButtonText'] = getTenantParamValue('UPDATE_DEVICE_COORDINATES_BUTTON_TEXT', user.organization, settings.UPDATE_DEVICE_COORDINATES_BUTTON_TEXT) 
 
     if user.is_superuser:
@@ -629,6 +629,7 @@ def searchUser(request):
         if request.user.username == tenantAdminName  and user.username != tenantAdminName:
             locked = False
 
+        data[i]['is_admin'] = user.hasRole('ADMIN')
         data[i]['locked'] = locked
         data[i]['role_names'] = user.role_names
         
@@ -783,7 +784,7 @@ def addDevice(request):
 @api_view(['POST'])
 @permission_classes((IsAuthenticated,))
 def updateDeviceCoordinates(request):
-    if not request.user.organization or not request.user.hasAnyRole(['ADMIN', 'INSTALLER']):
+    if not request.user.organization or not request.user.hasAnyRole(['ADMIN', 'STAFF']):
         return Response({'success': False, 'message': _('no.permission')})
 
     mobiletime = float(request.data.get('mobiletime', '0'))

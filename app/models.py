@@ -27,7 +27,7 @@ class Role(models.Model):
 
 class Group(models.Model):
     organization = models.ForeignKey(Organization, blank=True, null=True, on_delete=models.CASCADE)
-    code = models.CharField(max_length=30, unique=True)
+    code = models.CharField(max_length=30)
     name = models.CharField(max_length=200)
     description = models.CharField(max_length=500, blank=True, null=True)
 
@@ -110,11 +110,24 @@ class User(AbstractUser):
         if self.hasRole('ADMIN'):
             return True
 
+        featurePermissionSet = UserFeaturePermission.objects.filter(user=self)
+        if any(p.featureCode == featureCode for p in featurePermissionSet):
+            return True
+        
         return any(group.hasFeaturePermission(featureCode) for group in self.groups.all())
 
     def hasPagePermission(self, pageCode, actionCode):
         if self.hasRole('ADMIN'):
             return True
+
+        pagePermissionSet = UserPagePermission.objects.filter(user=self)
+        
+        if actionCode != 'VIEW':
+            if any(p.pageCode == pageCode and p.actionCode == actionCode for p in pagePermissionSet):
+                return True
+        else:
+            if any(p.pageCode == pageCode for p in pagePermissionSet):
+                return True
 
         return any(group.hasPagePermission(pageCode, actionCode) for group in self.groups.all())
 
@@ -129,6 +142,12 @@ class User(AbstractUser):
                 if not any(x.code == viewed_group.code for x in viewed_groups):
                     viewed_groups.append(viewed_group)
         
+        viewHistoryPermissionSet = UserViewHistoryPermission.objects.filter(user=self)
+        
+        for p in viewHistoryPermissionSet:
+            if not any(x.code == p.viewGroup.code for x in viewed_groups):
+                viewed_groups.append(p.viewGroup)
+
         return viewed_groups
 
     @property
@@ -141,10 +160,6 @@ class User(AbstractUser):
             return User.objects.filter(organization=self.organization)
         else:
             return User.objects.filter(groups__in=self.getViewHistoryGroups())
-
-    @property
-    def view_users(self):
-        return self.getViewHistoryGroups()
 
     @property
     def role_names(self):
@@ -181,7 +196,7 @@ class User(AbstractUser):
         else:
             logs = logs.filter(organization=self.organization).filter(~Q(viewUsers=self))
             if not self.hasRole('ADMIN'):
-                logs = logs.filter(performUser__in=self.view_users)
+                logs = logs.filter(performUser__in=self.viewed_users)
             
             return logs.count()
         
@@ -198,12 +213,25 @@ class User(AbstractUser):
         else:
             logs = logs.filter(organization=self.organization).filter(~Q(viewUsers=self))
             if not self.hasRole('ADMIN'):
-                logs = logs.filter(performUser__in=self.view_users)
+                logs = logs.filter(performUser__in=self.viewed_users)
             
             return logs.order_by('-actionDate')[:5]
         
         return []
-       
+
+class UserFeaturePermission(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    featureCode = models.CharField(max_length=50)
+
+class UserPagePermission(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    pageCode = models.CharField(max_length=50)
+    actionCode = models.CharField(max_length=30)
+
+class UserViewHistoryPermission(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    viewGroup = models.ForeignKey(Group, related_name='userViewGroup', on_delete=models.CASCADE, default=None)
+
 class Location(models.Model):
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE,  blank=True, null=True)
     addressLine1 = models.CharField(verbose_name=_("addressLine1") + " (*)", max_length=100)

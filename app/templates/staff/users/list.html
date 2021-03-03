@@ -224,6 +224,9 @@ $(document).ready(function() {
 
           if('{{user|has_page_edit_permission:"USERS"}}' == 'True') {
             html += `<a title='{% trans "edit" %}' href="/staff/users/update/${row['id']}"><i class="fas fa-edit"></i></a>&nbsp;&nbsp`;
+            if(!row.is_admin) {
+              html += `<a title='{% trans "set.permissions" %}' href="/staff/users/permissions/${row['id']}"><i class="fas fa-user-secret"></i></a>&nbsp;&nbsp;`
+            }
           }
 
           if(('{{user|has_page_delete_permission:"USERS"}}' == 'True') && !row.locked){

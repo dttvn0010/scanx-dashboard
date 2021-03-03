@@ -10,8 +10,8 @@ from .models import MailTemplate
 SMTP_PORT = 465 
 SMTP_SERVER = "smtp.gmail.com"
 SENDER = "ScanX <scanx.cloud@gmail.com>"
-GMAIL = "scanx.cloud@gmail.com"
-GMAIL_PASS = "abc@123@def"
+GMAIL = "dttvn0010@gmail.com"#"scanx.cloud@gmail.com"
+GMAIL_PASS = "Ab01234567"#"abc@123@def"
 
 def sendMail2(to, subject, body):
 
