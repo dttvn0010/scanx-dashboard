@@ -193,7 +193,7 @@ PAGE_ACTIONS = [
     {'code': 'DELETE', 'name': 'Delete'},
 ]
 
-HOST_URL =  "https://scanx.cloud"
+HOST_URL =  "http://scanx.cloud:8080"
 INVITE_URL = HOST_URL + "/accounts/initial_setup"
 RESET_PASSWORD_URL = HOST_URL + "/accounts/reset_password"
 PROFILE_IMAGE_SIZE = 300
