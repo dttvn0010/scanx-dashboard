@@ -129,7 +129,8 @@ def addUser(request):
 
             groupIds = form.cleaned_data.get('groupIds', '')
             for groupId in groupIds.split(','):
-                user.groups.add(Group.objects.get(pk=groupId))
+                if groupId:
+                    user.groups.add(Group.objects.get(pk=groupId))
 
             user.save()
             
