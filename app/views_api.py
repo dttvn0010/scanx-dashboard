@@ -8,6 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from django.utils.timezone import make_aware
 
+import math
 import json
 import requests
 import traceback
@@ -389,6 +390,15 @@ def getAdressFromGeoLocation(lat, lng):
     except:
         return ''
 
+def getDistance(lat1, lng1, lat2, lng2):
+    R = 6371
+    lat = (lat1+lat2)/2
+    phi = math.pi * lat/180
+    R1 = R * math.cos(phi)
+    dx = R1 * math.pi * abs(lng2-lng1)/180
+    dy = R * math.pi * abs(lat2-lat1)/180
+    return 1000*math.sqrt(dx*dx + dy*dy)
+
 @api_view(['POST'])
 @permission_classes((IsAuthenticated,))
 def userCheckIn(request):
@@ -416,6 +426,7 @@ def userCheckIn(request):
     message_params = []
     status = CheckIn.Status.SUCCESS
 
+    maxCheckInDistance = getSystemParamValue('MAX_CHECK_IN_DISTANCE', settings.MAX_CHECK_IN_DISTANCE)
     allowedTimeDiff = getSystemParamValue('MAX_TIME_DIFF_ALLOW', settings.MAX_TIME_DIFF_ALLOW)
 
     if abs(scantime - time()) > allowedTimeDiff:
@@ -423,7 +434,7 @@ def userCheckIn(request):
 
     if status == CheckIn.Status.SUCCESS and (not isValidLat(lat) or not isValidLng(lng)):
         status = CheckIn.Status.INVALID_GPS_POSITION
-    
+
     device = None
 
     arr = code.split('-')
@@ -457,6 +468,9 @@ def userCheckIn(request):
         if status == CheckIn.Status.SUCCESS and timediff < scanDelay:
             status = CheckIn.Status.SCAN_NOT_TIME_OUT_YET
             message_params = [scanDelay]
+
+    if status == CheckIn.Status.SUCCESS and getDistance(lat, lng, device.lat, device.lng) > maxCheckInDistance:
+        status = CheckIn.Status.MAX_DISTANCE_EXCEED
 
     checkIn.status = status        
     checkIn.save()
@@ -1115,7 +1129,7 @@ def searchGroup(request):
     groups = Group.objects.filter(organization=request.user.organization)
     recordsTotal = groups.count()
 
-    groups = groups.filter(Q(code__contains=keyword) | Q(name__contains=keyword))
+    groups = groups.filter(name__contains=keyword)
     
     recordsFiltered = groups.count()
     groups = groups[start:start+length]

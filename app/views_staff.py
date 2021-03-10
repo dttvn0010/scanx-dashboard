@@ -254,76 +254,6 @@ def resendMail(request, pk):
     
     return redirect('staff-user')
 
-def setUserPermission(request, pk):
-    if not request.user.organization:
-        return redirect('login')
-
-    user = get_object_or_404(User, pk=pk)
-    user_features = UserFeaturePermission.objects.filter(user=user)
-    user_page_permissions = UserPagePermission.objects.filter(user=user)
-    user_view_history_groups = UserViewHistoryPermission.objects.filter(user=user) 
-    
-    pages = [dict(p) for p in settings.PAGES]
-    
-    for user_page_permission in user_page_permissions:
-        page = next(x for x in pages if x['code'] == user_page_permission.pageCode)
-        if not page: continue
-        page[user_page_permission.actionCode.lower()] = True
-
-    features = [dict(f) for f in (settings.FEATURES)]
-    for user_feature in user_features:
-        feature = next(x for x in features if x['code'] == user_feature.featureCode)
-        if not feature: continue
-        feature['access'] = True
-
-    viewed_groups = Group.objects.filter(organization=request.user.organization)
-    for user_view_history_group in user_view_history_groups:
-        viewed_group = next(x for x in viewed_groups if x.id == user_view_history_group.viewGroup.id)
-        if not viewed_group: continue
-        viewed_group.viewed = True
-
-    context = {
-        'edit_user': user,
-        'viewed_groups': viewed_groups,
-        'pages': pages,
-        'features': features,
-    }
-
-    if request.method == 'POST':
-        data = request.POST
-
-        for user_feature in user_features:
-            user_feature.delete()
-
-        for user_page_permission in user_page_permissions:
-            user_page_permission.delete()
-
-        for user_view_history_group in user_view_history_groups:
-            user_view_history_group.delete()
-
-        for feature in features:
-            featureCode = feature['code']
-            if data.get('feature_' + featureCode):
-                user_feature = UserFeaturePermission(user=user, featureCode=featureCode)
-                user_feature.save()
-
-        for page in pages:
-            pageCode = page['code']
-            for action in settings.PAGE_ACTIONS:
-                actionCode = action['code']
-                if data.get(f'page_{pageCode}_{actionCode}'):
-                    user_page_permission = UserPagePermission(user=user, pageCode=pageCode, actionCode=actionCode)
-                    user_page_permission.save()
-
-        for viewed_group in viewed_groups:
-            if data.get(f'viewed_group_{viewed_group.id}'):
-                user_view_history_group = UserViewHistoryPermission(user=user, viewGroup=viewed_group)
-                user_view_history_group.save()
-
-        return redirect('staff-user')
-
-    return render(request, 'staff/users/permissions.html', context)
-
 #================================= Locations  ====================================================================
 @login_required
 def listLocations(request):
@@ -510,51 +440,10 @@ def listGroups(request):
     groups = Group.objects.filter(organization=request.user.organization)
     return render(request, "staff/groups/list.html", {"groups": groups})
 
-@login_required
-def addGroup(request):
-    if not request.user.organization:
-        return redirect('login')
-
-    form = GroupForm()
-
-    if request.method == 'POST':
-        form = GroupForm(request.POST)
-        if form.is_valid():     
-            group = form.save(commit=False)
-            group.organization = request.user.organization
-            group.save()
-            logAction('CREATE', request.user, None, group)
-            return redirect('staff-group')
-
-    return render(request, 'staff/groups/form.html', {'form': form})
-
-@login_required
-def updateGroup(request, pk):
-    if not request.user.organization:
-        return redirect('login')
-
-    old_group = get_object_or_404(Group, pk=pk)
-    group = get_object_or_404(Group, pk=pk)
-    form = GroupForm(instance=group)
-
-    if request.method == 'POST':
-        form = GroupForm(request.POST, instance=group)
-
-        if form.is_valid():
-            group = form.save()
-            logAction('UPDATE', request.user, old_group, group)
-            return redirect('staff-group')
-
-    return render(request, 'staff/groups/form.html', {'form': form })
-
-def setGroupPermission(request, pk):
-    if not request.user.organization:
-        return redirect('login')
-
-    group = get_object_or_404(Group, pk=pk)
-    group_features = GroupFeaturePermission.objects.filter(group=group)
-    group_page_permissions = GroupPagePermission.objects.filter(group=group)
-    group_view_history_groups = GroupViewHistoryPermission.objects.filter(group=group) 
+def getGroupPermissionContext(group, request):
+    group_features = GroupFeaturePermission.objects.filter(group=group) if group else []
+    group_page_permissions = GroupPagePermission.objects.filter(group=group) if group else []
+    group_view_history_groups = GroupViewHistoryPermission.objects.filter(group=group) if group else []
     
     pages = [dict(p) for p in settings.PAGES]
     
@@ -569,54 +458,112 @@ def setGroupPermission(request, pk):
         if not feature: continue
         feature['access'] = True
 
+    feature = next(x for x in features if x['code'] == 'USE_APP')
+    if feature and not group:
+        feature['access'] = True
+
     viewed_groups = Group.objects.filter(organization=request.user.organization)
     for group_view_history_group in group_view_history_groups:
         viewed_group = next(x for x in viewed_groups if x.id == group_view_history_group.viewGroup.id)
         if not viewed_group: continue
         viewed_group.viewed = True
 
-    context = {
-        'group': group,
+    if group:
+        viewed_groups = [x for x in viewed_groups if x.id != group.id]
+        
+    return {
         'viewed_groups': viewed_groups,
         'pages': pages,
         'features': features,
     }
 
+def deleteOldGroupPermissions(group):
+    group_features = GroupFeaturePermission.objects.filter(group=group)
+    group_page_permissions = GroupPagePermission.objects.filter(group=group)
+    group_view_history_groups = GroupViewHistoryPermission.objects.filter(group=group)
+
+    for group_feature in group_features:
+        group_feature.delete()
+
+    for group_page_permission in group_page_permissions:
+        group_page_permission.delete()
+
+    for group_view_history_group in group_view_history_groups:
+        group_view_history_group.delete()
+
+def saveGroupPermissions(group, request):
+
+    data = request.POST
+    
+    features = [dict(f) for f in (settings.FEATURES)]
+
+    for feature in features:
+        featureCode = feature['code']
+        if data.get('feature_' + featureCode):
+            group_feature = GroupFeaturePermission(group=group, featureCode=featureCode)
+            group_feature.save()
+
+    pages = [dict(p) for p in settings.PAGES]
+
+    for page in pages:
+        pageCode = page['code']
+        for action in settings.PAGE_ACTIONS:
+            actionCode = action['code']
+            if data.get(f'page_{pageCode}_{actionCode}'):
+                group_page_permission = GroupPagePermission(group=group, pageCode=pageCode, actionCode=actionCode)
+                group_page_permission.save()
+
+    viewed_groups = Group.objects.filter(organization=request.user.organization)
+
+    for viewed_group in viewed_groups:
+        if data.get(f'viewed_group_{viewed_group.id}'):
+            group_view_history_group = GroupViewHistoryPermission(group=group, viewGroup=viewed_group)
+            group_view_history_group.save()
+
+
+@login_required
+def addGroup(request):
+    if not request.user.organization:
+        return redirect('login')
+
+    form = GroupForm()
+    context = getGroupPermissionContext(None, request)
+
     if request.method == 'POST':
-        data = request.POST
+        form = GroupForm(request.POST)
+        if form.is_valid():     
+            group = form.save(commit=False)
+            group.organization = request.user.organization
+            group.save()
+            saveGroupPermissions(group, request)
+            logAction('CREATE', request.user, None, group)
+            return redirect('staff-group')
+    
+    context['form'] = form
+    return render(request, 'staff/groups/form.html', context)
 
-        for group_feature in group_features:
-            group_feature.delete()
+@login_required
+def updateGroup(request, pk):
+    if not request.user.organization:
+        return redirect('login')
 
-        for group_page_permission in group_page_permissions:
-            group_page_permission.delete()
+    old_group = get_object_or_404(Group, pk=pk)
+    group = get_object_or_404(Group, pk=pk)
+    context = getGroupPermissionContext(group, request)
+    form = GroupForm(instance=group)
 
-        for group_view_history_group in group_view_history_groups:
-            group_view_history_group.delete()
+    if request.method == 'POST':
+        form = GroupForm(request.POST, instance=group)
 
-        for feature in features:
-            featureCode = feature['code']
-            if data.get('feature_' + featureCode):
-                group_feature = GroupFeaturePermission(group=group, featureCode=featureCode)
-                group_feature.save()
+        if form.is_valid():
+            group = form.save()
+            deleteOldGroupPermissions(group)
+            saveGroupPermissions(group, request)
+            logAction('UPDATE', request.user, old_group, group)
+            return redirect('staff-group')
 
-        for page in pages:
-            pageCode = page['code']
-            for action in settings.PAGE_ACTIONS:
-                actionCode = action['code']
-                if data.get(f'page_{pageCode}_{actionCode}'):
-                    group_page_permission = GroupPagePermission(group=group, pageCode=pageCode, actionCode=actionCode)
-                    group_page_permission.save()
-
-        for viewed_group in viewed_groups:
-            if data.get(f'viewed_group_{viewed_group.id}'):
-                group_view_history_group = GroupViewHistoryPermission(group=group, viewGroup=viewed_group)
-                group_view_history_group.save()
-
-        return redirect('staff-group')
-
-    return render(request, 'staff/groups/permissions.html', context)
-
+    context['form'] = form
+    return render(request, 'staff/groups/form.html', context)
 
 #================================= Reports  ====================================================================
 

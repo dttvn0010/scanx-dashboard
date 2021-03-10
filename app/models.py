@@ -27,7 +27,6 @@ class Role(models.Model):
 
 class Group(models.Model):
     organization = models.ForeignKey(Organization, blank=True, null=True, on_delete=models.CASCADE)
-    code = models.CharField(max_length=30)
     name = models.CharField(max_length=200)
     description = models.CharField(max_length=500, blank=True, null=True)
 
@@ -110,24 +109,11 @@ class User(AbstractUser):
         if self.hasRole('ADMIN'):
             return True
 
-        featurePermissionSet = UserFeaturePermission.objects.filter(user=self)
-        if any(p.featureCode == featureCode for p in featurePermissionSet):
-            return True
-        
         return any(group.hasFeaturePermission(featureCode) for group in self.groups.all())
 
     def hasPagePermission(self, pageCode, actionCode):
         if self.hasRole('ADMIN'):
             return True
-
-        pagePermissionSet = UserPagePermission.objects.filter(user=self)
-        
-        if actionCode != 'VIEW':
-            if any(p.pageCode == pageCode and p.actionCode == actionCode for p in pagePermissionSet):
-                return True
-        else:
-            if any(p.pageCode == pageCode for p in pagePermissionSet):
-                return True
 
         return any(group.hasPagePermission(pageCode, actionCode) for group in self.groups.all())
 
@@ -142,12 +128,6 @@ class User(AbstractUser):
                 if not any(x.code == viewed_group.code for x in viewed_groups):
                     viewed_groups.append(viewed_group)
         
-        viewHistoryPermissionSet = UserViewHistoryPermission.objects.filter(user=self)
-        
-        for p in viewHistoryPermissionSet:
-            if not any(x.code == p.viewGroup.code for x in viewed_groups):
-                viewed_groups.append(p.viewGroup)
-
         return viewed_groups
 
     @property
@@ -219,19 +199,6 @@ class User(AbstractUser):
         
         return []
 
-class UserFeaturePermission(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    featureCode = models.CharField(max_length=50)
-
-class UserPagePermission(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    pageCode = models.CharField(max_length=50)
-    actionCode = models.CharField(max_length=30)
-
-class UserViewHistoryPermission(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    viewGroup = models.ForeignKey(Group, related_name='userViewGroup', on_delete=models.CASCADE, default=None)
-
 class Location(models.Model):
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE,  blank=True, null=True)
     addressLine1 = models.CharField(verbose_name=_("addressLine1") + " (*)", max_length=100)
@@ -282,6 +249,7 @@ class CheckIn(models.Model):
         DEVICE_NOT_REGISTERED = 7
         DEVICE_DISABLED = 8
         SCAN_NOT_TIME_OUT_YET = 10
+        MAX_DISTANCE_EXCEED = 11
 
         messages =  {
             SUCCESS : _('check_in.status.success'),
@@ -293,6 +261,7 @@ class CheckIn(models.Model):
             DEVICE_NOT_REGISTERED : _('check_in.status.device.not.registered'),
             DEVICE_DISABLED: _('check_in.status.device.disabled'),
             SCAN_NOT_TIME_OUT_YET : _('check_in.status.scan.not.time.out.yet'),
+            MAX_DISTANCE_EXCEED : _('check_in.status.max.distance.exceed'),
         }
 
         mobile_messages = {
@@ -305,6 +274,7 @@ class CheckIn(models.Model):
             DEVICE_NOT_REGISTERED : _('check_in.mobile.message.device.not.registered'),
             DEVICE_DISABLED : _('check_in.mobile.message.device.disabled'),
             SCAN_NOT_TIME_OUT_YET : _('check_in.mobile.message.scan.not.time.out.yet'),
+            MAX_DISTANCE_EXCEED : _('check_in.mobile.message.max.distance.exceed'),
         }
 
     organization = models.ForeignKey(Organization, null=True, on_delete=models.SET_NULL)

@@ -203,6 +203,7 @@ POST_CODER_API_URL = f"https://ws.postcoder.com/pcw/{POST_CODER_API_KEY}/address
 GMAP_API = "AIzaSyAl-bO6JsKLkpOZ9tUEqMuy8Emt6Uds-yg"
 GMAP_ADDRESS_API_URL = f"https://maps.googleapis.com/maps/api/geocode/json?key={GMAP_API}"
 
+MAX_CHECK_IN_DISTANCE = 1.0
 SCAN_TIME_DELAY = 60
 MAP_VIEW_FLUSH_TIME = '00:00'
 MAX_TIME_DIFF_ALLOW = 300

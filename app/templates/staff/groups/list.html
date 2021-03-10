@@ -28,8 +28,7 @@
           <table id="table" class="table table-bordered" width="100%" cellspacing="0">
             <thead>
               <tr>
-                <th style="width: 25%;">{% trans "code" %}</th>
-                <th style="width: 25%;">{% trans "name" %}</th>                
+                <th style="width: 40%;">{% trans "name" %}</th>                
                 <th style="width: 40%;">{% trans "description" %}</th>
                 <th style="width: 10%;"></th>
               </tr>
@@ -94,7 +93,6 @@
         },
         "ajax": "/api/group/search",
         "columns": [
-          { "data": "code" },
           { "data": "name" },
           { "data": "description" },         
           {
@@ -103,7 +101,6 @@
               if('{{user|has_page_edit_permission:"GROUPS"}}' == 'True') {
                 html += `<a title='{% trans "edit" %}' href="/staff/groups/update/${row['id']}"><i class="fas fa-edit"></i></a>&nbsp;&nbsp;`
               }
-              html += `<a title='{% trans "set.permissions" %}' href="/staff/groups/permissions/${row['id']}"><i class="fas fa-user-secret"></i></a>&nbsp;&nbsp;`
               if('{{user|has_page_delete_permission:"GROUPS"}}' == 'True') {
                 html += `<a title='{% trans "delete" %}' href="#" onclick="openDeleteConfirmation(${row['id']})" ><i class="fas fa-trash" style="color:red"></i></a>`;
               }

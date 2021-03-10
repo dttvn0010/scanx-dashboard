@@ -58,7 +58,6 @@ urlpatterns = [
     path('staff/users/import_preview', views_staff.importUserPreview),
     path('staff/users/import', views_staff.importUser),
     path('staff/users/resend_mail/<int:pk>', views_staff.resendMail),
-    path('staff/users/permissions/<int:pk>', views_staff.setUserPermission),  
 
     path('staff/locations', views_staff.listLocations, name='staff-location'),
     path('staff/locations/add', views_staff.addLocation),
@@ -74,7 +73,6 @@ urlpatterns = [
     path('staff/groups', views_staff.listGroups, name='staff-group'),
     path('staff/groups/add', views_staff.addGroup),
     path('staff/groups/update/<int:pk>', views_staff.updateGroup),  
-    path('staff/groups/permissions/<int:pk>', views_staff.setGroupPermission),  
 
     path('staff/reports/check_in', views_staff.reportCheckIn),
     path('staff/reports/check_in/export_pdf', views_staff.reportCheckInExportPdf),
