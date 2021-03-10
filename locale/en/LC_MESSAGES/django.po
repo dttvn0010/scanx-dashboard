@@ -229,6 +229,9 @@ msgstr "Device was disabled"
 msgid "check_in.status.scan.not.time.out.yet"
 msgstr "Scan delay error"
 
+msgid "check_in.status.max.distance.exceed"
+msgstr "Checkin location is different from registered location"
+
 #: .\app\models.py:161
 msgid "check_in.mobile.message.success"
 msgstr "Successfully Scanned Device. Location is: %s"
@@ -265,6 +268,9 @@ msgstr "Device has been disabled, please contact admin."
 #: .\app\models.py:169
 msgid "check_in.mobile.message.scan.not.time.out.yet"
 msgstr "Please wait a minimum of %d seconds before next scan."
+
+msgid "check_in.mobile.message.max.distance.exceed"
+msgstr "Checkin location is different from registered location."
 
 #: .\app\models.py:281
 msgid "log.view.checkin.template"

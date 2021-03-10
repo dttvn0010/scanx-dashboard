@@ -86,7 +86,7 @@ class User(AbstractUser):
     status = models.IntegerField(blank=True, null=True)   
     tmpPassword = models.CharField(max_length=30, blank=True, null=True)
     tmpPasswordExpired = models.DateTimeField(null=True)    
-    isReseller = models.BooleanField(verbose_name=_('is.reseller'), default=False)
+    isReseller = models.BooleanField(verbose_name=_('is.reseller'), null=True,  default=False)
     createdDate = models.DateTimeField(null=True)
     
     @property
