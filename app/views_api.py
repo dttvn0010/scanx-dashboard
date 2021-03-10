@@ -643,6 +643,9 @@ def searchUser(request):
         if request.user.username == tenantAdminName  and user.username != tenantAdminName:
             locked = False
 
+        if user.id == request.user.id:
+            locked = True
+
         data[i]['is_admin'] = user.hasRole('ADMIN')
         data[i]['locked'] = locked
         data[i]['role_names'] = user.role_names
