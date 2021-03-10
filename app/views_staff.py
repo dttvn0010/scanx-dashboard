@@ -180,7 +180,8 @@ def updateUser(request, pk):
             user.groups.clear()
             
             for groupId in groupIds.split(','):
-                user.groups.add(Group.objects.get(pk=groupId))
+                if groupId:
+                    user.groups.add(Group.objects.get(pk=groupId))
 
             user.save()
             form.save_m2m()
