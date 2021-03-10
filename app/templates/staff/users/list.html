@@ -222,11 +222,11 @@ $(document).ready(function() {
         render: function (data, type, row) { 
           var html = `<a title='{% trans "view.details" %}' href="#" onclick="viewInfo(${row['id']})"><i class="fas fa-eye"></i></a>&nbsp;&nbsp;`
           
-          if('{% if user|has_page_edit_permission:"USERS" %}' == 'True') {
+          if('{% user|has_page_edit_permission:"USERS" %}' == 'True') {
             html += `<a title='{% trans "edit" %}' href="/staff/users/update/${row['id']}"><i class="fas fa-edit"></i></a>&nbsp;&nbsp`;
           }
 
-          if(!row.locked && '{% if user|has_page_delete_permission:"USERS" %}' == 'True'){
+          if(!row.locked && '{% user|has_page_delete_permission:"USERS" %}' == 'True'){
             html += `<a title='{% trans "delete" %}' href="#" onclick="openDeleteConfirmation(${row['id']})" ><i class="fas fa-trash" style="color:red"></i></a>`;
           }
           
