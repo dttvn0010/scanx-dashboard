@@ -163,6 +163,9 @@ msgstr "Active"
 msgid "role"
 msgstr "Role"
 
+msgid "roles"
+msgstr "Roles"
+
 #: .\app\models.py:101 .\app\templates\_admin\organizations\details.html:111
 #: .\app\templates\staff\locations\form.html:83
 #: .\app\templates\staff\locations\list.html:34

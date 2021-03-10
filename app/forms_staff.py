@@ -5,18 +5,14 @@ from django.utils.translation import gettext_lazy as _
 class UserCreateForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ('fullname', 'email', 'nfcEnabled', 'sharedLocation', 'groups')
-
-    def __init__(self, *args, **kwargs):        
-        organization = kwargs.pop('organization', None)
-        super().__init__(*args, **kwargs)  
-        self.fields['groups'].queryset = Group.objects.filter(organization=organization)
+        fields = ('fullname', 'email', 'nfcEnabled', 'sharedLocation')
 
     fullname = forms.CharField(max_length=30, label=_("fullname") + " (*)")
     email = forms.EmailField(max_length=50, label=_("email.address") + " (*)")
     nfcEnabled = forms.BooleanField(label=_('nfc.enabled'), required=False)
     sharedLocation = forms.BooleanField(label=_('geolocation.enabled'), required=False)
     roleIds = forms.CharField(widget=forms.HiddenInput(), required=False)
+    groupIds = forms.CharField(widget=forms.HiddenInput(), required=False)
     
     def clean_email(self):
         email = self.cleaned_data.get('email')
@@ -28,16 +24,12 @@ class UserCreateForm(forms.ModelForm):
 class UserChangeForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ( 'nfcEnabled', 'sharedLocation', 'groups')
-
-    def __init__(self, *args, **kwargs):        
-        organization = kwargs.pop('organization', None)
-        super().__init__(*args, **kwargs)  
-        self.fields['groups'].queryset = Group.objects.filter(organization=organization)
+        fields = ( 'nfcEnabled', 'sharedLocation')
 
     nfcEnabled = forms.BooleanField(label=_('nfc.enabled'), required=False)
     sharedLocation = forms.BooleanField(label=_('geolocation.enabled'), required=False)
     roleIds = forms.CharField(widget=forms.HiddenInput(), required=False)
+    groupIds = forms.CharField(widget=forms.HiddenInput(), required=False)
 
 class LocationForm(forms.ModelForm):
     class Meta:

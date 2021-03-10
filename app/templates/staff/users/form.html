@@ -30,21 +30,29 @@
             {%endif%}
             {{ form }}
             <tr>
-              <th>Roles (*):</th>
+              <th>{% trans "roles" %} (*):</th>
               <td>
                 {% if lockAdmin %}
-                  <span title="{{roleAdmin.description}}" data-toggle="tooltip" data-placement="top">
-                    <input type="checkbox" 
-                      onclick="return false;" checked class="role-chkbox" value="{{roleAdmin.id}}"> {{roleAdmin.name}}
-                  </span>
+                <input type="checkbox" 
+                  onclick="return false;" checked class="role-chkbox" value="{{roleAdmin.id}}"> {{roleAdmin.name}}
                 {% else %}
                   {% for role in allRoles %}
-                    <span title="{{role.description}}" data-toggle="tooltip" data-placement="top" class="mr-4">
-                      <input {% if edit_user|has_role:role.code %} checked {%endif%}
-                        class="role-chkbox" value="{{role.id}}" type="checkbox" code="{{role.code}}"> {{role.name}}
-                    </span>
+                    <input {% if edit_user|has_role:role.code %} checked {%endif%}
+                      class="role-chkbox" value="{{role.id}}" type="checkbox" code="{{role.code}}"> {{role.name}}
+                    &nbsp;
                   {%endfor%}
                 {%endif%}
+              </td>
+            </tr>
+            <tr>
+              <th>{% trans "groups" %} :</th>
+              <td>
+                {% for group in allGroups %}
+                  <span title="{{group.description|default:''}}" data-toggle="tooltip" data-placement="top" class="mr-4">
+                    <input {% if edit_user|has_group:group %} checked {%endif%}
+                      class="group-chkbox" value="{{group.id}}" type="checkbox" > {{group.name}}
+                  </span>
+                {%endfor%}
               </td>
             </tr>
           </table>
@@ -72,6 +80,11 @@
       alert('{% trans "please.select.a.role" %}');
       return;
     }
+    var groupIds = [];
+    $('.group-chkbox:checked').each(function() {
+      groupIds.push($(this).val());
+    });
+    $('#id_groupIds').val(groupIds.join(','));
     $('#fmt').submit();
   }
 
@@ -80,17 +93,13 @@
     $('.role-chkbox').change(function() {
       var code = $(this).attr('code');
       var checked = $(this).prop('checked');
-      if(code == 'ADMIN') {
-        if(checked) {
+      if(checked) {
+        $('.role-chkbox').prop('checked', false);
+        $(this).prop('checked', true);
+        if(code == 'ADMIN') {
           alert('{% trans "role.admin.warning" %}');
-          $('.role-chkbox').attr('disabled', 'disabled');
-          $('.role-chkbox').prop('checked', false);
-          $(this).removeAttr('disabled');
-          $(this).prop('checked', true);
-        }else {
-          $('.role-chkbox').removeAttr('disabled');
         }
-      }      
+      }         
     });
 
     if('{{edit_user|has_role:"ADMIN"}}' == 'True') {

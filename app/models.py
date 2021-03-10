@@ -104,6 +104,9 @@ class User(AbstractUser):
 
     def hasAnyRole(self, roleCodes):
         return any(self.hasRole(roleCode) for roleCode in roleCodes)
+    
+    def hasGroup(self, group):
+        return any(x.id == group.id for x in self.groups.all())
 
     def hasFeaturePermission(self, featureCode):
         if self.hasRole('ADMIN'):

@@ -30,6 +30,10 @@ def has_role(user, roleCode):
     return user and user.hasRole(roleCode)
 
 @register.filter
+def has_group(user, group):
+    return user and user.hasGroup(group)
+
+@register.filter
 def has_page_view_permission(user, pageCode):
     return user and user.hasPagePermission(pageCode, 'VIEW')
 
@@ -105,12 +109,13 @@ def addUser(request):
     if not request.user.organization:
         return redirect('login')
 
-    form = UserCreateForm(organization=request.user.organization, initial={'nfcEnabled': True, 'sharedLocation': True})
+    form = UserCreateForm(initial={'nfcEnabled': True, 'sharedLocation': True})
     allRoles = Role.objects.all()
     roleAdmin = allRoles.filter(code='ADMIN').first()
+    allGroups = Group.objects.filter(organization=request.user.organization)
 
     if request.method == 'POST':
-        form = UserCreateForm(request.POST, organization=request.user.organization)
+        form = UserCreateForm(request.POST)
         if form.is_valid():
             email = form.cleaned_data['email']
             fullname = form.cleaned_data['fullname']            
@@ -121,6 +126,10 @@ def addUser(request):
             
             for roleId in roleIds.split(','):
                 user.roles.add(Role.objects.get(pk=roleId))
+
+            groupIds = form.cleaned_data.get('groupIds', '')
+            for groupId in groupIds.split(','):
+                user.groups.add(Group.objects.get(pk=groupId))
 
             user.save()
             
@@ -134,7 +143,12 @@ def addUser(request):
             logAction('CREATE', request.user, None, user)
             return redirect('staff-user')
 
-    return render(request, 'staff/users/form.html', {'form': form, 'allRoles': allRoles, 'roleAdmin': roleAdmin})
+    return render(request, 'staff/users/form.html', {
+        'form': form, 
+        'allRoles': allRoles, 
+        'roleAdmin': roleAdmin,
+        'allGroups': allGroups
+        })
 
 @login_required
 def updateUser(request, pk):
@@ -144,14 +158,15 @@ def updateUser(request, pk):
     old_user = get_object_or_404(User, pk=pk)
     user = get_object_or_404(User, pk=pk)
     
-    form = UserChangeForm(organization=request.user.organization, instance=user)
-    allRoles = Role.objects.all()
+    form = UserChangeForm(instance=user)
+    allRoles = Role.objects.all()    
     roleAdmin = allRoles.filter(code='ADMIN').first()
+    allGroups = Group.objects.filter(organization=request.user.organization)
 
     lockAdmin = request.user.username == user.username and user.hasRole('ADMIN')
 
     if request.method == 'POST':
-        form = UserChangeForm(request.POST, organization=request.user.organization, instance=user)        
+        form = UserChangeForm(request.POST, instance=user)        
         if form.is_valid():
             user = form.save(commit=False)
             roleIds = form.cleaned_data.get('roleIds', '')
@@ -159,6 +174,12 @@ def updateUser(request, pk):
             
             for roleId in roleIds.split(','):
                 user.roles.add(Role.objects.get(pk=roleId))
+
+            groupIds = form.cleaned_data.get('groupIds', '')
+            user.groups.clear()
+            
+            for groupId in groupIds.split(','):
+                user.groups.add(Group.objects.get(pk=groupId))
 
             user.save()
             form.save_m2m()
@@ -169,7 +190,8 @@ def updateUser(request, pk):
     return render(request, 'staff/users/form.html', 
         {
             'form': form, 'edit_user': user, 'lockAdmin': lockAdmin,
-            'allRoles': allRoles, 'roleAdmin': roleAdmin
+            'allRoles': allRoles, 'roleAdmin': roleAdmin,
+            'allGroups': allGroups
         })
 
 @login_required
