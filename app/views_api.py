@@ -472,7 +472,7 @@ def userCheckIn(request):
             status = CheckIn.Status.SCAN_NOT_TIME_OUT_YET
             message_params = [scanDelay]
 
-    if status == CheckIn.Status.SUCCESS and checkDistance(lat, lng, device.lat, device.lng, maxCheckInDistance):
+    if status == CheckIn.Status.SUCCESS and not checkDistance(lat, lng, device.lat, device.lng, maxCheckInDistance):
         status = CheckIn.Status.MAX_DISTANCE_EXCEED
 
     checkIn.status = status        
