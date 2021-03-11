@@ -390,14 +390,17 @@ def getAdressFromGeoLocation(lat, lng):
     except:
         return ''
 
-def getDistance(lat1, lng1, lat2, lng2):
+def checkDistance(lat1, lng1, lat2, lng2, maxCheckInDistance):
+    if lat1 == None or lng1 == None or lat2 == None or lng2 == None:
+        return False
+
     R = 6371
     lat = (lat1+lat2)/2
     phi = math.pi * lat/180
     R1 = R * math.cos(phi)
     dx = R1 * math.pi * abs(lng2-lng1)/180
     dy = R * math.pi * abs(lat2-lat1)/180
-    return 1000*math.sqrt(dx*dx + dy*dy)
+    return 1000*math.sqrt(dx*dx + dy*dy) <= maxCheckInDistance 
 
 @api_view(['POST'])
 @permission_classes((IsAuthenticated,))
@@ -469,7 +472,7 @@ def userCheckIn(request):
             status = CheckIn.Status.SCAN_NOT_TIME_OUT_YET
             message_params = [scanDelay]
 
-    if status == CheckIn.Status.SUCCESS and getDistance(lat, lng, device.lat, device.lng) > maxCheckInDistance:
+    if status == CheckIn.Status.SUCCESS and checkDistance(lat, lng, device.lat, device.lng, maxCheckInDistance):
         status = CheckIn.Status.MAX_DISTANCE_EXCEED
 
     checkIn.status = status        
