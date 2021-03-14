@@ -11,7 +11,7 @@
 {% block content %}
 <div class="content p-3">
   {% if user|has_page_view_permission:"REPORTS" %}
-    {% if user.viewed_groups or user|has_role:"ADMIN" %}
+    {% if user.viewed_groups or user.is_tenant_admin %}
       <div class="card shadow mb-4">
         <div class="card-header py-3">
           <h6 class="m-0 font-weight-bold text-primary">{% trans "check_in" %} {% trans "report" %}</h6>

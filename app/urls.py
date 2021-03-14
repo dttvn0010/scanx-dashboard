@@ -85,7 +85,6 @@ urlpatterns = [
 
     path('staff/settings/organization', views_staff.configureOranization),
     path('staff/settings/custom_params', views_staff.editCustomParams),
-    path('staff/app_info', views_staff.appInfo),
 
     # API
     path('api/login', views_api.logIn),

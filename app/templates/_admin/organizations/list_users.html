@@ -22,7 +22,7 @@
             <tr>
               <th style="width: 30%;">{% trans "fullname" %}</th>
               <th style="width: 30%;">{% trans "email" %}</th>
-              <th style="width: 20%;">{% trans "role" %}</th>
+              <th style="width: 20%;">{% trans "groups" %}</th>
               <th style="width: 20%;">{% trans "status" %}</th>        
             </tr>
           </thead>
@@ -64,7 +64,7 @@
           } 
         },
         { "data": "email" },
-        { "data": "role_names"},
+        { "data": "group_names"},
         { "data": "status", "render": function(data, type, row) {
             if(data == 0) return '{% trans "pending" %}';
             return row.is_active? '{% trans "active" %}': '{% trans "inactive" %}';

@@ -21,7 +21,7 @@ class ResellerCreateForm(forms.ModelForm):
 class OrganizationCreationForm(forms.ModelForm):
     class Meta:
         model = Organization
-        fields = ('name', 'nfcEnabled', 'active')
+        fields = ('name', 'active')
 
     adminName = forms.CharField(max_length=30, label=_("admin.name") + " (*)")
     adminEmail = forms.EmailField(max_length=50, label=_("admin.email") + " (*)")
@@ -36,7 +36,7 @@ class OrganizationCreationForm(forms.ModelForm):
 class OrganizationChangeForm(forms.ModelForm):
     class Meta:
         model = Organization
-        fields = ('name', 'nfcEnabled', 'active')
+        fields = ('name', 'active')
 
 class UnRegisteredDeviceForm(forms.ModelForm):
     class Meta:

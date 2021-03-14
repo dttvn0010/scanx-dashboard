@@ -10,7 +10,7 @@
 {% block content %}
 <div class="content d-flex flex-column">
   {% if user|has_page_view_permission:"DASHBOARD" %}
-    {% if user.viewed_groups or user|has_role:"ADMIN" %}
+    {% if user.viewed_groups or user.is_tenant_admin %}
       <ul class="nav nav-tabs">
         <li class="nav-item">
           <a href="/staff/dashboard" class="nav-link">{% trans "table.view" %}</a>

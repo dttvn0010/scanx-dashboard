@@ -26,10 +26,6 @@ def get_item(d, key):
     return val
 
 @register.filter
-def has_role(user, roleCode):
-    return user and user.hasRole(roleCode)
-
-@register.filter
 def has_group(user, group):
     return user and user.hasGroup(group)
 
@@ -109,9 +105,7 @@ def addUser(request):
     if not request.user.organization:
         return redirect('login')
 
-    form = UserCreateForm(initial={'nfcEnabled': True, 'sharedLocation': True})
-    allRoles = Role.objects.all()
-    roleAdmin = allRoles.filter(code='ADMIN').first()
+    form = UserCreateForm()
     allGroups = Group.objects.filter(organization=request.user.organization)
 
     if request.method == 'POST':
@@ -120,17 +114,14 @@ def addUser(request):
             email = form.cleaned_data['email']
             fullname = form.cleaned_data['fullname']            
             user = createTempUser(request,  fullname, email)
-            user.nfcEnabled = form.cleaned_data['nfcEnabled']
-            user.sharedLocation = form.cleaned_data['sharedLocation']
-            roleIds = form.cleaned_data.get('roleIds', '')
-            
-            for roleId in roleIds.split(','):
-                user.roles.add(Role.objects.get(pk=roleId))
-
-            groupIds = form.cleaned_data.get('groupIds', '')
-            for groupId in groupIds.split(','):
-                if groupId:
-                    user.groups.add(Group.objects.get(pk=groupId))
+                        
+            if request.POST.get('isTenantAdmin'):
+                user.roles.add(Role.objects.get(code='ADMIN'))
+            else:
+                groupIds = form.cleaned_data.get('groupIds', '')
+                for groupId in groupIds.split(','):
+                    if groupId:
+                        user.groups.add(Group.objects.get(pk=groupId))
 
             user.save()
             
@@ -146,8 +137,6 @@ def addUser(request):
 
     return render(request, 'staff/users/form.html', {
         'form': form, 
-        'allRoles': allRoles, 
-        'roleAdmin': roleAdmin,
         'allGroups': allGroups
         })
 
@@ -160,28 +149,29 @@ def updateUser(request, pk):
     user = get_object_or_404(User, pk=pk)
     
     form = UserChangeForm(instance=user)
-    allRoles = Role.objects.all()    
-    roleAdmin = allRoles.filter(code='ADMIN').first()
     allGroups = Group.objects.filter(organization=request.user.organization)
 
-    lockAdmin = request.user.username == user.username and user.hasRole('ADMIN')
+    lockAdmin = user.is_tenant_admin
+
+    if request.user.username == request.user.organization.adminUsername and request.user.username != user.username:
+        lockAdmin = False
 
     if request.method == 'POST':
         form = UserChangeForm(request.POST, instance=user)        
         if form.is_valid():
             user = form.save(commit=False)
-            roleIds = form.cleaned_data.get('roleIds', '')
-            user.roles.clear()
             
-            for roleId in roleIds.split(','):
-                user.roles.add(Role.objects.get(pk=roleId))
-
-            groupIds = form.cleaned_data.get('groupIds', '')
             user.groups.clear()
             
-            for groupId in groupIds.split(','):
-                if groupId:
-                    user.groups.add(Group.objects.get(pk=groupId))
+            if request.POST.get('isTenantAdmin'):
+                if not user.is_tenant_admin:
+                    user.roles.add(Role.objects.get(code='ADMIN'))
+            else:
+                user.roles.clear()
+                groupIds = form.cleaned_data.get('groupIds', '')
+                for groupId in groupIds.split(','):
+                    if groupId:
+                        user.groups.add(Group.objects.get(pk=groupId))
 
             user.save()
             form.save_m2m()
@@ -192,7 +182,6 @@ def updateUser(request, pk):
     return render(request, 'staff/users/form.html', 
         {
             'form': form, 'edit_user': user, 'lockAdmin': lockAdmin,
-            'allRoles': allRoles, 'roleAdmin': roleAdmin,
             'allGroups': allGroups
         })
 
@@ -206,7 +195,7 @@ def deleteUser(request, pk):
     user.delete()
     return redirect("staff-user")
 
-USER_HEADER = ['Full Name', 'Email', 'Role', 'NFC Enabled', 'QR Scan Enabled', 'Location Shared']
+USER_HEADER = ['Full Name', 'Email']
 
 @login_required
 def exportUser(request):
@@ -218,8 +207,7 @@ def exportUser(request):
         writer = csv.writer(fo)
         writer.writerow(USER_HEADER)
         for item in lst:
-            roles = '|'.join([role.code for role in item.roles.all()])
-            writer.writerow([item.fullname, item.email, roles, item.nfcEnabled, item.sharedLocation])
+            writer.writerow([item.fullname, item.email])
 
     csv_file = open('users.csv', 'rb')
     response = HttpResponse(content=csv_file)
@@ -247,17 +235,11 @@ def importUser(request):
             indexes[i] = int(request.POST.get(f'col_{i}', '0'))
         
         for row in records:
-            fullname, email, roles, nfcEnabled, sharedLocation  = getPermutation(row, indexes)
+            fullname, email = getPermutation(row, indexes)
             if User.objects.filter(email=email).count() > 0 or User.objects.filter(fullname=fullname).count() > 0:
                 continue
 
-            user = createTempUser(request, fullname, email)
-            
-            for role in roles.split('|'):
-                user.roles.add(Role.objects.get(code=role))
-
-            user.nfcEnabled = nfcEnabled == 'True'
-            user.sharedLocation = sharedLocation == 'True'
+            user = createTempUser(request, fullname, email) 
             user.save()
 
         del request.session['records']
@@ -472,13 +454,13 @@ def getGroupPermissionContext(group, request):
     pages = [dict(p) for p in settings.PAGES]
     
     for group_page_permission in group_page_permissions:
-        page = next(x for x in pages if x['code'] == group_page_permission.pageCode)
+        page = next((x for x in pages if x['code'] == group_page_permission.pageCode), None)
         if not page: continue
         page[group_page_permission.actionCode.lower()] = True
 
     features = [dict(f) for f in (settings.FEATURES)]
     for group_feature in group_features:
-        feature = next(x for x in features if x['code'] == group_feature.featureCode)
+        feature = next((x for x in features if x['code'] == group_feature.featureCode), None)
         if not feature: continue
         feature['access'] = True
 
@@ -488,7 +470,7 @@ def getGroupPermissionContext(group, request):
 
     viewed_groups = Group.objects.filter(organization=request.user.organization)
     for group_view_history_group in group_view_history_groups:
-        viewed_group = next(x for x in viewed_groups if x.id == group_view_history_group.viewGroup.id)
+        viewed_group = next((x for x in viewed_groups if x.id == group_view_history_group.viewGroup.id), None)
         if not viewed_group: continue
         viewed_group.viewed = True
 
@@ -762,7 +744,7 @@ def configureOranization(request):
         return redirect('login')
 
     org = request.user.organization
-    initial = {'name': org.name, 'description': org.description, 'nfcEnabled': org.nfcEnabled}
+    initial = {'name': org.name, 'description': org.description}
 
     form = OrganizationChangeForm(initial=initial)
     saved = False
@@ -772,17 +754,10 @@ def configureOranization(request):
         if form.is_valid():
             org.name = form.cleaned_data.get("name")
             org.description = form.cleaned_data.get("description")
-            org.nfcEnabled = form.cleaned_data.get("nfcEnabled")
             org.save()
             saved = True
 
     return render(request, 'staff/settings/organization.html', {'form': form, 'saved': saved})
-
-def appInfo(request):
-    if not request.user.organization:
-        return redirect('login')
-
-    return render(request, 'staff/app_link.html')    
 
 def createTenantParams(organization):
     params = SystemParameter.objects.filter(customizedByTenants=True)

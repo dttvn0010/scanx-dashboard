@@ -8,8 +8,6 @@ class Organization(models.Model):
     name = models.CharField(verbose_name=_('company.name') + ' * ', max_length=200, unique=True)
     adminUsername = models.CharField(max_length=150, null=True)
     description = models.CharField(max_length=500, blank=True, null=True)
-    nfcEnabled = models.BooleanField(verbose_name=_('nfc.enabled'), default=False)
-    geoLocationEnabled = models.BooleanField(verbose_name=_('geolocation.enabled'), default=False)    
     active = models.BooleanField(verbose_name=_('active'), default=False)
     createdDate = models.DateTimeField(null=True)
     createdBy = models.ForeignKey('app.User', null=True, on_delete=models.SET_NULL, related_name='createdBy')
@@ -80,8 +78,6 @@ class User(AbstractUser):
     fullname = models.CharField(verbose_name=_("fullname") + " (*)", max_length=50, blank=True, null=True)
     roles = models.ManyToManyField(Role, verbose_name=_("role") + " (*)")
     groups = models.ManyToManyField(Group, verbose_name=_("group"), blank=True, null=True)
-    nfcEnabled = models.BooleanField(verbose_name=_('nfc.enabled'), blank=True, null=True)
-    sharedLocation = models.BooleanField(verbose_name=_('geolocation.enabled'), blank=True, null=True)
     profilePicture = models.ImageField(upload_to='static/images', blank=True, null=True) 
     status = models.IntegerField(blank=True, null=True)   
     tmpPassword = models.CharField(max_length=30, blank=True, null=True)
@@ -98,30 +94,31 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.display        
-
-    def hasRole(self, roleCode):
-        return any(role.code == roleCode for role in self.roles.all())
-
-    def hasAnyRole(self, roleCodes):
-        return any(self.hasRole(roleCode) for roleCode in roleCodes)
     
     def hasGroup(self, group):
         return any(x.id == group.id for x in self.groups.all())
 
+    @property
+    def is_tenant_admin(self):
+        for role in self.roles.all():
+            if role.code == 'ADMIN':
+                return True
+        return False
+
     def hasFeaturePermission(self, featureCode):
-        if self.hasRole('ADMIN'):
+        if self.is_tenant_admin:
             return True
 
         return any(group.hasFeaturePermission(featureCode) for group in self.groups.all())
 
     def hasPagePermission(self, pageCode, actionCode):
-        if self.hasRole('ADMIN'):
+        if self.is_tenant_admin:
             return True
 
         return any(group.hasPagePermission(pageCode, actionCode) for group in self.groups.all())
 
     def getViewHistoryGroups(self):
-        if self.hasRole('ADMIN'):
+        if self.is_tenant_admin:
             return Group.objects.filter(organization=self.organization)
 
         viewed_groups = []
@@ -139,34 +136,23 @@ class User(AbstractUser):
 
     @property
     def viewed_users(self):
-        if self.hasRole('ADMIN'):
+        if self.is_tenant_admin:
             return User.objects.filter(organization=self.organization)
         else:
             return User.objects.filter(groups__in=self.getViewHistoryGroups())
 
     @property
-    def role_names(self):
+    def group_names(self):
         if self.is_superuser:
             return 'Super Admin'
 
         if self.isReseller:
             return 'Reseller'
+
+        if self.is_tenant_admin:
+            return 'Tenant Admin'
             
-        return ','.join([role.name for role in self.roles.all()])
-
-    @property
-    def role_codes(self):
-        if self.is_superuser:
-            return 'SUPER_ADMIN'
-
-        if self.isReseller:
-            return 'RESELLER'
-
-        return ','.join([role.code for role in self.roles.all()])
-
-    @property
-    def is_tenant_admin(self):
-        return self.hasRole('ADMIN')
+        return ','.join([group.name for group in self.groups.all()])
 
     @property   
     def count_new_logs(self):
@@ -178,7 +164,7 @@ class User(AbstractUser):
             return logs.filter(organization__in=organizations).filter(~Q(viewUsers=self)).count()
         else:
             logs = logs.filter(organization=self.organization).filter(~Q(viewUsers=self))
-            if not self.hasRole('ADMIN'):
+            if not self.is_tenant_admin:
                 logs = logs.filter(performUser__in=self.viewed_users)
             
             return logs.count()
@@ -195,7 +181,7 @@ class User(AbstractUser):
             return logs.filter(organization__in=organizations).filter(~Q(viewUsers=self)).order_by('-actionDate')[:5]
         else:
             logs = logs.filter(organization=self.organization).filter(~Q(viewUsers=self))
-            if not self.hasRole('ADMIN'):
+            if not self.is_tenant_admin:
                 logs = logs.filter(performUser__in=self.viewed_users)
             
             return logs.order_by('-actionDate')[:5]

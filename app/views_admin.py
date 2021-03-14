@@ -83,13 +83,12 @@ def createTenantAdmin(request, organization, adminName, adminEmail):
     user.username = user.email = adminEmail
     user.password = make_password('temp_' + password)
     user.fullname = adminName    
-    user.nfcEnabled =  user.sharedLocation = True
     user.status = User.Status.INVITED
     user.createdDate = timezone.now()
     user.organization = organization    
     
     user.save()
-    user.roles.add(Role.objects.get(code=settings.ROLES['ADMIN']))
+    user.roles.add(Role.objects.get(code='ADMIN'))
     user.save()
 
     logAction('CREATE', request.user, None, user)
@@ -190,7 +189,7 @@ def resendAdminMail(request, pk):
     
     return redirect('admin-organization')
     
-ORG_HEADER = [_('name'), _('admin.name'), _('admin.email'), _('nfc.enabled'), _('active')]
+ORG_HEADER = [_('name'), _('admin.name'), _('admin.email'), _('active')]
 
 @login_required
 def exportOrganization(request):
@@ -205,7 +204,7 @@ def exportOrganization(request):
             tenantAdmin = User.objects.filter(username=item.adminUsername).first()
             adminName = tenantAdmin.fullname if tenantAdmin else ''
             adminEmail = tenantAdmin.email if tenantAdmin else ''
-            writer.writerow([item.name, adminName, adminEmail, item.nfcEnabled, item.active])
+            writer.writerow([item.name, adminName, adminEmail, item.active])
 
     csv_file = open('organizations.csv', 'rb')
     response = HttpResponse(content=csv_file)
@@ -233,14 +232,13 @@ def importOrganization(request):
             indexes[i] = int(request.POST.get(f'col_{i}', '0'))
         
         for row in records:
-            name, adminName, adminEmail, nfcEnabled, active = getPermutation(row, indexes)
+            name, adminName, adminEmail, active = getPermutation(row, indexes)
             if Organization.objects.filter(name=name).count() > 0:
                 continue
 
             org = Organization()
             org.name = name
             org.adminUsername = adminEmail
-            org.nfcEnabled = nfcEnabled == 'True'
             org.active = active == 'True'
             org.createdDate = timezone.now()
             org.save()

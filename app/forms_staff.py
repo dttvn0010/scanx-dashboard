@@ -5,13 +5,10 @@ from django.utils.translation import gettext_lazy as _
 class UserCreateForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ('fullname', 'email', 'nfcEnabled', 'sharedLocation')
+        fields = ('fullname', 'email')
 
     fullname = forms.CharField(max_length=30, label=_("fullname") + " (*)")
     email = forms.EmailField(max_length=50, label=_("email.address") + " (*)")
-    nfcEnabled = forms.BooleanField(label=_('nfc.enabled'), required=False)
-    sharedLocation = forms.BooleanField(label=_('geolocation.enabled'), required=False)
-    roleIds = forms.CharField(widget=forms.HiddenInput(), required=False)
     groupIds = forms.CharField(widget=forms.HiddenInput(), required=False)
     
     def clean_email(self):
@@ -24,11 +21,8 @@ class UserCreateForm(forms.ModelForm):
 class UserChangeForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ( 'nfcEnabled', 'sharedLocation')
+        fields = []
 
-    nfcEnabled = forms.BooleanField(label=_('nfc.enabled'), required=False)
-    sharedLocation = forms.BooleanField(label=_('geolocation.enabled'), required=False)
-    roleIds = forms.CharField(widget=forms.HiddenInput(), required=False)
     groupIds = forms.CharField(widget=forms.HiddenInput(), required=False)
 
 class LocationForm(forms.ModelForm):
@@ -83,4 +77,3 @@ class OrganizationChangeForm(forms.Form):
     name = forms.CharField(label=_("organization.name") + " (*)")
     description = forms.CharField(label=_("detail.information"), required=False, 
                         widget=forms.Textarea(attrs={'rows':4}))
-    nfcEnabled = forms.BooleanField(label=_('nfc.enabled'), required=False)

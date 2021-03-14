@@ -2,15 +2,15 @@
 {% load i18n %}
 
 <meta charset="utf-8">
-<title>{% trans "scanx.cloud.dashboard" %}</title>
+<title>{% trans "tracdisc.cloud.dashboard" %}</title>
 <link rel="/static/img/apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=XBb4w6pr3a">
 <link rel="icon" type="image/png" sizes="32x32" href="/static/img/favicon-32x32.png?v=XBb4w6pr3a">
 <link rel="icon" type="image/png" sizes="16x16" href="/static/img/favicon-16x16.png?v=XBb4w6pr3a">
 <link rel="manifest" href="/static/img/site.webmanifest?v=XBb4w6pr3a">
 <link rel="mask-icon" href="/static/img/safari-pinned-tab.svg?v=XBb4w6pr3a" color="#5bbad5">
 <link rel="shortcut icon" href="/static/img/favicon.ico?v=XBb4w6pr3a">
-<meta name="apple-mobile-web-app-title" content="ScanX">
-<meta name="application-name" content="ScanX">
+<meta name="apple-mobile-web-app-title" content="tracdisc">
+<meta name="application-name" content="tracdisc">
 <meta name="msapplication-TileColor" content="#da532c">
 <meta name="msapplication-TileImage" content="/static/img/mstile-144x144.png?v=XBb4w6pr3a">
 <meta name="theme-color" content="#000000">
@@ -38,7 +38,7 @@
     {% block sidebar %}
     <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark" id="accordionSidebar">
       <a class="sidebar-brand d-flex align-items-center" href="/staff">
-        <div class="sidebar-brand-text">{% trans "scanx" %}</div>
+        <div class="sidebar-brand-text">{% trans "tracdisc" %}</div>
       </a>
 
       <hr class="sidebar-divider my-0">
@@ -106,7 +106,7 @@
           <div id="collapse2" class="collapse {% if group == 2%}show{%endif%}" data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
               <a class="collapse-item {% if page == 6 %} active {%endif%}" href="/staff/settings/organization">
-                {% trans "organizations" %}
+                {% trans "organization.info" %}
               </a>
               <a class="collapse-item {% if page == 7 %} active {%endif%}" href="/staff/settings/custom_params">
                 {% trans "custom.parameters" %}
@@ -124,14 +124,6 @@
         </li>
         <hr class="sidebar-divider my-0">
       {% endif %}
-
-      {% if user|has_page_view_permission:"APP_INFO" %}
-        <li class="nav-item {% if page == 8 %} active {%endif%}">
-          <a class="nav-link" href="/staff/app_info">
-            <span>{% trans "app.info" %}</span></a>
-        </li>
-        <hr class="sidebar-divider my-0">
-        {% endif %}
 
       <!-- Sidebar Toggler (Sidebar) -->
       <div class="text-center d-none d-md-inline">
@@ -175,7 +167,7 @@
               <a class="p-0 nav-link dropdown-toggle" href="#" data-toggle="dropdown" aria-haspopup="true"
                 aria-expanded="false">
                 {% if user.profilePicture %}
-                  <img class="img-profile rounded-circle" src="/{{ user.profilePicture.url }}">
+                  <img class="img-profile rounded-circle" src="/{{ user.profilePicture }}">
                 {%else%}
                   <img class="img-profile rounded-circle" src="/static/img/user.png">
                 {%endif%}

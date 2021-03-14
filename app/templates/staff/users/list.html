@@ -34,7 +34,7 @@
               <tr>
                 <th style="width: 25%;">{% trans "fullname" %}</th>
                 <th style="width: 25%;">{% trans "email.address" %}</th>
-                <th style="width: 20%;">{% trans "role" %}</th>
+                <th style="width: 20%;">{% trans "groups" %}</th>
                 <th style="width: 15%;">{% trans "status" %}</th>
                 <th style="width: 15%;"></th>
               </tr>
@@ -67,20 +67,12 @@
                     <th><span id="email"></span></th>
                   </tr>
                   <tr>
-                    <td><label>{% trans "nfc.enabled" %}:</label></td>
-                    <th><span id="nfc_enabled"></span></th>
-                  </tr>
-                  <tr>
-                    <td><label>{% trans "geolocation.enabled" %}:</label></td>
-                    <th><span id="geo_location_enabled"></span></th>
-                  </tr>
-                  <tr>
                     <td><label>{% trans "status" %}:</label></td>
                     <th><span id="status"></span></th>
                   </tr>
                   <tr>
-                    <td><label>{% trans "role" %}:</label></td>
-                    <th><span id="role"></span></th>
+                    <td><label>{% trans "groups" %}:</label></td>
+                    <th><span id="groups"></span></th>
                   </tr>
                 </tbody>
               </table>         
@@ -192,7 +184,7 @@ $(document).ready(function() {
         render: function(data, type, row) {
           var html = '';
           if(row.profilePicture) {
-            html += `<img class="img-profile rounded-circle mr-2" src="/${ row.profilePicture }">`;
+            html += `<img class="img-profile rounded-circle mr-2" src="${ row.profilePicture }">`;
           }else {
             html += `<img class="img-profile rounded-circle mr-2" src="/static/img/user.png">`;
           }
@@ -201,7 +193,7 @@ $(document).ready(function() {
         } 
       },
       { "data": "email" },
-      { "data": "role_names" },
+      { "data": "group_names" },
       
       { "data": "is_active",
         render: function (data, type, row){
@@ -210,6 +202,9 @@ $(document).ready(function() {
           }
           var id = row.id;
           var locked = row.locked;
+          if('{{user|has_page_edit_permission:"USERS"}}' == 'False') {
+            locked = true;
+          }
           return `<input id="status_${id}" 
                   type="checkbox" 
                   ${data?  'checked':''} 
@@ -247,10 +242,8 @@ async function viewInfo(id) {
   var user = await resp.json();
   $("#full_name").html(user.fullname);
   $("#email").html(user.email);
-  $("#nfc_enabled").html(user.nfcEnabled? '{% trans "yes" %}': '{% trans "no" %}');
-  $("#geo_location_enabled").html(user.sharedLocation? '{% trans "yes" %}': '{% trans "no" %}');
   $("#status").html(user.status == 0? '{% trans "pending" %}' : (user.is_active? '{% trans "active" %}': '{% trans "inactive" %}'));
-  $("#role").html(user.role_names);
+  $("#groups").html(user.group_names);
   $("#viewDetailsModal").modal();
 }
 

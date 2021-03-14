@@ -11,7 +11,7 @@
 {% block content %}
 <div class="content p-3">
   {% if user|has_page_view_permission:"LOGS" %}
-    {% if user.viewed_groups or user|has_role:"ADMIN" %}
+    {% if user.viewed_groups or user.is_tenant_admin %}
       <div class="card shadow mb-4">
         <div class="card-header py-3">
           <h6 class="m-0 font-weight-bold text-primary">{% trans "logs" %}</h6>
@@ -26,7 +26,7 @@
             </div>
             <div class="row mt-2">
               <div class="col-4">
-                <label>{% trans "perform.user" %}:</label>
+                <label>{% trans "perform.by" %}:</label>
                 <select id="userId" onchange="updateData()" class="form-control">
                   <option value="">{% trans "all" %}</option>
                   {% for u in users %}
@@ -85,7 +85,7 @@
               <tr>
                 <th style="width: 22%;">{% trans "action" %}</th>            
                 <th style="width: 22%;">{% trans "object" %}</th>
-                <th style="width: 24%;">{% trans "perform.user" %}</th>
+                <th style="width: 24%;">{% trans "perform.by" %}</th>
                 <th style="width: 22%;">{% trans "date.time" %}</th>       
                 <th style="width: 8%;" class="text-center"></th>     
               </tr>

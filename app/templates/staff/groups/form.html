@@ -77,6 +77,11 @@
                   </td>
                 </tr>
               {% endfor %}
+              {% if not viewed_groups %}
+                <tr>
+                  <td colspan="4">{% trans "no.group" %}</td>
+                </tr>
+              {% endif %}
             </tbody>
           </table>
 

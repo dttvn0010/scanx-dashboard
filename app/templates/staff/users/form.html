@@ -30,28 +30,26 @@
             {%endif%}
             {{ form }}
             <tr>
-              <th>{% trans "roles" %} (*):</th>
+              <th>{% trans "is.admin" %}:</th>
               <td>
                 {% if lockAdmin %}
-                <input type="checkbox" 
-                  onclick="return false;" checked class="role-chkbox" value="{{roleAdmin.id}}"> {{roleAdmin.name}}
+                  <input type="checkbox" onclick="return false;" checked>
                 {% else %}
-                  {% for role in allRoles %}
-                    <input {% if edit_user|has_role:role.code %} checked {%endif%}
-                      class="role-chkbox" value="{{role.id}}" type="checkbox" code="{{role.code}}"> {{role.name}}
-                    &nbsp;
-                  {%endfor%}
+                  <input type="checkbox" id='isTenantAdmin' name='isTenantAdmin' {%if edit_user.is_tenant_admin%} checked {% endif %}>
                 {%endif%}
               </td>
             </tr>
-            <tr>
+
+            <tr id='groups'>
               <th>{% trans "groups" %} :</th>
               <td>
                 {% for group in allGroups %}
-                  <span title="{{group.description|default:''}}" data-toggle="tooltip" data-placement="top" class="mr-4">
-                    <input {% if edit_user|has_group:group %} checked {%endif%}
-                      class="group-chkbox" value="{{group.id}}" type="checkbox" > {{group.name}}
-                  </span>
+                  <div class="mb-2">
+                    <span title="{{group.description|default:''}}" data-toggle="tooltip" data-placement="top">
+                      <input {% if edit_user|has_group:group %} checked {%endif%}
+                        class="group-chkbox" value="{{group.id}}" type="checkbox" > {{group.name}}
+                    </span>
+                  </div>
                 {%endfor%}
               </td>
             </tr>
@@ -70,16 +68,7 @@
   {% endif %}
 </div>
 <script> 
-  function save() {
-    var roleIds = [];
-    $('.role-chkbox:checked').each(function() {
-      roleIds.push($(this).val());
-    });
-    $('#id_roleIds').val(roleIds.join(','));
-    if($('#id_roleIds').val() == '') {
-      alert('{% trans "please.select.a.role" %}');
-      return;
-    }
+  function save() {   
     var groupIds = [];
     $('.group-chkbox:checked').each(function() {
       groupIds.push($(this).val());
@@ -89,24 +78,19 @@
   }
 
   $(document).ready(function(){
-    
-    $('.role-chkbox').change(function() {
-      var code = $(this).attr('code');
-      var checked = $(this).prop('checked');
-      if(checked) {
-        $('.role-chkbox').prop('checked', false);
-        $(this).prop('checked', true);
-        if(code == 'ADMIN') {
-          alert('{% trans "role.admin.warning" %}');
-        }
-      }         
-    });
-
-    if('{{edit_user|has_role:"ADMIN"}}' == 'True') {
-      $('.role-chkbox:not(":checked")').attr('disabled', 'disabled');
+    $('[data-toggle="tooltip"]').tooltip();
+    if('{{edit_user.is_tenant_admin}}' == 'True') {
+      $('#groups').hide();
     }
 
-    $('[data-toggle="tooltip"]').tooltip();
+    $('#isTenantAdmin').click(function() {
+      var checked = $(this).prop('checked');
+      if(checked) {
+        $('#groups').hide();
+      }else {
+        $('#groups').show();
+      }
+    });
   })
 </script>
 {% endblock %}

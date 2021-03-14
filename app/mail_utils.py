@@ -9,7 +9,7 @@ from .models import MailTemplate
 
 SMTP_PORT = 465 
 SMTP_SERVER = "smtp.gmail.com"
-SENDER = "ScanX <scanx.cloud@gmail.com>"
+SENDER = "tracdisc <scanx.cloud@gmail.com>"
 GMAIL = "scanx.cloud@gmail.com"
 GMAIL_PASS = "abc@123@def"
 

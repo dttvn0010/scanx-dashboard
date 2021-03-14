@@ -295,20 +295,17 @@ def isValidLat(lat):
         return False
 
 def getUserData(user):
-    nfcEnabled = sharedLocation = False
     scanDelay = 0
  
     if user.organization:
-        nfcEnabled = user.nfcEnabled and user.organization.nfcEnabled
-        sharedLocation = user.sharedLocation
         scanDelay = getTenantParamValue('SCAN_TIME_DELAY', user.organization, settings.SCAN_TIME_DELAY)      
 
     data = {
         'fullname': user.fullname, 
         'email': user.email,
-        'nfcEnabled': nfcEnabled,
-        'sharedLocation': sharedLocation,
-        'roles': user.role_codes,
+        'nfcEnabled': True,
+        'sharedLocation': True,
+        'roles': 'ADMIN' if user.is_tenant_admin else 'USER',
         'scanDelay': scanDelay,
         'iosAppVersion': getSystemParamValue('IOS_APP_VERSION', '1.0'),
         'isIOSNewUpdate': getSystemParamValue('IS_IOS_APP_NEW_UPDATE') == 1,
@@ -322,9 +319,7 @@ def getUserData(user):
     if user.organization:
         data['company'] = user.organization.name
         data['NFCButtonText'] = getTenantParamValue('NFC_BUTTON_TEXT', user.organization, settings.NFC_BUTTON_TEXT)
-        data['QRButtonText'] = getTenantParamValue('QR_BUTTON_TEXT', user.organization, settings.QR_BUTTON_TEXT)
-
-    if user.hasAnyRole(['ADMIN', 'STAFF']):
+        data['QRButtonText'] = ''
         data['UpdateDeviceCoordinatesButtonText'] = getTenantParamValue('UPDATE_DEVICE_COORDINATES_BUTTON_TEXT', user.organization, settings.UPDATE_DEVICE_COORDINATES_BUTTON_TEXT) 
 
     if user.is_superuser:
@@ -405,7 +400,7 @@ def checkDistance(lat1, lng1, lat2, lng2, maxCheckInDistance):
 @api_view(['POST'])
 @permission_classes((IsAuthenticated,))
 def userCheckIn(request):
-    if not request.user.organization or not request.user.hasAnyRole(['ADMIN', 'STAFF', 'USER']):
+    if not request.user.organization:
         return Response({'success': False, 'message': _('no.permission')})
 
     code = request.data.get("scanCode", "")
@@ -641,7 +636,7 @@ def searchUser(request):
     tenantAdminName = organization.adminUsername if organization else None
 
     for i, user in enumerate(users):
-        locked = user.hasRole('ADMIN')
+        locked = user.is_tenant_admin
 
         if request.user.username == tenantAdminName  and user.username != tenantAdminName:
             locked = False
@@ -649,9 +644,12 @@ def searchUser(request):
         if user.id == request.user.id:
             locked = True
 
-        data[i]['is_admin'] = user.hasRole('ADMIN')
+        data[i]['is_admin'] = user.is_tenant_admin
         data[i]['locked'] = locked
-        data[i]['role_names'] = user.role_names
+        data[i]['group_names'] = user.group_names
+
+        if data[i]['profilePicture'] and not data[i]['profilePicture'].startswith('/'):
+            data[i]['profilePicture'] = '/' + data[i]['profilePicture']
         
     return Response({
         "draw": draw,
@@ -665,7 +663,7 @@ def searchUser(request):
 def viewUserDetails(request, pk):    
     user = User.objects.get(pk=pk)
     data = UserSerializer(user).data
-    data['role_names'] = user.role_names
+    data['group_names'] = user.group_names
     return Response(data)
 
 @api_view(['POST'])
@@ -697,7 +695,7 @@ def disableUser(request, pk):
             user.status = User.Status.LOCK_BY_SUPER_ADMIN
             user.is_active = False
 
-        elif request.user.is_tenant_admin:
+        elif request.user.hasPagePermission('USERS', 'EDIT'):
             user.status = User.Status.LOCK_BY_TENANT_ADMIN
             user.is_active = False
 
@@ -724,7 +722,7 @@ def enableUser(request, pk):
             user.status = User.Status.ACTIVE
             user.is_active = True
 
-        elif request.user.is_tenant_admin:
+        elif request.user.hasPagePermission('USERS', 'EDIT'):
             if user.status == User.Status.LOCK_BY_SUPER_ADMIN:
                 return Response({'success': False, 'error': _('user.locked.by.super.admin')})
             else:
@@ -804,7 +802,7 @@ def addDevice(request):
 @api_view(['POST'])
 @permission_classes((IsAuthenticated,))
 def updateDeviceCoordinates(request):
-    if not request.user.organization or not request.user.hasAnyRole(['ADMIN', 'STAFF']):
+    if not request.user.organization:
         return Response({'success': False, 'message': _('no.permission')})
 
     mobiletime = float(request.data.get('mobiletime', '0'))
@@ -934,7 +932,7 @@ def disableDevice(request, pk):
             device.status = Device.Status.LOCK_BY_SUPER_ADMIN
             device.enabled = False
 
-        elif request.user.is_tenant_admin:
+        elif request.user.hasPagePermission('DEVICES', 'EDIT'):
             device.status = Device.Status.LOCK_BY_TENANT_ADMIN
             device.enabled = False
 
@@ -961,7 +959,7 @@ def enableDevice(request, pk):
             device.status = Device.Status.ENABLED
             device.enabled = True
 
-        elif request.user.is_tenant_admin:
+        elif request.user.hasPagePermission('DEVICES', 'EDIT'):
             if device.status == Device.Status.LOCK_BY_SUPER_ADMIN:
                 return Response({'success': False, 'error': _('device.locked.by.super.admin')})
             else:
@@ -1185,7 +1183,7 @@ def markAllLogsAsRead(request):
     if request.user.is_superuser:
         logs = Log.objects.filter(~Q(viewUsers=request.user))
 
-    elif request.user.hasRole('ADMIN'):
+    elif request.user.is_tenant_admin:
         logs = Log.objects.filter(organization=request.user.organization).filter(~Q(viewUsers=request.user))
 
     for log in logs:

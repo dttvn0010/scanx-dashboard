@@ -289,8 +289,8 @@ msgstr "User '%s' has performed action '%s %s'"
 
 #: .\app\templates\_admin\base.html:7 .\app\templates\profile\base.html:3
 #: .\app\templates\staff\base.html:5 .\app\templates\users\base.html:5
-msgid "scanx.cloud.dashboard"
-msgstr "ScanX Cloud Dashboard"
+msgid "tracdisc.cloud.dashboard"
+msgstr "tracdisc Cloud Dashboard"
 
 #: .\app\templates\_admin\base.html:44 .\app\templates\error.html:7
 #: .\app\templates\registration\forgot_password.html:3
@@ -299,8 +299,8 @@ msgstr "ScanX Cloud Dashboard"
 #: .\app\templates\registration\login.html:3
 #: .\app\templates\registration\reset_password.html:3
 #: .\app\templates\staff\base.html:41 .\app\templates\users\base.html:46
-msgid "scanx"
-msgstr "ScanX"
+msgid "tracdisc"
+msgstr "tracdisc"
 
 #: .\app\templates\_admin\base.html:51 .\app\templates\staff\base.html:95
 msgid "organizations"
@@ -356,7 +356,7 @@ msgstr "Logout"
 #: .\app\templates\_admin\base.html:159 .\app\templates\profile\base.html:71
 #: .\app\templates\staff\base.html:191 .\app\templates\users\base.html:115
 msgid "copyright"
-msgstr "Copyright &copy; ScanX 3.0 2020. All rights reserved."
+msgstr "Copyright &copy; tracdisc 3.0 2020. All rights reserved."
 
 #: .\app\templates\_admin\base.html:161 .\app\templates\profile\base.html:73
 #: .\app\templates\staff\base.html:193 .\app\templates\users\base.html:117
@@ -538,8 +538,8 @@ msgstr "Action"
 #: .\app\templates\staff\logs\details.html:81
 #: .\app\templates\staff\logs\list.html:27
 #: .\app\templates\staff\logs\list.html:86
-msgid "perform.user"
-msgstr "Perform User"
+msgid "perform.by"
+msgstr "Perform By"
 
 #: .\app\templates\_admin\logs\details.html:32
 #: .\app\templates\_admin\logs\details.html:49
@@ -555,7 +555,7 @@ msgstr "Perform User"
 #: .\app\templates\staff\reports\log_in_pdf.html:85
 #: .\app\templates\staff\table_view.html:24 .\app\templates\users\index.html:15
 msgid "date.time"
-msgstr "Date Time"
+msgstr "Date & Time"
 
 #: .\app\templates\_admin\logs\details.html:53
 #: .\app\templates\_admin\organizations\details.html:148
@@ -907,8 +907,8 @@ msgstr "Choose a profile picture"
 
 #: .\app\templates\registration\login.html:33
 #: .\app\templates\staff\app_link.html:14
-msgid "welcome.to.scanx"
-msgstr "Welcome to ScanX"
+msgid "welcome.to.tracdisc"
+msgstr "Welcome to tracdisc"
 
 #: .\app\templates\registration\login.html:54
 msgid "forgot.password"
@@ -1080,12 +1080,12 @@ msgstr "Export PDF"
 
 #: .\app\templates\staff\reports\check_in_pdf.html:3
 #: .\app\templates\staff\reports\log_in_pdf.html:2
-msgid "scanx.report"
-msgstr "ScanX Report"
+msgid "tracdisc.report"
+msgstr "tracdisc Report"
 
 #: .\app\templates\staff\reports\check_in_pdf.html:21
-msgid "scanx.check_in.report"
-msgstr "ScanX Check-In Report"
+msgid "tracdisc.check_in.report"
+msgstr "tracdisc Check-In Report"
 
 #: .\app\templates\staff\reports\check_in_pdf.html:40
 #: .\app\templates\staff\reports\log_in_pdf.html:33
@@ -1098,8 +1098,8 @@ msgid "reported.at"
 msgstr "Reported at"
 
 #: .\app\templates\staff\reports\log_in_pdf.html:14
-msgid "scanx.log_in.report"
-msgstr "ScanX Log-In Report"
+msgid "tracdisc.log_in.report"
+msgstr "tracdisc Log-In Report"
 
 #: .\app\templates\staff\settings\organization.html:14
 msgid "organization.info"
@@ -1279,3 +1279,8 @@ msgstr "You do not have access to this page"
 msgid "you.have.not.been.granted.access.to.view.history.of.any.group"
 msgstr "You have not been granted access to view history of any group"
 
+msgid "is.admin"
+msgstr "Is Admin"
+
+msgid "no.group"
+msgstr "There is currently no group"

@@ -165,12 +165,6 @@ MAIL_TEMPLATE_CODES = {
     'ADMIN_CREATE_NOTIFICATION': 'ADMIN_CREATE_NOTIFICATION'
 }
 
-ROLES = {
-    'ADMIN': 'ADMIN',
-    'STAFF': 'STAFF',
-    'USER': 'USER'
-}
-
 FEATURES = [
     {'code': 'USE_APP', 'name': 'Use of tracdisc app (ability to scan tracdisc devices)'}
 ]
@@ -184,7 +178,6 @@ PAGES = [
     {'code': 'REPORTS', 'name': 'Reports'},
     {'code': 'SETTINGS', 'name': 'Settings'},
     {'code': 'LOGS', 'name': 'Logs'},
-    {'code': 'APP_INFO', 'name': 'App Info'},
 ]
 
 PAGE_ACTIONS = [
@@ -208,7 +201,6 @@ SCAN_TIME_DELAY = 60
 MAP_VIEW_FLUSH_TIME = '00:00'
 MAX_TIME_DIFF_ALLOW = 300
 NFC_BUTTON_TEXT = 'NFC Scan'
-QR_BUTTON_TEXT = 'QR Scan'
 SET_DEVICE_UID_BUTTON_TEXT = 'Set Device UID'
 UPDATE_DEVICE_COORDINATES_BUTTON_TEXT = 'Update Device Coordinates'
 

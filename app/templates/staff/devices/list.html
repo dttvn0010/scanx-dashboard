@@ -136,8 +136,13 @@
           "data": "enabled",
           render: function (data, type, row) {
             var id = row['id'];
-            return `<input id="status_${id}" type="checkbox" onChange="toggleItem(${id})"
-                      ${data?'checked':''} class="toggle-button">`;
+            if('{{user|has_page_edit_permission:"DEVICES"}}' == 'True') {
+              return `<input id="status_${id}" type="checkbox" onChange="toggleItem(${id})"
+                        ${data?'checked':''} class="toggle-button">`;
+            }else {
+              return `<input id="status_${id}" type="checkbox" disabled
+                        ${data?'checked':''} class="toggle-button">`;
+            }
           },
           sClass: "text-center"
         },

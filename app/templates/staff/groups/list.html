@@ -124,7 +124,7 @@
     async function deleteGroup() {
       $("#errorLabel").html('');
       var formData = new FormData(document.getElementById("fmt3"));
-      var response = await fetch("/api/group/delete_from_org/" + $('#groupId').val(), {
+      var response = await fetch("/api/group/delete/" + $('#groupId').val(), {
         body: formData,
         method: "POST"
       });

@@ -36,13 +36,7 @@
             <tr>
               <td>{% trans "number.of.registered.devices" %}:</td>
               <th>{{devices|length}}</th>
-            </tr>
-            <tr>
-              <td>{% trans "nfc.enabled" %}:</td>
-              <th>
-                {%if organization.nfcEnabled %} {% trans "yes" %} {%else%} {% trans "no" %} {%endif%}
-              </th>
-            </tr>
+            </tr>           
             <tr>
               <td>{% trans "status" %}:</td>
               <th>
@@ -66,7 +60,7 @@
             <tr>
               <th style="width: 30%;">{% trans "fullname" %}</th>
               <th style="width: 30%;">{% trans "email" %}</th>
-              <th style="width: 20%;">{% trans "role" %}</th>
+              <th style="width: 20%;">{% trans "groups" %}</th>
               <th style="width: 20%;">{% trans "status" %}</th>
             </tr>
           </thead>
@@ -75,7 +69,7 @@
             <tr>
               <td>{{u.fullname}}</td>
               <td>{{u.email}}</td>
-              <td>{{u.role_names}}</td>
+              <td>{{u.group_names}}</td>
               <td>
                 {% if u.status == 0 %}
                   {% trans "pending" %}
