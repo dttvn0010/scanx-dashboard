@@ -12,9 +12,11 @@ def resizeProfileImage(imgField):
     sz = min(w, h, settings.PROFILE_IMAGE_SIZE)
 
     image_data = np.array(image)
-    if len(image_data.shape) == 3:
-        image_data = image_data[:,:,:3]
+    if len(image_data.shape) < 3:
+        return imgField
         
+    image_data = image_data[:,:,:3]
+
     if h > w:
         image_data = image_data[:w]
     
