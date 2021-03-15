@@ -150,7 +150,7 @@ class User(AbstractUser):
             return 'Reseller'
 
         if self.is_tenant_admin:
-            return 'Tenant Admin'
+            return 'Admin'
             
         return ','.join([group.name for group in self.groups.all()])
 

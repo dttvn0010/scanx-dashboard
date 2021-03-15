@@ -29,20 +29,25 @@
               </tr>         
             {%endif%}
             {{ form }}
+          
             <tr>
-              <th>{% trans "is.admin" %}:</th>
-              <td>
-                {% if lockAdmin %}
-                  <input type="checkbox" onclick="return false;" checked>
-                {% else %}
-                  <input type="checkbox" id='isTenantAdmin' name='isTenantAdmin' {%if edit_user.is_tenant_admin%} checked {% endif %}>
-                {%endif%}
-              </td>
-            </tr>
-
-            <tr id='groups'>
               <th>{% trans "groups" %} :</th>
               <td>
+                {% if lockAdmin %}
+                  <div class="mb-2">
+                    <span title="{% trans "admin.desc" %}" data-toggle="tooltip" data-placement="top">
+                      <input type="checkbox" onclick="return false;" checked> 
+                      Admin
+                    </span>
+                  </div>
+                {% else %}
+                  <div class="mb-2">
+                    <span title="{% trans "admin.desc" %}" data-toggle="tooltip" data-placement="top">
+                      <input type="checkbox" id='isTenantAdmin' name='isTenantAdmin' {%if edit_user.is_tenant_admin%} checked {% endif %}>
+                      Admin
+                    </span>
+                  </div>
+                {%endif%}
                 {% for group in allGroups %}
                   <div class="mb-2">
                     <span title="{{group.description|default:''}}" data-toggle="tooltip" data-placement="top">
@@ -51,9 +56,6 @@
                     </span>
                   </div>
                 {%endfor%}
-                {% if not allGroups %}
-                  <label>{% trans "no.group.please.create" %}</label>
-                {% endif %}
               </td>
             </tr>
           </table>
@@ -83,15 +85,16 @@
   $(document).ready(function(){
     $('[data-toggle="tooltip"]').tooltip();
     if('{{edit_user.is_tenant_admin}}' == 'True') {
-      $('#groups').hide();
+      $('.group-chkbox').attr('disabled', 'disabled');
     }
 
     $('#isTenantAdmin').click(function() {
       var checked = $(this).prop('checked');
       if(checked) {
-        $('#groups').hide();
+        $('.group-chkbox').prop('checked', false);
+        $('.group-chkbox').attr('disabled', 'disabled');
       }else {
-        $('#groups').show();
+        $('.group-chkbox').removeAttr('disabled');
       }
     });
   })

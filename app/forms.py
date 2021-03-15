@@ -56,7 +56,7 @@ class ForgotPasswordForm(forms.Form):
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
-        if User.objects.filter(username=email).count() == 0:
+        if User.objects.filter(username=email, status=User.Status.ACTIVE).count() == 0:
             raise forms.ValidationError(_('no.user.with.email.exist'))
 
         return email

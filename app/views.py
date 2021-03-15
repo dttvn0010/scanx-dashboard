@@ -109,7 +109,7 @@ def forgotPassword(request):
     if request.method == 'POST':
         form = ForgotPasswordForm(request.POST)
         if form.is_valid():
-            user = User.objects.get(username=form.cleaned_data.get('email'))
+            user = User.objects.get(username=form.cleaned_data.get('email'), status=User.Status.ACTIVE)
             user.tmpPassword = genPassword(20)
             user.tmpPasswordExpired = timezone.now() + timedelta(days=1)
             user.save()
@@ -135,6 +135,7 @@ def resetPassword(request):
     else:
         form = ResetPasswordForm(request.POST)
         if form.is_valid():
+            print('Pass=', form.cleaned_data['password'])
             user = User.objects.filter(username=form.cleaned_data['email']).first()
             user.password = make_password(form.cleaned_data['password'])
             user.tmpPassword = ''
@@ -143,6 +144,8 @@ def resetPassword(request):
             
             user = authenticate(username=user.username,
                                     password=form.cleaned_data['password'])
+
+            print('user=', user)
             login(request, user)
 
             return HttpResponseRedirect("/")

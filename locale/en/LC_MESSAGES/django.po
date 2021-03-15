@@ -1132,6 +1132,9 @@ msgstr ""
 "This user will have complete access to all features of Dashboard (can add/"
 "remove users etc.)"
 
+msgid "admin.desc"
+msgstr "This group has complete access to all features of Dashboard"
+
 #: .\app\templates\staff\users\list.html:20
 msgid "add.user"
 msgstr "Add User"
