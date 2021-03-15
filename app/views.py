@@ -150,7 +150,7 @@ def resetPassword(request):
             email = request.POST.get('email')
             return render(request, 'registration/reset_password.html', {'email': email, 'form': form})
 
-    
+@login_required
 def updateAccount(request):
     form = UpdateAccountForm(initial={
             'fullname': request.user.fullname
@@ -170,6 +170,7 @@ def updateAccount(request):
 
     return render(request, 'profile/update_account.html', {'form': form})
 
+@login_required
 def changePassword(request):
     form = ChangePasswordForm(initial={'user': request.user})
 
