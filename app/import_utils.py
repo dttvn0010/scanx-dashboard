@@ -8,7 +8,7 @@ fs = FileSystemStorage()
 TMP_PATH = 'tmp'
 
 def getPermutation(row, indexes):
-    return [row[i] for i in indexes]
+    return [row[i].strip() for i in indexes]
 
 def importPreview(request, header):
     if request.method == 'POST':
