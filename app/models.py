@@ -312,7 +312,7 @@ class TenantParameter(models.Model):
     value = models.CharField(max_length=500, null=True, blank=True)
 
     def __str__(self):
-        return self.name
+        return self.parameter.name if self.parameter else ''
 
     def getValue(self):
         if self.parameter and self.parameter.type == 'number':
