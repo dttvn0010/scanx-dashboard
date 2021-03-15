@@ -1284,3 +1284,6 @@ msgstr "Is Admin"
 
 msgid "no.group"
 msgstr "There is currently no group"
+
+msgid "no.group.please.create"
+msgstr "There is currently no group, please create groups in the Groups Link"

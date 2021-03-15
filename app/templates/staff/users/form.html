@@ -51,6 +51,9 @@
                     </span>
                   </div>
                 {%endfor%}
+                {% if not allGroups %}
+                  <label>{% trans "no.group.please.create" %}</label>
+                {% endif %}
               </td>
             </tr>
           </table>
