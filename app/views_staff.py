@@ -236,7 +236,7 @@ def importUser(request):
         
         for row in records:
             fullname, email = getPermutation(row, indexes)
-            if User.objects.filter(email=email).count() > 0 or User.objects.filter(fullname=fullname).count() > 0:
+            if User.objects.filter(email=email).count() > 0:
                 continue
 
             user = createTempUser(request, fullname, email) 
