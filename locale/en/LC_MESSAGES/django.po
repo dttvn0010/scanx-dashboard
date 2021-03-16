@@ -538,8 +538,8 @@ msgstr "Action"
 #: .\app\templates\staff\logs\details.html:81
 #: .\app\templates\staff\logs\list.html:27
 #: .\app\templates\staff\logs\list.html:86
-msgid "perform.by"
-msgstr "Perform By"
+msgid "performed.by"
+msgstr "Performed By"
 
 #: .\app\templates\_admin\logs\details.html:32
 #: .\app\templates\_admin\logs\details.html:49
