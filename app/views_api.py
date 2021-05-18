@@ -1043,7 +1043,7 @@ def searchDeviceByOrganization(request):
     data = DeviceSerializer(devices, many=True).data
 
     for item in data:
-        item['location'] = f'{item["addressLine1"]}, {item["addressLine2"]}, {item["city"]}, {item["postCode"]}'
+        item['location'] = f'{item["addressLine1"]}, {item["addressLine2"] or ""}, {item["city"]}, {item["postCode"]}'
         if item['location'].replace(',','').strip() == '':
             item['location'] = ''
     

@@ -198,7 +198,7 @@ class Location(models.Model):
     createdBy = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
-        return f'{self.addressLine1}, {self.addressLine2}, {self.city}, {self.postCode}'
+        return f'{self.addressLine1}, {self.addressLine2 or ""}, {self.city}, {self.postCode}'
 
 class Device(models.Model):
     class Status:
