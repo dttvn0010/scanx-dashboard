@@ -11,7 +11,7 @@ SMTP_PORT = 465
 SMTP_SERVER = "smtp.gmail.com"
 SENDER = "tracdisc <scanx.cloud@gmail.com>"
 GMAIL = "scanx.cloud@gmail.com"
-GMAIL_PASS = "abc@123@def"
+GMAIL_PASS = "n4us2njy1-"
 
 def sendMail2(to, subject, body):
 
