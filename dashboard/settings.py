@@ -191,9 +191,9 @@ INVITE_URL = HOST_URL + "/accounts/initial_setup"
 RESET_PASSWORD_URL = HOST_URL + "/accounts/reset_password"
 PROFILE_IMAGE_SIZE = 300
 
-POST_CODER_API_KEY = "PCWJ7-LXWC9-ZGHHK-LFD5B"
+POST_CODER_API_KEY = "*****"
 POST_CODER_API_URL = f"https://ws.postcoder.com/pcw/{POST_CODER_API_KEY}/address/UK/"
-GMAP_API = "AIzaSyAl-bO6JsKLkpOZ9tUEqMuy8Emt6Uds-yg"
+GMAP_API = "*****"
 GMAP_ADDRESS_API_URL = f"https://maps.googleapis.com/maps/api/geocode/json?key={GMAP_API}"
 
 MAX_CHECK_IN_DISTANCE = 1.0
